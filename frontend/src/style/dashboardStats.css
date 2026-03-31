@@ -1,0 +1,124 @@
+/* Container with glass effect */
+.ds-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 30px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.781);
+  color: #003366;
+  position: relative;
+}
+
+/* Section title */
+.ds-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+/* Grid Layout */
+.ds-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 25px;
+}
+
+/* Card */
+.ds-card {
+  background: rgba(255, 255, 255, 0.145);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 25px 20px 40px 20px;
+  text-align: center;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.671);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+}
+
+.ds-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+}
+
+/* Card title, value, description */
+.ds-card-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.ds-card-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #1565c0;
+  margin-bottom: 10px;
+}
+
+.ds-card-desc {
+  font-size: 0.95rem;
+  color: #333;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+/* Card internal button */
+.ds-btn-card {
+  display: inline-block;
+  background: #1565c0;
+  color: #fff;
+  padding: 10px 22px;
+  border-radius: 25px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.ds-btn-card:hover {
+  background: transparent;
+  border: 2px solid #1565c0;
+  color: #1565c0;
+}
+
+/* Floating bottom-right button */
+.ds-btn-floating {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background: #ffcc00;
+  color: #003366;
+  padding: 15px 30px;
+  border-radius: 30px;
+  font-weight: bold;
+  text-decoration: none;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.ds-btn-floating:hover {
+  background: #003366;
+  color: #ffcc00;
+  transform: translateY(-3px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .ds-container {
+    padding: 20px;
+  }
+
+  .ds-card-value {
+    font-size: 1.5rem;
+  }
+
+  .ds-btn-floating {
+    padding: 12px 25px;
+    font-size: 0.9rem;
+  }
+}

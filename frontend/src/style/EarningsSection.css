@@ -1,0 +1,82 @@
+.earnings-section {
+  margin-bottom: 2rem;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  font-weight: bold;
+}
+
+/* Top grid (4 cards) */
+.earnings-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Bottom grid (2 cards) */
+.earnings-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+/* Common card styling */
+.card {
+  background: #fff;
+  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.card-title {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.card-value {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.card-subtext {
+  font-size: 0.875rem;
+  color: #666;
+}
+
+.card-text {
+  font-size: 1rem;
+  margin: 0.5rem 0;
+}
+
+.text-green {
+  color: #16a34a;
+}
+
+.text-yellow {
+  color: #f59e0b;
+}
+
+.highlight {
+  font-weight: bold;
+  color: #2563eb;
+}
+
+/* Withdraw button */
+.withdraw-btn {
+  margin-top: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.withdraw-btn:hover {
+  background: #1e40af;
+}

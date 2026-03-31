@@ -1,0 +1,335 @@
+
+.roi-dashboard {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  padding: 16px;
+  max-width: 1400px;
+  margin: 80px auto;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  box-sizing: border-box;
+}
+
+.dashboard-header {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.dashboard-title {
+  font-size: clamp(1.5rem, 5vw, 2rem);
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 8px 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.dashboard-title .icon {
+  font-size: clamp(1.5rem, 4vw, 2rem);
+}
+
+.dashboard-subtitle {
+  color: #6b7280;
+  margin: 0;
+  font-size: clamp(0.875rem, 2.5vw, 1rem);
+  line-height: 1.5;
+}
+
+.dashboard-content {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.input-card, .metric-card, .chart-card {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-sizing: border-box;
+}
+
+.input-card:hover, .metric-card:hover, .chart-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.08);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.card-header h3 {
+  margin: 0;
+  color: #1f2937;
+  font-weight: 600;
+  font-size: clamp(1rem, 3vw, 1.125rem);
+}
+
+.card-icon {
+  font-size: clamp(1.25rem, 3vw, 1.5rem);
+}
+
+.input-group {
+  margin-bottom: 16px;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #374151;
+  font-size: clamp(0.875rem, 2.5vw, 1rem);
+}
+
+.input-field {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 16px; /* Fixed size for better mobile UX */
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  background: rgba(255, 255, 255, 0.6);
+  box-sizing: border-box;
+  min-height: 48px; /* Better touch target */
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+
+.calculate-btn {
+  width: 100%;
+  padding: 16px 20px;
+  background: #6366f1;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  min-height: 52px; /* Better touch target */
+}
+
+.calculate-btn:hover:not(:disabled) {
+  background: #4f46e5;
+}
+
+.calculate-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.calculate-btn.loading {
+  background: #818cf8;
+}
+
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid transparent;
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error-message {
+  background: #fef2f2;
+  color: #ef4444;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  border-left: 4px solid #ef4444;
+  font-size: clamp(0.875rem, 2.5vw, 1rem);
+}
+
+.results-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.metric-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+}
+
+.metric-icon {
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  flex-shrink: 0;
+}
+
+.metric-content h4 {
+  margin: 0 0 6px 0;
+  font-size: clamp(0.75rem, 2.5vw, 0.875rem);
+  font-weight: 500;
+  color: #6b7280;
+}
+
+.metric-value {
+  margin: 0;
+  font-size: clamp(1.125rem, 4vw, 1.5rem);
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+.chart-container {
+  height: 300px;
+  min-height: 250px;
+}
+
+.analysis-content {
+  padding: 12px 0;
+}
+
+.roi-analysis {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.analysis-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #e5e7eb;
+  flex-wrap: wrap;
+}
+
+.analysis-item:last-child {
+  border-bottom: none;
+}
+
+.analysis-label {
+  font-weight: 500;
+  color: #6b7280;
+  font-size: clamp(0.875rem, 2.5vw, 1rem);
+}
+
+.analysis-value {
+  font-weight: 600;
+  color: #1f2937;
+  font-size: clamp(0.875rem, 2.5vw, 1rem);
+}
+
+/* Medium screens (tablets) */
+@media (min-width: 768px) {
+  .roi-dashboard {
+    padding: 20px;
+  }
+  
+  .dashboard-content {
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  
+  .results-section {
+    grid-column: 1 / -1;
+  }
+  
+  .charts-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .metrics-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Large screens (desktops) */
+@media (min-width: 1024px) {
+  .dashboard-content {
+    grid-template-columns: 1fr 2fr;
+  }
+  
+  .results-section {
+    grid-column: auto;
+  }
+}
+
+/* Extra small devices */
+@media (max-width: 360px) {
+  .dashboard-header,
+  .input-card,
+  .metric-card,
+  .chart-card {
+    padding: 16px;
+  }
+  
+  .metric-card {
+    flex-direction: column;
+    text-align: center;
+    gap: 8px;
+  }
+  
+  .analysis-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+}
+
+/* Print styles */
+@media print {
+  .roi-dashboard {
+    background: white;
+    padding: 0;
+  }
+  
+  .dashboard-header,
+  .input-card,
+  .metric-card,
+  .chart-card {
+    background: white;
+    border: 1px solid #ddd;
+    box-shadow: none;
+    break-inside: avoid;
+  }
+  
+  .calculate-btn {
+    display: none;
+  }
+}

@@ -1,0 +1,346 @@
+/* src/style/AIHashtag.css */
+
+/* Main Container */
+.ai-hashtag-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: calc(100vh - 120px);
+  padding: 2rem 1rem;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Card Layout */
+.ai-hashtag-card {
+  background: white;
+  border-radius: 20px;
+  padding: 2.5rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 700px;
+  position: relative;
+  overflow: hidden;
+}
+
+.ai-hashtag-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: linear-gradient(90deg, #667eea, #2563eb, #f093fb);
+  border-radius: 10px 10px 0 0;
+}
+
+/* Header */
+.ai-hashtag-title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #2d3748;
+  margin-bottom: 0.5rem;
+  text-align: center;
+  background: linear-gradient(135deg, #667eea, #2563eb);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.ai-hashtag-subtitle {
+  color: #718096;
+  text-align: center;
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+  line-height: 1.5;
+}
+
+/* Textarea */
+.hashtag-textarea {
+  width: 100%;
+  padding: 1.2rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 120px;
+  transition: all 0.3s ease;
+  background: #fafafa;
+  margin-bottom: 1.5rem;
+}
+
+.hashtag-textarea:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+  background: white;
+}
+
+.hashtag-textarea::placeholder {
+  color: #a0aec0;
+}
+
+/* Generate Button */
+.generate-button {
+  width: 100%;
+  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, #667eea 0%, #2563eb 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.generate-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+}
+
+.generate-button:hover::before {
+  left: 100%;
+}
+
+.generate-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+}
+
+.generate-button:disabled {
+  background: #cbd5e0;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.generate-button:disabled::before {
+  display: none;
+}
+
+/* Error Message */
+.error-message {
+  background: #fed7d7;
+  color: #c53030;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-left: 4px solid #f56565;
+}
+
+/* Results Section */
+.hashtags-results {
+  background: #f7fafc;
+  border-radius: 16px;
+  padding: 1.5rem;
+  border: 1px solid #e2e8f0;
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.hashtags-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.hashtags-header h2 {
+  font-size: 1.4rem;
+  color: #2d3748;
+  margin: 0;
+  font-weight: 600;
+}
+
+/* Copy Button */
+.copy-button {
+  padding: 0.6rem 1.2rem;
+  background: #48bb78;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.copy-button:hover {
+  background: #38a169;
+  transform: translateY(-1px);
+}
+
+.copy-button:active {
+  transform: translateY(0);
+}
+
+/* Hashtags Container */
+.hashtags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  margin-top: 1rem;
+}
+
+.hashtag {
+  background: linear-gradient(135deg, #667eea, #2563eb);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.hashtag::before {
+  content: '#';
+  margin-right: 2px;
+  opacity: 0.8;
+}
+
+.hashtag:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.hashtag:active {
+  transform: translateY(0);
+}
+
+/* Loading Animation */
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+.generate-button:disabled {
+  animation: pulse 1.5s infinite;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .ai-hashtag-container {
+    padding: 1rem;
+  }
+  
+  .ai-hashtag-card {
+    padding: 1.5rem;
+    border-radius: 16px;
+  }
+  
+  .ai-hashtag-title {
+    font-size: 1.8rem;
+  }
+  
+  .ai-hashtag-subtitle {
+    font-size: 1rem;
+  }
+  
+  .hashtags-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .copy-button {
+    align-self: flex-end;
+  }
+}
+
+@media (max-width: 480px) {
+  .ai-hashtag-card {
+    padding: 1.2rem;
+  }
+  
+  .ai-hashtag-title {
+    font-size: 1.6rem;
+  }
+  
+  .generate-button {
+    padding: 0.8rem 1.2rem;
+    font-size: 1rem;
+  }
+  
+  .hashtag {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
+  }
+}
+
+/* Success Animation for Copy */
+@keyframes success {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.copy-button:active {
+  animation: success 0.3s ease;
+}
+
+/* Enhanced focus states for accessibility */
+.generate-button:focus,
+.copy-button:focus,
+.hashtag-textarea:focus {
+  outline: 2px solid #667eea;
+  outline-offset: 2px;
+}
+
+/* Dark mode support (optional) */
+@media (prefers-color-scheme: dark) {
+  .ai-hashtag-card {
+    background: #2d3748;
+    color: #e2e8f0;
+  }
+  
+  .ai-hashtag-title,
+  .hashtags-header h2 {
+    color: #e2e8f0;
+  }
+  
+  .ai-hashtag-subtitle {
+    color: #a0aec0;
+  }
+  
+  .hashtag-textarea {
+    background: #4a5568;
+    border-color: #4a5568;
+    color: #e2e8f0;
+  }
+  
+  .hashtag-textarea:focus {
+    background: #4a5568;
+    border-color: #667eea;
+  }
+  
+  .hashtags-results {
+    background: #4a5568;
+    border-color: #4a5568;
+  }
+}

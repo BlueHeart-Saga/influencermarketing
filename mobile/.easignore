@@ -1,0 +1,10 @@
+node_modules
+.git
+.expo
+android
+ios
+*.log
+*.zip
+*.mp4
+*.apk
+*.aab

@@ -1,0 +1,460 @@
+/* AvailableCampaigns.css */
+
+/* Global Styles */
+.campaigns-container {
+  padding: 2rem;
+}
+
+@media (max-width: 768px) {
+  .campaigns-container {
+    padding: 1rem;
+  }
+}
+
+/* Header Styles */
+.campaigns-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .campaigns-header {
+    flex-direction: row;
+    gap: 0;
+  }
+}
+
+.header-content {
+  text-align: center;
+}
+
+@media (min-width: 768px) {
+  .header-content {
+    text-align: left;
+  }
+}
+
+.page-title {
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(45deg, #2C3E50 30%, #3498DB 90%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.page-subtitle {
+  color: #666;
+}
+
+.refresh-btn {
+  border-radius: 8px;
+  min-width: 120px;
+}
+
+/* Alert Styles */
+.error-alert,
+.success-alert {
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+}
+
+/* Search and Filter Styles */
+.search-filter-card {
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.search-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-direction: column;
+}
+
+@media (min-width: 768px) {
+  .search-container {
+    flex-direction: row;
+  }
+}
+
+.search-field {
+  flex: 1;
+}
+
+.search-field .MuiOutlinedInput-root {
+  border-radius: 8px;
+}
+
+.filter-toggle-btn,
+.clear-filters-btn {
+  border-radius: 8px;
+  min-width: auto;
+  white-space: nowrap;
+}
+
+.filter-content {
+  padding-top: 1rem;
+}
+
+.filter-select .MuiOutlinedInput-root {
+  border-radius: 8px;
+}
+
+.budget-filter {
+  padding: 1rem 0;
+}
+
+.budget-slider {
+  margin-top: 0.5rem;
+}
+
+.results-counter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e0e0e0;
+}
+
+.results-text {
+  color: #666;
+}
+
+.filters-active-chip {
+  font-weight: 500;
+}
+
+/* Loading Styles */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 400px;
+  flex-direction: column;
+}
+
+.loading-text {
+  margin-top: 1rem;
+  color: #666;
+}
+
+/* Empty State Styles */
+.empty-state {
+  text-align: center;
+  padding: 3rem 2rem;
+  background-color: #f8f9fa;
+  border-radius: 12px;
+  border: 2px dashed #dee2e6;
+}
+
+.empty-icon {
+  font-size: 60px;
+  color: #adb5bd;
+  margin-bottom: 1rem;
+}
+
+.empty-title {
+  color: #666;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.empty-description {
+  color: #666;
+  max-width: 400px;
+  margin: 0 auto 1.5rem;
+  line-height: 1.5;
+}
+
+.empty-action-btn {
+  border-radius: 8px;
+}
+
+/* Campaign Card Styles */
+.campaign-card-content {
+  flex-grow: 1;
+  padding: 1.5rem;
+}
+
+.campaign-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+}
+
+.campaign-title {
+  font-weight: 600;
+  margin-right: 0.5rem;
+  flex: 1;
+}
+
+.brand-name {
+  color: #666;
+  margin-bottom: 1rem;
+}
+
+.campaign-description {
+  display: -webkit-box;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-bottom: 1rem;
+  line-height: 1.5;
+  color: #333;
+}
+
+.campaign-stats {
+  margin-bottom: 1rem;
+}
+
+.stat-text {
+  color: #333;
+}
+
+.requirements-text {
+  color: #666;
+  display: block;
+  margin-top: 0.5rem;
+  font-style: italic;
+}
+
+.campaign-actions {
+  padding: 1rem 1.5rem;
+  padding-top: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.view-details-btn {
+  border-radius: 8px;
+}
+
+.apply-btn {
+  margin-left: auto;
+  min-width: 80px;
+}
+
+/* Dialog Styles */
+.details-dialog,
+.application-dialog {
+  border-radius: 12px;
+}
+
+.dialog-header {
+  background-color: #1976d2;
+  color: white;
+  font-weight: 600;
+  padding: 1.5rem 2rem;
+}
+
+.dialog-content {
+  padding: 2rem;
+}
+
+.detail-title {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.detail-brand {
+  color: #666;
+  margin-bottom: 1rem;
+}
+
+.detail-status {
+  margin-bottom: 1.5rem;
+}
+
+.detail-description {
+  margin-bottom: 2rem;
+  line-height: 1.6;
+  color: #333;
+}
+
+.detail-grid {
+  margin-top: 1rem;
+}
+
+.detail-text {
+  color: #333;
+}
+
+.requirements-section {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e0e0e0;
+}
+
+.requirements-title {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.requirements-content {
+  color: #666;
+  line-height: 1.5;
+}
+
+.dialog-actions {
+  padding: 1rem 2rem;
+  gap: 1rem;
+}
+
+.close-btn,
+.cancel-btn {
+  border-radius: 8px;
+}
+
+.apply-now-btn,
+.submit-btn {
+  border-radius: 8px;
+  min-width: 120px;
+}
+
+/* Application Dialog Specific Styles */
+.application-brand {
+  color: #666;
+  margin-bottom: 1.5rem;
+}
+
+.message-field .MuiOutlinedInput-root {
+  border-radius: 8px;
+}
+
+.message-tip {
+  color: #666;
+  display: block;
+  margin-top: 0.5rem;
+  font-style: italic;
+}
+
+/* Animation and Hover Effects */
+.campaign-card {
+  transition: all 0.3s ease;
+}
+
+.campaign-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Utility Classes */
+.text-gradient {
+  background: linear-gradient(45deg, #2C3E50 30%, #3498DB 90%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+.shadow-soft {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.border-radius-md {
+  border-radius: 8px;
+}
+
+.border-radius-lg {
+  border-radius: 12px;
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+  .campaigns-container {
+    padding: 0.5rem;
+  }
+  
+  .page-title {
+    font-size: 1.8rem;
+  }
+  
+  .campaign-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .campaign-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .apply-btn {
+    margin-left: 0;
+    margin-top: 0.5rem;
+  }
+  
+  .dialog-content {
+    padding: 1rem;
+  }
+  
+  .dialog-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .close-btn,
+  .cancel-btn,
+  .apply-now-btn,
+  .submit-btn {
+    width: 100%;
+    margin: 0.25rem 0;
+  }
+}
+
+/* Focus States */
+/* .MuiButton-root:focus,
+.MuiIconButton-root:focus,
+.MuiTextField-root .MuiOutlinedInput-root:focus {
+  outline: 2px solid #1976d2;
+  outline-offset: 2px;
+} */
+
+/* Loading Animation */
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.MuiCircularProgress-root {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Custom Scrollbar for Dialog Content */
+.dialog-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dialog-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.dialog-content::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.dialog-content::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}

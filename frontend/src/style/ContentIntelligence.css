@@ -1,0 +1,184 @@
+/* Container */
+.ci-container {
+  max-width: 1400px;
+  margin: auto auto;
+  padding: 2rem;
+  font-family: "Segoe UI", sans-serif;
+  color: #333;
+}
+
+/* Header */
+.ci-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.ci-title {
+  font-size: 2.2rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  color: #111;
+}
+
+.ci-subtitle {
+  font-size: 1.1rem;
+  color: #555;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+/* Stats */
+.ci-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.ci-stat-card {
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.ci-stat-card h3 {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #16a34a;
+}
+
+.ci-stat-card p {
+  margin-top: 0.4rem;
+  color: #666;
+}
+
+/* Features */
+.ci-section {
+  margin-bottom: 3rem;
+}
+
+.ci-section-title {
+  font-size: 1.6rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.ci-feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.ci-feature-card {
+  background: #fff;
+  padding: 1.5rem;
+  border-radius: 12px;
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid #eee;
+}
+
+.ci-feature-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+.ci-icon {
+  font-size: 2rem;
+  margin-bottom: 0.8rem;
+}
+
+/* Suggestions */
+.ci-suggestions {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.ci-suggestion-card {
+  background: #f9fafb;
+  border: 1px solid #ddd;
+  padding: 1.2rem;
+  border-radius: 10px;
+  transition: background 0.3s ease;
+}
+
+.ci-suggestion-card:hover {
+  background: #f3f4f6;
+}
+
+.ci-suggestion-card h4 {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Call to Action */
+.ci-cta {
+  background: linear-gradient(135deg, #16a34a, #15803d);
+  padding: 2.5rem 1.5rem;
+  border-radius: 16px;
+  text-align: center;
+  color: #fff;
+  margin-top: 3rem;
+}
+
+.ci-cta h2 {
+  font-size: 1.8rem;
+  margin-bottom: 0.8rem;
+}
+
+.ci-cta p {
+  max-width: 600px;
+  margin: 0 auto 1.5rem;
+  opacity: 0.9;
+}
+
+.ci-cta-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.ci-btn {
+  padding: 0.8rem 1.6rem;
+  font-size: 1rem;
+  font-weight: 500;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.ci-btn-primary {
+  background: #fff;
+  color: #16a34a;
+  border: none;
+}
+
+.ci-btn-primary:hover {
+  background: #f0fdf4;
+}
+
+.ci-btn-secondary {
+  background: transparent;
+  border: 2px solid #fff;
+  color: #fff;
+}
+
+.ci-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .ci-title {
+    font-size: 1.8rem;
+  }
+
+  .ci-subtitle {
+    font-size: 1rem;
+  }
+}

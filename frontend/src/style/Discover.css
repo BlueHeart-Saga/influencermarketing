@@ -1,0 +1,220 @@
+/* Discover.css */
+
+.discover-container {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  font-family: 'Inter', sans-serif;
+  color: #ffffff;
+}
+
+.discover-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  color: #ececec;
+}
+
+/* Filter Bar */
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.search-input,
+.filter-select {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  box-shadow: 0 0 0 2px rgba(37, 100, 235, 0.814);
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+.search-input:focus,
+.filter-select:focus {
+  border-color: #2563eb;
+  outline: none;
+  box-shadow: 0 0 0 2px rgb(44, 44, 44);
+}
+
+/* Loading & Empty */
+.loading-text,
+.empty-text {
+  font-size: 1rem;
+  color: #6b7280;
+  text-align: center;
+  margin-top: 2rem;
+}
+
+/* Grid */
+.influencer-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Cards */
+.influencer-card {
+  background-color: #ffffff25;
+  border-radius: 12px;
+  overflow: hidden;
+  padding: 1rem;
+  box-shadow: 0 2px 6px rgb(0, 0, 0);
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.influencer-card:hover {
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  transform: translateY(-3px);
+}
+
+/* Avatar / Image */
+.influencer-img,
+.influencer-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: #fff;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.influencer-img {
+  object-fit: cover;
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.801);
+}
+
+/* Text */
+.influencer-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+  color: #111827;
+}
+
+.influencer-niche,
+.influencer-location,
+.influencer-followers {
+  font-size: 0.9rem;
+  color: #000000;
+  margin: 0.15rem 0;
+  font-weight: 600;
+}
+
+/* Show More Button */
+.show-more-wrapper {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.show-more-btn {
+  padding: 0.6rem 1.5rem;
+  background-color: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.show-more-btn:hover {
+  background-color: #1e40af;
+  transform: translateY(-2px);
+}
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+  .filter-bar {
+    flex-direction: column;
+  }
+}
+
+
+
+/* this or that */
+
+
+
+
+
+/* .discover-page {
+  padding: 20px;
+  font-family: "Segoe UI", sans-serif;
+}
+
+h2 {
+  margin-bottom: 20px;
+  color: #111827;
+}
+
+.filter-bar {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.filter-bar select,
+.filter-bar input {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  outline: none;
+}
+
+.cards-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.influencer-card {
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 15px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.influencer-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.influencer-card img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  margin-bottom: 10px;
+}
+
+.influencer-card h3 {
+  margin: 8px 0;
+  font-size: 1.1rem;
+  color: #111827;
+}
+
+.influencer-card p {
+  font-size: 0.9rem;
+  color: #6b7280;
+  margin-bottom: 10px;
+}
+
+.influencer-card a {
+  text-decoration: none;
+  color: #3b82f6;
+  font-weight: 500;
+} */

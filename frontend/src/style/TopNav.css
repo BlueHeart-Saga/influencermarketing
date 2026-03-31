@@ -1,0 +1,60 @@
+/* Top Navbar */
+.top-nav {
+  position: absolute;
+  top: 20px;
+    right: 2%;
+  display: flex;
+  gap: 8px;
+  background: #ffffff;
+  padding: 6px;
+  border-radius: 14px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+  z-index: 10;
+}
+
+/* Nav Items */
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: #4b5563;
+  transition: all 0.25s ease;
+}
+
+.nav-item svg {
+  font-size: 18px;
+}
+
+/* Hover */
+.nav-item:hover {
+  background: #f3f4f6;
+}
+
+/* Active */
+.nav-item.active {
+  background: #e6f7f5;
+  color: #0d9488;
+  font-weight: 600;
+}
+
+.nav-item.active svg {
+  color: #0d9488;
+}
+
+/* Upgrade Highlight */
+.nav-item.upgrade {
+  color: #374151;
+  font-weight: 600;
+}
+
+.nav-item.upgrade:hover {
+  background: #fff7ed;
+  color: #ea580c;
+}

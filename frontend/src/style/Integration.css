@@ -1,0 +1,109 @@
+/* Container */
+.id-container {
+  width: 100%;
+  margin: 0;
+  padding: 2rem;
+  background: rgb(255, 255, 255);
+}
+
+/* Title & subtitle */
+.id-title {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #1a1a1a;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.id-subtitle {
+  color: #666;
+  text-align: center;
+  margin-bottom: 2rem;
+  font-size: 1rem;
+}
+
+/* Grid Layout */
+.id-integration-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Card */
+.id-card {
+  background: #fff;
+  border: 1px solid #e5e5e5;
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.id-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* Icons */
+.id-icon {
+  font-size: 2rem;
+  color: #0070f3;
+  margin-bottom: 1rem;
+}
+
+/* Titles */
+.id-card-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+/* Status */
+.id-card-status {
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+}
+
+.id-status {
+  font-weight: bold;
+}
+
+.id-connected {
+  color: #16a34a; /* green */
+}
+
+.id-disconnected {
+  color: #dc2626; /* red */
+}
+
+/* Buttons */
+.id-btn {
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.id-btn-connect {
+  background: #2563eb;
+  color: #fff;
+}
+
+.id-btn-connect:hover {
+  background: #1d4ed8;
+}
+
+.id-btn-manage {
+  background: #f3f4f6;
+  color: #111;
+  border: 1px solid #ddd;
+}
+
+.id-btn-manage:hover {
+  background: #e5e7eb;
+}

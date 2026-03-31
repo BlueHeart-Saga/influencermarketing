@@ -1,0 +1,75 @@
+.welcome-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 40px 50px;
+  /* background-image: url('../../public/images/bg1.jpg');
+  background-size: cover;
+  background-position: center; */
+  border-radius: 16px;
+  color: #fff;
+  margin: 30px auto;
+  max-width: 1200px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.welcome-content h1 {
+  font-size: 2rem;
+  margin-bottom: 12px;
+  font-weight: 700;
+}
+
+.welcome-content p {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 20px;
+  max-width: 480px;
+  line-height: 1.6;
+  color: #f7f7f7;
+}
+
+.access-btn {
+  text-decoration: none;
+  background-color: #1d4ed8;
+  color: #fff;
+  padding: 12px 28px;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.access-btn:hover {
+  background-color: #2563eb;
+}
+
+.welcome-image img {
+  max-width: 220px;
+  width: 100%;
+  animation: awc-float 3s ease-in-out infinite;
+}
+
+/* Floating animation for the image */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-12px); }
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .welcome-card {
+    flex-direction: column;
+    text-align: center;
+    padding: 30px 20px;
+    gap: 25px;
+  }
+
+  .welcome-image img {
+    max-width: 180px;
+  }
+
+  .welcome-content h1 {
+    font-size: 1.6rem;
+  }
+}

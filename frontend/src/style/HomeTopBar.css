@@ -1,0 +1,135 @@
+.hometopbar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 24px;
+  background: rgba(255, 255, 255, 0.55);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  margin: 10px 20px;
+  position: sticky;
+  top: 80px;
+  z-index: 100;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+/* Logo */
+.hometopbar-logo a {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1d4ed8;
+  text-decoration: none;
+}
+.hometopbar-logo a:hover {
+  color: #2563eb;
+}
+
+/* CTA */
+.hometopbar-cta {
+  flex-grow: 1;
+  text-align: center;
+}
+.cta-btn {
+  background: linear-gradient(90deg, #1d4ed8, #3b82f6);
+  color: #fff;
+  padding: 8px 20px;
+  border-radius: 25px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.cta-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(29, 78, 216, 0.3);
+}
+
+/* Nav Buttons */
+.hometopbar-nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.hometopbar-btn,
+.hometopbar-btn-outline {
+  padding: 6px 16px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: 0.3s;
+}
+.hometopbar-btn {
+  background-color: #1d4ed8;
+  color: #fff;
+}
+.hometopbar-btn:hover {
+  background-color: #2563eb;
+}
+.hometopbar-btn-outline {
+  background-color: transparent;
+  color: #1d4ed8;
+  border: 1.5px solid #1d4ed8;
+}
+.hometopbar-btn-outline:hover {
+  background-color: #1d4ed8;
+  color: #fff;
+}
+
+/* Welcome text */
+.hometopbar-welcome {
+  font-weight: 500;
+  color: #1f2937;
+}
+
+/* --- Mobile Menu --- */
+.hometopbar-menu-toggle {
+  display: none;
+  font-size: 22px;
+  color: #1d4ed8;
+  cursor: pointer;
+}
+
+@media (max-width: 900px) {
+  .hometopbar-container {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .hometopbar-cta {
+    order: 3;
+    width: 100%;
+    text-align: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .hometopbar-menu-toggle {
+    display: block;
+  }
+
+  .hometopbar-nav {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    margin-top: 10px;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 8px;
+    padding: 12px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+  }
+
+  .hometopbar-nav.open {
+    display: flex;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .hometopbar-cta {
+    order: 3;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+}

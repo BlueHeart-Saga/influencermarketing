@@ -1,0 +1,286 @@
+/* BrandCreateCampaign.css */
+.brand-campaign-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+}
+
+.brand-campaign-tiny-container {
+  max-width: 800px;
+  margin: 0 auto;
+  background: #2563eb;
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.brand-campaign-ai-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.2) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.15) 0%, transparent 50%);
+  animation: brandCampaignAiPulse 8s ease-in-out infinite;
+}
+
+@keyframes brandCampaignAiPulse {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.02); }
+}
+
+.brand-campaign-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-radius: 16px;
+  padding: 30px;
+  margin-bottom: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.brand-campaign-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+.brand-campaign-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.brand-campaign-avatar {
+  width: 70px;
+  height: 70px;
+  margin: 0 auto 15px;
+  background: linear-gradient(135deg, #3498DB 0%, #2C3E50 100%);
+  box-shadow: 0 8px 25px rgba(52, 152, 219, 0.3);
+}
+
+.brand-campaign-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #2C3E50 0%, #3498DB 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 10px;
+}
+
+.brand-campaign-subtitle {
+  font-size: 1.1rem;
+  color: #6c757d;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.brand-campaign-stepper {
+  margin-bottom: 40px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+}
+
+.brand-campaign-form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.brand-campaign-field-group {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 15px;
+}
+
+.brand-campaign-field {
+  width: 100%;
+  margin-bottom: 0 !important;
+}
+
+.brand-campaign-textarea {
+  min-height: 120px;
+  resize: vertical;
+  
+}
+
+.brand-campaign-ai-section {
+  background: #2563eb;
+  color: white;
+  border-radius: 16px;
+  padding: 25px;
+  margin-bottom: 25px;
+  position: relative;
+  overflow: hidden;
+}
+
+.brand-campaign-ai-glow {
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(
+    from 0deg,
+    transparent,
+    rgba(168, 239, 255, 0.1),
+    transparent 30%
+  );
+  animation: brandCampaignRotate 4s linear infinite;
+}
+
+@keyframes brandCampaignRotate {
+  100% { transform: rotate(360deg); }
+}
+
+.brand-campaign-media-upload {
+  border: 2px dashed #e0e0e0;
+  border-radius: 12px;
+  padding: 30px;
+  text-align: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.brand-campaign-media-upload:hover {
+  border-color: #3498DB;
+  background: rgba(52, 152, 219, 0.05);
+}
+
+.brand-campaign-preview-image {
+  max-width: 100%;
+  max-height: 200px;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  margin-top: 15px;
+}
+
+.brand-campaign-summary-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.brand-campaign-summary-item:last-child {
+  border-bottom: none;
+}
+
+.brand-campaign-navigation {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-top: 30px;
+}
+
+.brand-campaign-button {
+  padding: 12px 24px !important;
+  border-radius: 10px !important;
+  font-weight: 600 !important;
+  text-transform: none !important;
+  transition: all 0.3s ease !important;
+}
+
+.brand-campaign-button-primary {
+  background: linear-gradient(135deg, #3498DB 0%, #2C3E50 100%) !important;
+  color: white !important;
+}
+
+.brand-campaign-button-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(52, 152, 219, 0.3) !important;
+}
+
+.brand-campaign-success-screen {
+  text-align: center;
+  padding: 40px 20px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 20px;
+  backdrop-filter: blur(20px);
+}
+
+.brand-campaign-success-animation {
+  animation: brandCampaignSuccessBounce 1s ease-in-out;
+}
+
+@keyframes brandCampaignSuccessBounce {
+  0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+  40% {transform: translateY(-10px);}
+  60% {transform: translateY(-5px);}
+}
+
+/* Responsive Design */
+@media (min-width: 768px) {
+  .brand-campaign-form-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .brand-campaign-field-group {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .brand-campaign-media-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 767px) {
+  .brand-campaign-tiny-container {
+    padding: 20px 15px;
+    margin: 10px;
+  }
+  
+  .brand-campaign-card {
+    padding: 20px;
+  }
+  
+  .brand-campaign-title {
+    font-size: 2rem;
+  }
+  
+  .brand-campaign-navigation {
+    grid-template-columns: 1fr;
+  }
+  
+  .brand-campaign-button {
+    width: 100%;
+  }
+}
+
+/* Loading Animation */
+.brand-campaign-loading {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid #ffffff;
+  border-radius: 50%;
+  border-top-color: transparent;
+  animation: brandCampaignSpin 1s ease-in-out infinite;
+}
+
+@keyframes brandCampaignSpin {
+  to { transform: rotate(360deg); }
+}
+
+/* Chip Styles */
+.brand-campaign-chip {
+  border-radius: 20px !important;
+  font-weight: 600 !important;
+  margin: 4px !important;
+}
+
+/* Alert Styles */
+.brand-campaign-alert {
+  border-radius: 12px !important;
+  margin-bottom: 20px !important;
+  backdrop-filter: blur(10px);
+}

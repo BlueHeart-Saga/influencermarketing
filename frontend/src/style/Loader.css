@@ -1,0 +1,530 @@
+/* Loader.css - Premium White & Blue Theme */
+.loader-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #ffffff 0%, #f8faff 50%, #f0f4ff 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  overflow: hidden;
+  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+/* Premium Background Elements */
+.premium-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.geometric-shape {
+  position: absolute;
+  border: 1px solid rgba(59, 130, 246, 0.1);
+  border-radius: 8px;
+  animation: floatGeometric 20s ease-in-out infinite;
+}
+
+.shape-1 {
+  width: 80px;
+  height: 80px;
+  top: 15%;
+  left: 10%;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, transparent 100%);
+  animation-delay: 0s;
+}
+
+.shape-2 {
+  width: 120px;
+  height: 120px;
+  top: 65%;
+  right: 8%;
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.03) 0%, transparent 100%);
+  animation-delay: 5s;
+}
+
+.shape-3 {
+  width: 60px;
+  height: 60px;
+  bottom: 20%;
+  left: 15%;
+  background: linear-gradient(135deg, rgba(29, 78, 216, 0.04) 0%, transparent 100%);
+  animation-delay: 10s;
+}
+
+.floating-orb {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
+  animation: floatOrb 15s ease-in-out infinite;
+}
+
+.orb-1 {
+  width: 150px;
+  height: 150px;
+  top: 10%;
+  right: 15%;
+  animation-delay: 0s;
+}
+
+.orb-2 {
+  width: 100px;
+  height: 100px;
+  bottom: 15%;
+  left: 20%;
+  animation-delay: 7s;
+}
+
+.grid-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    linear-gradient(rgba(59, 130, 246, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(59, 130, 246, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+  animation: gridPulse 8s ease-in-out infinite;
+}
+
+/* Main Content */
+.loader-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  z-index: 2;
+  gap: 3rem;
+  padding: 2rem;
+}
+
+/* Premium Logo Container */
+.premium-logo-container {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.logo-wrapper {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 140px;
+  height: 140px;
+}
+
+/* Premium Logo Styles */
+.premium-logo {
+  width: 80px;
+  height: 80px;
+  border-radius: 20px;
+  animation: premiumLogoSpin 4s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+  box-shadow: 
+    0 8px 32px rgba(59, 130, 246, 0.15),
+    0 2px 8px rgba(59, 130, 246, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  position: relative;
+  z-index: 3;
+  background: white;
+}
+
+.premium-default-logo {
+  width: 80px;
+  height: 80px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.logo-inner-glow {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+  animation: innerGlow 3s ease-in-out infinite;
+}
+
+.logo-center-dot {
+  width: 16px;
+  height: 16px;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+}
+
+/* Premium Rings */
+.premium-ring {
+  position: absolute;
+  border: 2px solid transparent;
+  border-radius: 50%;
+  background: linear-gradient(135deg, transparent, transparent),
+              linear-gradient(135deg, #3b82f6, #1d4ed8);
+  background-clip: padding-box, border-box;
+  background-origin: padding-box, border-box;
+  animation: premiumPulse 3s ease-out infinite;
+}
+
+.premium-ring-1 {
+  width: 100px;
+  height: 100px;
+  animation-delay: 0s;
+}
+
+.premium-ring-2 {
+  width: 130px;
+  height: 130px;
+  animation-delay: 1s;
+}
+
+.premium-ring-3 {
+  width: 160px;
+  height: 160px;
+  animation-delay: 2s;
+}
+
+/* Premium Loading Text */
+.premium-loading-text {
+  text-align: center;
+  color: #1f2937;
+}
+
+.premium-title {
+  font-size: 2.75rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.025em;
+}
+
+.premium-subtitle {
+  font-size: 1.125rem;
+  color: #6b7280;
+  margin-bottom: 2.5rem;
+  font-weight: 400;
+  letter-spacing: 0.025em;
+}
+
+/* Premium Progress */
+.premium-progress {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.progress-track {
+  width: 280px;
+  height: 6px;
+  background: #e5e7eb;
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.progress-fill {
+  height: 100%;
+  width: 45%;
+  background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+  border-radius: 3px;
+  animation: premiumProgress 2.5s ease-in-out infinite;
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+}
+
+.progress-steps {
+  display: flex;
+  gap: 12px;
+}
+
+.step {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #d1d5db;
+  transition: all 0.3s ease;
+  animation: stepPulse 2s ease-in-out infinite;
+}
+
+.step.active {
+  background: #3b82f6;
+  transform: scale(1.2);
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.6);
+}
+
+.step:nth-child(1) { animation-delay: 0s; }
+.step:nth-child(2) { animation-delay: 0.5s; }
+.step:nth-child(3) { animation-delay: 1s; }
+.step:nth-child(4) { animation-delay: 1.5s; }
+
+/* Premium Status Bar */
+.premium-status-bar {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1rem 2rem;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(59, 130, 246, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.05);
+}
+
+.status-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+  animation: statusPulse 2s ease-in-out infinite;
+}
+
+.status-text {
+  font-size: 0.875rem;
+  color: #4b5563;
+  font-weight: 500;
+}
+
+.status-divider {
+  width: 1px;
+  height: 20px;
+  background: linear-gradient(to bottom, transparent, #e5e7eb, transparent);
+}
+
+/* Animations */
+@keyframes premiumLogoSpin {
+  0% {
+    transform: rotate(0deg) scale(1);
+    box-shadow: 
+      0 8px 32px rgba(59, 130, 246, 0.15),
+      0 2px 8px rgba(59, 130, 246, 0.1);
+  }
+  50% {
+    transform: rotate(180deg) scale(1.05);
+    box-shadow: 
+      0 12px 48px rgba(59, 130, 246, 0.25),
+      0 4px 16px rgba(59, 130, 246, 0.15);
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+    box-shadow: 
+      0 8px 32px rgba(59, 130, 246, 0.15),
+      0 2px 8px rgba(59, 130, 246, 0.1);
+  }
+}
+
+@keyframes premiumPulse {
+  0% {
+    transform: scale(0.8);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.4);
+    opacity: 0;
+  }
+}
+
+@keyframes floatGeometric {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  33% {
+    transform: translateY(-20px) rotate(90deg);
+  }
+  66% {
+    transform: translateY(10px) rotate(180deg);
+  }
+}
+
+@keyframes floatOrb {
+  0%, 100% {
+    transform: translateY(0) translateX(0) scale(1);
+  }
+  25% {
+    transform: translateY(-30px) translateX(15px) scale(1.1);
+  }
+  50% {
+    transform: translateY(-15px) translateX(-10px) scale(0.9);
+  }
+  75% {
+    transform: translateY(20px) translateX(20px) scale(1.05);
+  }
+}
+
+@keyframes gridPulse {
+  0%, 100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+@keyframes innerGlow {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+@keyframes premiumProgress {
+  0% {
+    transform: translateX(-100%);
+  }
+  50% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes stepPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 1;
+  }
+}
+
+@keyframes statusPulse {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+  }
+  50% {
+    opacity: 0.7;
+    box-shadow: 0 0 0 8px rgba(16, 185, 129, 0);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .logo-wrapper {
+    width: 120px;
+    height: 120px;
+  }
+  
+  .premium-logo {
+    width: 70px;
+    height: 70px;
+  }
+  
+  .premium-title {
+    font-size: 2.25rem;
+  }
+  
+  .premium-subtitle {
+    font-size: 1rem;
+  }
+  
+  .progress-track {
+    width: 240px;
+  }
+  
+  .premium-status-bar {
+    padding: 0.875rem 1.5rem;
+    gap: 1rem;
+  }
+  
+  .premium-ring-1 {
+    width: 90px;
+    height: 90px;
+  }
+  
+  .premium-ring-2 {
+    width: 110px;
+    height: 110px;
+  }
+  
+  .premium-ring-3 {
+    width: 130px;
+    height: 130px;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .premium-logo,
+  .premium-ring,
+  .geometric-shape,
+  .floating-orb,
+  .progress-fill,
+  .step,
+  .status-dot {
+    animation: none;
+  }
+  
+  .premium-logo {
+    animation: premiumLogoSpin 8s linear infinite;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .loader-container {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+  }
+  
+  .premium-loading-text {
+    color: #f8fafc;
+  }
+  
+  .premium-subtitle {
+    color: #cbd5e1;
+  }
+  
+  .progress-track {
+    background: #475569;
+  }
+  
+  .step {
+    background: #64748b;
+  }
+  
+  .premium-status-bar {
+    background: rgba(30, 41, 59, 0.8);
+    border-color: rgba(59, 130, 246, 0.2);
+  }
+  
+  .status-text {
+    color: #e2e8f0;
+  }
+  
+  .status-divider {
+    background: linear-gradient(to bottom, transparent, #475569, transparent);
+  }
+}

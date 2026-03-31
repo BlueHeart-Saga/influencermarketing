@@ -1,0 +1,172 @@
+.brand-workflow-container.vertical-mode {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: left;
+}
+
+.workflow-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+/* Vertical Progress Bar */
+.progress-container {
+  position: relative;
+  width: 20px;
+  height: 300px;
+  background: #e5e7eb;
+  border-radius: 12px;
+  margin: 0 auto 2rem auto;
+}
+.progress-bar {
+  width: 100%;
+  background: #1d4ed8;
+  border-radius: 12px;
+  position: absolute;
+  bottom: 0;
+  transition: height 0.5s ease;
+}
+.progress-text {
+  position: absolute;
+  top: 50%;
+  left: 30px;
+  transform: translateY(-50%);
+  font-weight: 600;
+  color: #1d4ed8;
+}
+
+/* Steps vertical layout */
+.steps-vertical-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  max-height: 600px;
+  overflow-y: hidden; /* hide scrollbar */
+  scroll-behavior: smooth;
+  position: relative;
+  padding-left: 50px;
+}
+
+.workflow-step-card-vertical {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  position: relative;
+  cursor: pointer;
+}
+
+.step-icon-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.vertical-line {
+  width: 4px;
+  flex-grow: 1;
+  background: #1d4ed8;
+  margin-top: 0.5rem;
+  border-radius: 2px;
+}
+
+.step-icon {
+  font-size: 2rem;
+  color: #1d4ed8;
+  z-index: 1;
+}
+
+.step-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.step-tooltip {
+  background: #1d4ed8;
+  color: #fff;
+  padding: 0.5rem;
+  font-size: 0.85rem;
+  border-radius: 8px;
+  margin-top: 0.5rem;
+  width: 250px;
+  text-align: left;
+}
+
+.step-complete-icon {
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  font-size: 1.5rem;
+  color: green;
+}
+
+/* BrandWorkflow.css */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(102, 126, 234, 0.6);
+  }
+}
+
+.workflow-step-card-vertical {
+  animation: glow 3s ease-in-out infinite;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .workflow-container {
+    padding: 1rem;
+  }
+  
+  .glass-card {
+    padding: 1.5rem;
+  }
+  
+  .progress-ring {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .progress-ring::before {
+    width: 60px;
+    height: 60px;
+  }
+}
+
+/* Custom scrollbar */
+.steps-vertical-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.steps-vertical-container::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+}
+
+.steps-vertical-container::-webkit-scrollbar-thumb {
+  background: #2563eb;
+  border-radius: 10px;
+}

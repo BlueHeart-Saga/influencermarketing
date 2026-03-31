@@ -1,0 +1,751 @@
+/* InstagramCollaborations.css */
+.instagram-collaborations {
+  background: linear-gradient(135deg, #fafafa 0%, #f0f0f0 100%);
+  min-height: 100vh;
+  padding: 0;
+}
+
+.instagram-header {
+  background: #ffffff;
+  border-bottom: 1px solid #dbdbdb;
+  padding: 12px 16px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+.instagram-header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.instagram-logo {
+  font-weight: 600;
+  font-size: 1.5rem;
+  color: #262626;
+  text-decoration: none;
+}
+
+.instagram-search-container {
+  flex: 1;
+  max-width: 400px;
+  margin: 0 20px;
+}
+
+.instagram-search {
+  background: #efefef;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  width: 100%;
+  font-size: 14px;
+}
+
+.instagram-search:focus {
+  outline: none;
+  background: #e0e0e0;
+}
+
+.instagram-nav-icons {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.instagram-nav-icon {
+  color: #262626;
+  cursor: pointer;
+  position: relative;
+}
+
+.instagram-main-container {
+  display: flex;
+  max-width: 1200px;
+  margin: 0 auto;
+  height: calc(100vh - 60px);
+}
+
+.instagram-sidebar {
+  width: 350px;
+  border-right: 1px solid #dbdbdb;
+  background: #ffffff;
+  overflow-y: auto;
+}
+
+.instagram-sidebar-header {
+  padding: 16px;
+  border-bottom: 1px solid #dbdbdb;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.instagram-sidebar-title {
+  font-weight: 600;
+  font-size: 16px;
+  color: #262626;
+}
+
+.instagram-new-message-btn {
+  color: #0095f6;
+  background: none;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.instagram-search-chats {
+  padding: 16px;
+  border-bottom: 1px solid #dbdbdb;
+}
+
+.instagram-search-input {
+  background: #efefef;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  width: 100%;
+  font-size: 14px;
+}
+
+.instagram-search-input:focus {
+  outline: none;
+  background: #e0e0e0;
+}
+
+.instagram-chats-list {
+  overflow-y: auto;
+}
+
+.instagram-chat-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background 0.2s;
+}
+
+.instagram-chat-item:hover {
+  background: #fafafa;
+}
+
+.instagram-chat-item.active {
+  background: #f0f8ff;
+}
+
+.instagram-chat-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  margin-right: 12px;
+  object-fit: cover;
+  border: 1px solid #dbdbdb;
+}
+
+.instagram-chat-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.instagram-chat-name {
+  font-weight: 600;
+  font-size: 14px;
+  color: #262626;
+  margin-bottom: 2px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.instagram-chat-preview {
+  font-size: 12px;
+  color: #8e8e8e;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.instagram-chat-time {
+  font-size: 12px;
+  color: #8e8e8e;
+  margin-top: 4px;
+}
+
+.instagram-chat-unread {
+  background: #0095f6;
+  color: white;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.instagram-chat-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+}
+
+.instagram-chat-header {
+  padding: 16px;
+  border-bottom: 1px solid #dbdbdb;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.instagram-chat-user {
+  display: flex;
+  align-items: center;
+}
+
+.instagram-chat-user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  margin-right: 12px;
+  object-fit: cover;
+}
+
+.instagram-chat-user-name {
+  font-weight: 600;
+  font-size: 16px;
+  color: #262626;
+}
+
+.instagram-chat-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.instagram-chat-action-btn {
+  background: none;
+  border: none;
+  color: #262626;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.instagram-chat-messages {
+  flex: 1;
+  padding: 16px;
+  overflow-y: auto;
+  background: #fafafa;
+}
+
+.instagram-message {
+  margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.instagram-message.sent {
+  align-items: flex-end;
+}
+
+.instagram-message.received {
+  align-items: flex-start;
+}
+
+.instagram-message-bubble {
+  max-width: 70%;
+  padding: 12px 16px;
+  border-radius: 18px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.instagram-message.sent .instagram-message-bubble {
+  background: #0095f6;
+  color: white;
+  border-bottom-right-radius: 4px;
+}
+
+.instagram-message.received .instagram-message-bubble {
+  background: #ffffff;
+  color: #262626;
+  border: 1px solid #dbdbdb;
+  border-bottom-left-radius: 4px;
+}
+
+.instagram-message-time {
+  font-size: 10px;
+  color: #8e8e8e;
+  margin-top: 4px;
+  padding: 0 8px;
+}
+
+.instagram-chat-input {
+  padding: 16px;
+  border-top: 1px solid #dbdbdb;
+  background: #ffffff;
+}
+
+.instagram-message-form {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.instagram-message-input {
+  flex: 1;
+  background: #efefef;
+  border: none;
+  border-radius: 22px;
+  padding: 12px 16px;
+  font-size: 14px;
+  resize: none;
+}
+
+.instagram-message-input:focus {
+  outline: none;
+}
+
+.instagram-send-btn {
+  background: #0095f6;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.instagram-send-btn:hover {
+  background: #0086e0ae;
+}
+
+.instagram-send-btn:disabled {
+  background: #b2dffc;
+  cursor: not-allowed;
+}
+
+.instagram-follow-btn {
+  background: #0095f6;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 6px 16px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.instagram-follow-btn:hover {
+  background: #0085e0;
+}
+
+.instagram-follow-btn.following {
+  background: #efefef;
+  color: #262626;
+}
+
+.instagram-follow-btn.following:hover {
+  background: #dbdbdb;
+}
+
+.instagram-empty-chat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 70%;
+  background: #ffffff;
+  color: #8e8e8e;
+}
+
+.instagram-empty-chat-icon {
+  font-size: 64px;
+  margin-bottom: 16px;
+  color: #dbdbdb;
+}
+
+.instagram-empty-chat-text {
+  font-size: 20px;
+  margin-bottom: 8px;
+  color: #262626;
+}
+
+.instagram-empty-chat-subtext {
+  font-size: 14px;
+  margin-bottom: 24px;
+  text-align: center;
+  max-width: 300px;
+}
+
+.instagram-follow-dialog {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 360px;
+  background: #ffffff;
+  border-left: 1px solid #dbdbdb;
+  box-shadow: -4px 0 12px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  overflow-y: auto;
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+}
+
+.instagram-follow-dialog.open {
+  transform: translateX(0);
+}
+
+.instagram-follow-header {
+  padding: 16px;
+  border-bottom: 1px solid #dbdbdb;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.instagram-follow-title {
+  font-weight: 600;
+  font-size: 16px;
+  color: #262626;
+}
+
+.instagram-follow-close {
+  background: none;
+  border: none;
+  color: #262626;
+  cursor: pointer;
+  font-size: 20px;
+}
+
+.instagram-follow-list {
+  padding: 8px 0;
+}
+
+.instagram-follow-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  transition: background 0.2s;
+}
+
+.instagram-follow-item:hover {
+  background: #fafafa;
+}
+
+.instagram-follow-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  margin-right: 12px;
+  object-fit: cover;
+}
+
+.instagram-follow-info {
+  flex: 1;
+}
+
+.instagram-follow-name {
+  font-weight: 600;
+  font-size: 14px;
+  color: #262626;
+  margin-bottom: 2px;
+}
+
+.instagram-follow-username {
+  font-size: 14px;
+  color: #8e8e8e;
+}
+
+.instagram-follow-action {
+  margin-left: 12px;
+}
+
+/* Users List Styles */
+.instagram-users-list {
+  padding: 8px 0;
+}
+
+.instagram-user-item {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  padding: 12px 16px;
+  transition: background 0.2s;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.instagram-user-item:hover {
+  background: #fafafa;
+}
+
+.instagram-user-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  margin-right: 12px;
+  object-fit: cover;
+  border: 1px solid #dbdbdb;
+}
+
+.instagram-user-info {
+  flex: 1;
+}
+
+.instagram-user-name {
+  font-weight: 600;
+  font-size: 14px;
+  color: #262626;
+  margin-bottom: 2px;
+}
+
+.instagram-user-username {
+  font-size: 14px;
+  color: #8e8e8e;
+}
+
+.instagram-user-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.instagram-message-user-btn {
+  background: none;
+  border: none;
+  color: #0095f6;
+  cursor: pointer;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.instagram-no-collaborations {
+  padding: 16px;
+}
+
+.instagram-no-collaborations-title {
+  font-weight: 600;
+  font-size: 16px;
+  color: #262626;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #dbdbdb;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .instagram-sidebar {
+    width: 100%;
+    border-right: none;
+  }
+  
+  .instagram-chat-content {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 100;
+    display: none;
+  }
+  
+  .instagram-chat-content.active {
+    display: flex;
+  }
+  
+  .instagram-follow-dialog {
+    width: 100%;
+  }
+  
+  .instagram-search-container {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .instagram-header-content {
+    padding: 0 8px;
+  }
+  
+  .instagram-nav-icons {
+    gap: 12px;
+  }
+  
+  .instagram-chat-item {
+    padding: 10px 12px;
+  }
+  
+  .instagram-chat-avatar {
+    width: 44px;
+    height: 44px;
+  }
+  
+  .instagram-user-avatar {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+.instagram-collaborations {
+  height: 100vh;
+  background: #fafafa;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+.instagram-main-container {
+  height: 100vh;
+  background: #fff;
+}
+
+.instagram-sidebar {
+  transition: all 0.3s ease;
+}
+
+.instagram-sidebar.hidden {
+  transform: translateX(-100%);
+  opacity: 0;
+}
+
+.instagram-chat-item {
+  transition: all 0.2s ease;
+  animation: slideIn 0.3s ease-out;
+}
+
+.instagram-chat-item:hover {
+  background: #f8f8f8;
+  transform: translateX(4px);
+}
+
+.instagram-chat-item.active {
+  background: #f0f0f0;
+}
+
+.instagram-message-bubble {
+  animation: messageSlide 0.3s ease-out;
+}
+
+@keyframes messageSlide {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  0% {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes typing {
+  0%, 60%, 100% {
+    transform: translateY(0);
+  }
+  30% {
+    transform: translateY(-5px);
+  }
+}
+
+.connection-status.connected {
+  background: #4CAF50 !important;
+  animation: pulseStatus 2s infinite;
+}
+
+.connection-status.reconnecting {
+  background: #FF9800 !important;
+  animation: blink 1s infinite;
+}
+
+.connection-status.disconnected {
+  background: #f44336 !important;
+}
+
+@keyframes pulseStatus {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0.3; }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .instagram-sidebar {
+    width: 100vw;
+    position: absolute;
+    z-index: 10;
+    background: white;
+  }
+  
+  .instagram-chat-content {
+    width: 100vw;
+    position: absolute;
+    z-index: 20;
+    background: white;
+  }
+  
+  .instagram-message-bubble {
+    max-width: 85% !important;
+  }
+}
+
+/* Scrollbar Styling */
+.instagram-chats-list::-webkit-scrollbar,
+.instagram-chat-messages::-webkit-scrollbar {
+  width: 6px;
+}
+
+.instagram-chats-list::-webkit-scrollbar-track,
+.instagram-chat-messages::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.instagram-chats-list::-webkit-scrollbar-thumb,
+.instagram-chat-messages::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.instagram-chats-list::-webkit-scrollbar-thumb:hover,
+.instagram-chat-messages::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}

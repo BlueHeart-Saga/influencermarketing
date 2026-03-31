@@ -1,0 +1,1100 @@
+/* src/style/BrandRegister.css */
+.brand-register-pro {
+  min-height: calc(100vh - 84px);
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  padding: 2rem 1rem;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.brand-register-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.brand-register-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, #3b82f6 0%, #3b82f6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.brand-register-subtitle {
+  font-size: 1.125rem;
+  color: #64748b;
+  line-height: 1.6;
+}
+
+/* Message Styles */
+.brand-register-message {
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  font-weight: 500;
+  text-align: center;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.brand-register-message.success {
+  background: #dcfce7;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.brand-register-message.error {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+/* Progress Bar */
+.brand-register-progress {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 800px;
+  margin: 0 auto 3rem;
+  position: relative;
+  padding: 0 2rem;
+}
+
+.brand-register-progress-line,
+.brand-register-progress-line-active {
+  position: absolute;
+  top: 25px;
+  left: 50px;
+  right: 50px;
+  height: 3px;
+  background: #e2e8f0;
+  z-index: 1;
+}
+
+.brand-register-progress-line-active {
+  background: linear-gradient(90deg, #3b82f6, #3b82f6);
+  transition: width 0.3s ease;
+  z-index: 2;
+}
+
+.brand-register-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 3;
+  flex: 1;
+}
+
+.brand-register-step-circle {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  background: white;
+  border: 3px solid #e2e8f0;
+  color: #64748b;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.brand-register-step.active .brand-register-step-circle {
+  border-color: #6366f1;
+  background: #3b82f6;
+  color: white;
+  transform: scale(1.1);
+}
+
+.brand-register-step.completed .brand-register-step-circle {
+  border-color: #10b981;
+  background: #10b981;
+  color: white;
+}
+
+.brand-register-step-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #64748b;
+  text-align: center;
+}
+
+.brand-register-step.active .brand-register-step-label {
+  color: #3b82f6;
+  font-weight: 600;
+}
+
+.brand-register-step.completed .brand-register-step-label {
+  color: #10b981;
+}
+
+/* Form Container */
+.brand-register-form-container {
+  max-width: 800px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  overflow: visible;
+  border: 1px solid #f1f5f9;
+}
+
+.brand-register-form-content {
+  padding: 2.5rem;
+}
+
+.brand-register-form-step {
+  display: none;
+  animation: fadeIn 0.5s ease;
+}
+
+.brand-register-form-step.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Form Grid */
+.brand-register-form-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.brand-register-form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.brand-register-social-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+/* Form Elements */
+.brand-register-form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.brand-register-form-label {
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.brand-register-form-input,
+.brand-phone-input,
+.brand-register-form-select,
+.brand-register-form-textarea {
+  padding: 0.875rem 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  background: white;
+  color: #374151;
+}
+
+.brand-register-form-input:focus,
+.brand-register-form-select:focus,
+.brand-register-form-textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  transform: translateY(-1px);
+}
+
+/* ========================================
+   BRAND REGISTRATION - UNIFIED FORM STYLES
+   ======================================== */
+
+/* Phone Input - Unified with other form fields */
+.brand-register-form-group .brand-phone-container {
+  width: 100%;
+}
+
+.brand-register-form-group .brand-phone-container .react-tel-input {
+  width: 100%;
+}
+
+/* Fix phone dropdown clipping & height */
+.react-tel-input .country-list {
+  max-height: 320px !important;
+  z-index: 999 !important;
+  position: relative !important;
+}
+
+
+
+/* Phone input matches other form inputs */
+.brand-register-form-group .brand-phone-container .form-control {
+  width: 100% !important;
+  height: 52px;
+  padding: 0.875rem 1rem 0.875rem 58px !important;
+  border: 2px solid #e5e7eb !important;
+  border-radius: 12px !important;
+  font-size: 1rem !important;
+  font-family: inherit !important;
+  color: #374151 !important;
+  background: white !important;
+  transition: all 0.2s ease !important;
+  line-height: normal !important;
+}
+
+/* Focus state - matches other inputs */
+.brand-register-form-group .brand-phone-container:focus-within .form-control {
+  outline: none !important;
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Country flag button - matches border radius */
+.brand-register-form-group .brand-phone-container .flag-dropdown {
+  border: 2px solid #e5e7eb00 !important;
+  border-right: none !important;
+  background: #f8fafc00 !important;
+  border-radius: 12px 0 0 12px !important;
+}
+
+/* Selected flag */
+.brand-register-form-group .brand-phone-container .selected-flag {
+  border-radius: 12px 0 0 12px !important;
+  padding: 0 8px 0 12px !important;
+  background: transparent !important;
+}
+
+/* Arrow */
+.brand-register-form-group .brand-phone-container .selected-flag .arrow {
+  border-top: 4px solid #64748b !important;
+  border-left: 3px solid transparent !important;
+  border-right: 3px solid transparent !important;
+}
+
+/* Country list dropdown */
+.brand-register-form-group .brand-phone-container .country-list {
+  width: 280px !important;
+  max-height: 240px !important;
+  overflow-y: auto !important;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;
+  border: 2px solid #e5e7eb !important;
+  background: white !important;
+  margin-top: 4px !important;
+  padding: 4px 0 !important;
+}
+
+/* Country items */
+.brand-register-form-group .brand-phone-container .country-list .country {
+  padding: 8px 12px !important;
+  font-size: 0.9rem !important;
+  color: #374151 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  font-family: inherit !important;
+}
+
+/* Country hover state */
+.brand-register-form-group .brand-phone-container .country-list .country:hover {
+  background: #eef2ff !important;
+}
+
+/* Highlighted country */
+.brand-register-form-group .brand-phone-container .country-list .country.highlight {
+  background: #e0e7ff !important;
+}
+
+/* Location Input Container */
+.brand-register-form-group .brand-input-with-action {
+  position: relative;
+  width: 100%;
+}
+
+/* Location input field */
+.brand-register-form-group .brand-input-with-action input {
+  width: 100%;
+  padding: 0.875rem 1rem !important;
+  padding-right: 120px !important;
+  border: 2px solid #e5e7eb !important;
+  border-radius: 12px !important;
+  font-size: 1rem !important;
+  color: #374151 !important;
+  background: white !important;
+  font-family: inherit !important;
+  transition: all 0.2s ease !important;
+}
+
+/* Focus state for location input */
+.brand-register-form-group .brand-input-with-action:focus-within input {
+  outline: none !important;
+  border-color: #6366f1 !important;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* Detect location button - matches style */
+.brand-register-form-group .brand-input-action-btn {
+  position: absolute !important;
+  right: 8px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  height: 36px !important;
+  padding: 0 14px !important;
+  border-radius: 8px !important;
+  border: none !important;
+  background: #eef2ff !important;
+  color: #3b82f6 !important;
+  font-size: 0.8rem !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+  font-family: inherit !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Button hover state */
+.brand-register-form-group .brand-input-action-btn:hover {
+  background: #e0e7ff !important;
+}
+
+/* Button active state */
+.brand-register-form-group .brand-input-action-btn:active {
+  transform: translateY(-50%) scale(0.97) !important;
+}
+
+/* Location suggestions dropdown */
+.brand-register-form-group .brand-location-suggestions {
+  position: relative !important;
+
+  background: white !important;
+  border: 2px solid #e5e7eb !important;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1) !important;
+  max-height: 200px !important;
+  overflow-y: auto !important;
+  z-index: 1000 !important;
+  margin: 0 !important;
+  padding: 4px 0 !important;
+  list-style: none !important;
+}
+
+/* Suggestion items */
+.brand-register-form-group .brand-location-suggestions li {
+  padding: 10px 12px !important;
+  font-size: 0.9rem !important;
+  color: #374151 !important;
+  cursor: pointer !important;
+  transition: background-color 0.15s ease !important;
+  margin: 0 !important;
+}
+
+/* Suggestion hover state */
+.brand-register-form-group .brand-location-suggestions li:hover {
+  background-color: #eef2ff !important;
+}
+
+/* Location loading hint */
+.brand-register-form-group .brand-field-hint {
+  display: block;
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-top: 0.25rem;
+  font-style: italic;
+}
+
+/* Phone error message */
+.brand-register-form-group .brand-field-error {
+  display: block;
+  font-size: 0.75rem;
+  color: #ef4444;
+  margin-top: 0.25rem;
+}
+
+/* Unified focus states for all inputs */
+.brand-register-form-input:focus,
+.brand-register-form-select:focus,
+.brand-register-form-textarea:focus,
+.brand-register-form-group .brand-phone-container:focus-within .form-control,
+.brand-register-form-group .brand-input-with-action:focus-within input {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  transform: translateY(-1px);
+}
+
+/* Unified border and background for all inputs */
+.brand-register-form-input,
+.brand-register-form-select,
+.brand-register-form-textarea,
+.brand-register-form-group .brand-phone-container .form-control,
+.brand-register-form-group .brand-input-with-action input {
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  background: white;
+  color: #374151;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+/* Unified disabled state */
+.brand-register-form-input:disabled,
+.brand-register-form-select:disabled,
+.brand-register-form-textarea:disabled,
+.brand-register-form-group .brand-phone-container .form-control:disabled,
+.brand-register-form-group .brand-input-with-action input:disabled {
+  background: #f9fafb;
+  border-color: #e5e7eb;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+/* Unified placeholder color */
+.brand-register-form-input::placeholder,
+.brand-register-form-select::placeholder,
+.brand-register-form-textarea::placeholder,
+.brand-register-form-group .brand-phone-container .form-control::placeholder,
+.brand-register-form-group .brand-input-with-action input::placeholder {
+  color: #9ca3af;
+  opacity: 1;
+}
+
+
+.brand-register-form-select {
+  height: 120px;
+  resize: vertical;
+}
+
+.brand-register-form-textarea {
+  resize: vertical;
+  min-height: 100px;
+  font-family: inherit;
+}
+
+.brand-register-social-input {
+  font-size: 0.9rem;
+}
+
+.brand-register-file-hint {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-top: 0.25rem;
+}
+
+/* File Upload */
+.brand-register-file-upload {
+  border: 2px dashed #d1d5db;
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.brand-register-file-upload:hover {
+  border-color: #3b82f6;
+  background: #f8faff;
+}
+
+.brand-register-file-upload label {
+  cursor: pointer;
+  display: block;
+}
+
+.brand-register-file-text {
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.25rem;
+}
+
+/* Image Previews */
+.brand-register-image-previews {
+  margin-top: 1rem;
+}
+
+.brand-register-image-preview {
+  width: 120px;
+  height: 120px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 2px solid #e5e7eb;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.brand-register-image-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Buttons */
+.brand-register-nav-buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 2.5rem;
+  padding-top: 2rem;
+  border-top: 1px solid #f1f5f9;
+}
+
+.brand-register-btn {
+  padding: 0.875rem 2rem;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.brand-register-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.brand-register-btn-prev {
+  background: #f8fafc;
+  color: #64748b;
+  border: 2px solid #e2e8f0;
+}
+
+.brand-register-btn-prev:hover:not(:disabled) {
+  background: #f1f5f9;
+  color: #475569;
+  transform: translateY(-1px);
+}
+
+.brand-register-btn-next,
+.brand-register-btn-submit {
+  background: linear-gradient(135deg, #3b82f6 0%, #3b82f6 100%);
+  color: white;
+  margin-left: auto;
+}
+
+.brand-register-btn-next:hover:not(:disabled),
+.brand-register-btn-submit:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+}
+
+.brand-register-btn-submit {
+  min-width: 180px;
+  justify-content: center;
+}
+
+/* Loading Animation */
+.brand-register-loading {
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Action Buttons */
+.brand-register-delete-btn {
+  display: block;
+  margin: 2rem auto;
+  padding: 0.75rem 1.5rem;
+  background: #fee2e2;
+  color: #dc2626;
+  border: 2px solid #fecaca;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.brand-register-delete-btn:hover {
+  background: #fecaca;
+  transform: translateY(-1px);
+}
+
+.brand-register-action-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.brand-register-action-btn {
+  padding: 0.75rem 1.5rem;
+  background: white;
+  color: #3b82f6;
+  border: 2px solid #3b82f6;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.brand-register-action-btn:hover {
+  background: #3b82f6;
+  color: white;
+  transform: translateY(-1px);
+}
+
+/* Review Step Styles */
+.brand-register-form-step:last-child p {
+  margin: 0.25rem 0;
+  color: #4b5563;
+  line-height: 1.5;
+}
+
+.brand-register-form-step:last-child strong {
+  color: #1f2937;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .brand-register-pro {
+    padding: 1rem 0.5rem;
+    min-height: calc(100vh - 74px);
+  }
+  
+  .brand-register-title {
+    font-size: 2rem;
+  }
+  
+  .brand-register-progress {
+    padding: 0 1rem;
+  }
+  
+  .brand-register-step-circle {
+    width: 40px;
+    height: 40px;
+    font-size: 0.9rem;
+  }
+  
+  .brand-register-form-content {
+    padding: 1.5rem;
+  }
+  
+  .brand-register-form-grid-2 {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .brand-register-social-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .brand-register-nav-buttons {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .brand-register-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .brand-register-action-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .brand-register-action-btn {
+    width: 200px;
+  }
+}
+
+@media (max-width: 480px) {
+  .brand-register-progress {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+  
+  .brand-register-progress-line,
+  .brand-register-progress-line-active {
+    display: none;
+  }
+  
+  .brand-register-step {
+    flex-direction: row;
+    gap: 1rem;
+    width: 100%;
+  }
+  
+  .brand-register-step-label {
+    text-align: left;
+  }
+}
+
+/* Add these styles to your existing BrandRegister.css */
+
+/* Dialog Styles */
+.brand-dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.brand-dialog {
+  background: white;
+  border-radius: 20px;
+  padding: 2.5rem;
+  max-width: 500px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  animation: dialogSlideIn 0.3s ease;
+}
+
+.brand-dialog-danger {
+  max-width: 600px;
+  text-align: left;
+}
+
+@keyframes dialogSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.brand-dialog-success-icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 1.5rem;
+  background: linear-gradient(135deg, #10b981, #059669);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.brand-dialog-success-icon svg {
+  width: 40px;
+  height: 40px;
+}
+
+.brand-dialog-warning-icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 1.5rem;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.brand-dialog-warning-icon svg {
+  width: 40px;
+  height: 40px;
+}
+
+.brand-dialog-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 1rem;
+}
+
+.brand-dialog-message {
+  color: #64748b;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+}
+
+.brand-dialog-danger-content {
+  margin-bottom: 2rem;
+}
+
+.brand-dialog-risks {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-top: 1rem;
+}
+
+.brand-dialog-risks h4 {
+  color: #dc2626;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  font-size: 0.95rem;
+}
+
+.brand-dialog-risks ul {
+  color: #991b1b;
+  padding-left: 1.5rem;
+  text-align: left;
+}
+
+.brand-dialog-risks li {
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.brand-dialog-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.brand-dialog-btn {
+  padding: 0.875rem 1.5rem;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 140px;
+}
+
+.brand-dialog-btn-primary {
+  background: linear-gradient(135deg, #3b82f6, #3b82f6);
+  color: white;
+}
+
+.brand-dialog-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+}
+
+.brand-dialog-btn-danger {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+}
+
+.brand-dialog-btn-danger:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
+}
+
+.brand-dialog-btn-secondary {
+  background: #f8fafc;
+  color: #64748b;
+  border: 2px solid #e2e8f0;
+}
+
+.brand-dialog-btn-secondary:hover {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+/* Enhanced Loading State */
+.brand-register-loading-full {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 1rem;
+}
+
+.brand-register-loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid #e2e8f0;
+  border-top: 4px solid #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+/* Review Step Enhancements */
+.brand-register-review-title {
+  margin-bottom: 1.5rem;
+  color: #1e293b;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.brand-register-review-section {
+  background: #f8fafc;
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid #f1f5f9;
+}
+
+.brand-register-review-section-title {
+  color: #3b82f6;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.brand-register-review-section p {
+  margin: 0.5rem 0;
+  color: #4b5563;
+  line-height: 1.5;
+}
+
+/* Responsive Dialog */
+@media (max-width: 640px) {
+  .brand-dialog {
+    padding: 2rem 1.5rem;
+    margin: 1rem;
+  }
+  
+  .brand-dialog-actions {
+    flex-direction: column;
+  }
+  
+  .brand-dialog-btn {
+    width: 100%;
+  }
+}
+
+.brand-location-suggestions {
+  list-style: none;
+  padding: 0;
+  margin: 4px 0 0;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: #fff;
+  max-height: 180px;
+  overflow-y: auto;
+  position: relative;
+  z-index: 10;
+}
+
+.brand-location-suggestions li {
+  padding: 8px 10px;
+  cursor: pointer;
+}
+
+.brand-location-suggestions li:hover {
+  background-color: #f2f2f2;
+}
+.brand-register-checkbox-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.brand-register-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.brand-register-checkbox input {
+  cursor: pointer;
+}
+
+
+.profile-completion-indicator {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.completion-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.completion-header h4 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.completion-percentage {
+  font-weight: 700;
+  color: #28a745;
+  font-size: 18px;
+}
+
+.progress-bar {
+  height: 8px;
+  background: #e9ecef;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #28a745, #20c997);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.missing-fields {
+  border-top: 1px solid #dee2e6;
+  padding-top: 12px;
+}
+
+.missing-title {
+  font-size: 14px;
+  color: #6c757d;
+  margin-bottom: 8px;
+}
+
+.missing-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.missing-list li {
+  font-size: 13px;
+  color: #dc3545;
+  padding: 4px 0;
+  display: flex;
+  align-items: center;
+}
+
+.missing-list li:before {
+  content: "⚠️";
+  margin-right: 8px;
+}

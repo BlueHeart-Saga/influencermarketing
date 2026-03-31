@@ -1,0 +1,330 @@
+
+/* ===== HERO SECTION ===== */
+.qb-hero {
+  max-width: 90%;
+  height: 90vh;
+  margin: 0 auto;
+  padding: 2rem 2rem 6rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+  position: relative;
+  min-height: 100vh;
+  background-color: rgb(255, 255, 255);
+}
+
+.qb-hero-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+  overflow: hidden;
+}
+
+.qb-hero-orbit {
+  position: absolute;
+  border-radius: 50%;
+  animation: orbit 20s linear infinite;
+}
+
+.orbit-1 {
+  width: 300px;
+  height: 300px;
+  border: 2px solid rgba(99, 102, 241, 0.1);
+  top: 10%;
+  right: 10%;
+  animation-duration: 25s;
+}
+
+.orbit-2 {
+  width: 500px;
+  height: 500px;
+  border: 2px solid rgba(139, 92, 246, 0.1);
+  bottom: 10%;
+  left: 10%;
+  animation-duration: 30s;
+  animation-direction: reverse;
+}
+
+.orbit-3 {
+  width: 200px;
+  height: 200px;
+  border: 2px solid rgba(6, 182, 212, 0.1);
+  top: 50%;
+  left: 20%;
+  animation-duration: 15s;
+}
+
+.qb-hero-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 2rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  margin-bottom: 2rem;
+  animation: pulse 2s infinite;
+}
+
+.qb-hero-content h1 {
+  font-size: 4.5rem;
+  font-weight: 900;
+  line-height: 1.1;
+  margin-bottom: 1.5rem;
+  color: var(--dark);
+  letter-spacing: -0.025em;
+}
+
+.qb-gradient-text {
+  background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  background-size: 200% 200%;
+  animation: gradientShift 3s ease infinite;
+}
+
+.qb-hero-content p {
+  font-size: 1.25rem;
+  color: var(--gray);
+  margin-bottom: 2.5rem;
+  max-width: 36rem;
+  line-height: 1.7;
+}
+
+.qb-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 3rem;
+}
+
+.qb-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 2rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+  text-decoration: none;
+  font-size: 1rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.qb-btn.primary {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  border: none;
+}
+
+.qb-btn.primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 30px -5px rgba(99, 102, 241, 0.4);
+}
+
+.qb-btn.secondary {
+  background: white;
+  color: var(--dark);
+  border-color: var(--gray-light);
+}
+
+.qb-btn.secondary:hover {
+  background: var(--light);
+  border-color: var(--gray);
+  transform: translateY(-3px);
+}
+
+.qb-btn.large {
+  padding: 1.25rem 2.5rem;
+  font-size: 1.125rem;
+}
+
+.qb-hero-trusted {
+  margin-top: 2rem;
+}
+
+.qb-hero-trusted p {
+  font-size: 0.875rem;
+  color: var(--gray);
+  margin-bottom: 1rem;
+}
+
+.qb-trusted-logos {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.qb-trusted-logos span {
+  font-weight: 600;
+  color: var(--dark);
+  opacity: 0.6;
+  transition: all 0.3s ease;
+}
+
+.qb-trusted-logos span:hover {
+  opacity: 1;
+  transform: translateY(-2px);
+}
+
+/* Hero Dashboard Preview */
+.qb-hero-dashboard {
+  background: white;
+  border-radius: 1.5rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  max-width: 28rem;
+  margin: 0 auto;
+  border: 1px solid var(--gray-light);
+  transform: perspective(1000px) rotateY(-5deg) rotateX(5deg);
+  transition: all 0.5s ease;
+}
+
+.qb-hero-dashboard:hover {
+  transform: perspective(1000px) rotateY(0deg) rotateX(0deg) translateY(-10px);
+}
+
+.qb-dashboard-header {
+  padding: 1rem;
+  background-color: var(--light);
+  border-bottom: 1px solid var(--gray-light);
+}
+
+.qb-dashboard-dots {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.qb-dashboard-dots span {
+  display: block;
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 50%;
+  background-color: var(--gray-light);
+  transition: all 0.3s ease;
+}
+
+.qb-dashboard-dots span:first-child {
+  background-color: var(--error);
+}
+
+.qb-dashboard-dots span:nth-child(2) {
+  background-color: var(--warning);
+}
+
+.qb-dashboard-dots span:last-child {
+  background-color: var(--success);
+}
+
+.qb-dashboard-dots:hover span:first-child {
+  transform: translateY(-2px);
+}
+
+.qb-dashboard-dots:hover span:nth-child(2) {
+  transform: translateY(-4px);
+}
+
+.qb-dashboard-dots:hover span:last-child {
+  transform: translateY(-2px);
+}
+
+.qb-dashboard-content {
+  padding: 2rem;
+}
+
+.qb-dashboard-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.qb-dashboard-stat {
+  text-align: center;
+  padding: 1.5rem 1rem;
+  background-color: var(--light);
+  border-radius: 0.75rem;
+  transition: all 0.3s ease;
+}
+
+.qb-dashboard-stat:hover {
+  transform: translateY(-5px);
+  background: linear-gradient(135deg, var(--light), white);
+}
+
+.qb-stat-value {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+}
+
+.qb-dashboard-stat:nth-child(1) .qb-stat-value {
+  color: var(--primary);
+}
+
+.qb-dashboard-stat:nth-child(2) .qb-stat-value {
+  color: var(--success);
+}
+
+.qb-dashboard-stat:nth-child(3) .qb-stat-value {
+  color: var(--secondary);
+}
+
+.qb-stat-label {
+  font-size: 0.75rem;
+  color: var(--gray);
+  font-weight: 500;
+}
+
+.qb-dashboard-chart {
+  display: flex;
+  align-items: end;
+  gap: 0.5rem;
+  height: 8rem;
+  padding: 1rem;
+  background-color: var(--light);
+  border-radius: 0.75rem;
+}
+
+.qb-chart-bar {
+  flex: 1;
+  background: linear-gradient(180deg, var(--primary), var(--secondary));
+  border-radius: 0.25rem;
+  transition: height 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.qb-chart-bar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  animation: shine 2s infinite;
+}
+
+.qb-chart-bar:nth-child(2) {
+  background: linear-gradient(180deg, var(--success), #059669);
+}
+
+.qb-chart-bar:nth-child(4) {
+  background: linear-gradient(180deg, var(--secondary), #7c3aed);
+}
+
+@keyframes shine {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}

@@ -1,0 +1,395 @@
+.about-container {
+  max-width: 1200px;
+  
+  margin: 0 auto;
+  padding: 2rem;
+  color: #000000;
+}
+
+/* Hero Section */
+.about-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4rem 0;
+  margin-bottom: 4rem;
+  gap: 3rem;
+  min-height: 80vh;
+}
+
+.hero-content {
+  flex: 1;
+  max-width: 500px;
+  padding-bottom: 2rem;
+}
+
+.about-title {
+  font-size: 2.8rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  color: #000000;
+  line-height: 1.2;
+}
+
+.about-intro {
+  font-size: 1.2rem;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+  color: #000000;
+}
+
+.hero-stats {
+  display: flex;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-item h3 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #0f6eeaff;
+  margin-bottom: 0.5rem;
+}
+
+.stat-item p {
+  color: #000000;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* Hero Image - Large Scale */
+.hero-image {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transform: scale(1.5);
+  transform-origin: center;
+  width: 100%;
+  margin: 2rem 0;
+}
+
+.hero-image img {
+  width: 100%;
+  max-width: 900px;
+  border-radius: 14px;
+}
+
+/* Section Styles */
+.about-section {
+  margin-bottom: 6rem;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.section-header h2 {
+  font-size: 2.2rem;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.section-header p {
+  color: #666;
+  font-size: 1.1rem;
+}
+
+/* About Cards - Large Images */
+.about-card {
+  display: flex;
+  align-items: center;
+  gap: 4rem;
+  margin-bottom: 3rem;
+  min-height: 60vh;
+}
+
+.about-card.reverse {
+  flex-direction: row-reverse;
+}
+
+.about-text {
+  flex: 1;
+}
+
+.about-image {
+  flex: 1.8;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transform: scale(1.4);
+  transform-origin: center;
+}
+
+.about-image img {
+  width: 100%;
+  max-width: 750px;
+  border-radius: 14px;
+}
+
+.about-text h2 {
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+.about-text p {
+  line-height: 1.7;
+  color: #555;
+  margin-bottom: 1.5rem;
+}
+
+/* Mission Section */
+.mission-points {
+  margin-top: 2rem;
+}
+
+.point {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+}
+
+.point-icon {
+  background: #0f6eeaff;
+  color: white;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1rem;
+  flex-shrink: 0;
+  font-size: 0.9rem;
+}
+
+.point-content h4 {
+  margin-bottom: 0.3rem;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.point-content p {
+  margin: 0;
+  color: #666;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* Offerings Section */
+.offering-item {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+}
+
+.offering-icon {
+  font-size: 1.5rem;
+  margin-right: 1rem;
+  flex-shrink: 0;
+  color: #0f6eeaff;
+}
+
+.offering-content h4 {
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.offering-content p {
+  margin: 0;
+  color: #666;
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+/* Differentiators Section */
+.differentiators-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.differentiator-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  text-align: center;
+}
+
+.differentiator-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+}
+
+.diff-icon {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: #0f6eeaff;
+}
+
+.differentiator-card h4 {
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.differentiator-card p {
+  color: #666;
+  line-height: 1.6;
+  font-size: 0.95rem;
+}
+
+/* Team Section */
+.story-content {
+  display: flex;
+  gap: 4rem;
+  /* align-items: center; */
+  min-height: 60vh;
+}
+
+.story-text {
+  flex: 1;
+}
+
+.story-text p {
+  margin-bottom: 1.5rem;
+  line-height: 1.7;
+  color: #555;
+}
+
+.values {
+  margin-top: 2rem;
+}
+
+.values h4 {
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.values-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+}
+
+.value-pill {
+  background: #f0f0f0;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  color: #555;
+  font-weight: 500;
+}
+
+.story-image {
+  flex: 1.8;
+  transform: scale(2);
+  transform-origin: center;
+}
+
+.story-image img {
+  width: 100%;
+  max-width: 750px;
+  border-radius: 14px;
+}
+
+/* CTA Section */
+.about-cta {
+  text-align: center;
+  
+  padding: 4rem 2rem;
+  border-radius: 16px;
+  color: #000000;
+  margin-top: 4rem;
+}
+
+.about-cta h2 {
+  font-size: 2.2rem;
+  margin-bottom: 1rem;
+}
+
+.about-cta p {
+  font-size: 1.1rem;
+  margin-bottom: 2rem;
+  opacity: 0.9;
+}
+
+.cta-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+
+
+
+/* Responsive Design */
+@media (max-width: 968px) {
+  .about-hero {
+    flex-direction: column;
+    text-align: center;
+    min-height: auto;
+  }
+  
+  .hero-image {
+    transform: scale(1.2);
+    order: -1;
+  }
+  
+  .hero-stats {
+    justify-content: center;
+  }
+  
+  .about-card, .about-card.reverse, .story-content {
+    flex-direction: column;
+    min-height: auto;
+  }
+  
+  .about-image, .story-image {
+    flex: 1;
+    width: 100%;
+  }
+  
+  .about-image img, .story-image img {
+    max-width: 100%;
+  }
+  
+  .cta-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .about-container {
+    padding: 1rem;
+  }
+  
+  .about-title {
+    font-size: 2.2rem;
+  }
+  
+  .differentiators-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .hero-stats {
+    flex-wrap: wrap;
+  }
+  
+  .hero-image {
+    transform: scale(1);
+  }
+  
+  .about-card, .story-content {
+    gap: 2rem;
+  }
+}

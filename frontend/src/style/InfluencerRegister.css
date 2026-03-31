@@ -1,0 +1,798 @@
+/* src/style/InfluencerRegister.css */
+.influencer-register-pro {
+  min-height: calc(100vh - 74px);
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  padding: 2rem 1rem;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.influencer-register-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.influencer-register-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg,#1565c0 0%, #3b82f6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.influencer-register-subtitle {
+  font-size: 1.125rem;
+  color: #64748b;
+  line-height: 1.6;
+}
+
+/* Message Styles */
+.influencer-register-message {
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  font-weight: 500;
+  text-align: center;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.influencer-register-message.success {
+  background: #dcfce7;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.influencer-register-message.error {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+/* Progress Bar */
+.influencer-register-progress {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 800px;
+  margin: 0 auto 3rem;
+  position: relative;
+  padding: 0 2rem;
+}
+
+.influencer-register-progress-line,
+.influencer-register-progress-line-active {
+  position: absolute;
+  top: 25px;
+  left: 50px;
+  right: 50px;
+  height: 3px;
+  background: #e2e8f0;
+  z-index: 1;
+}
+
+.influencer-register-progress-line-active {
+  background: linear-gradient(90deg, #3b82f6, #3b82f6);
+  transition: width 0.3s ease;
+  z-index: 2;
+}
+
+.influencer-register-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 3;
+  flex: 1;
+}
+
+.influencer-register-step-circle {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  background: white;
+  border: 3px solid #e2e8f0;
+  color: #64748b;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.influencer-register-step.active .influencer-register-step-circle {
+  border-color: #1565c0;
+  background: #1565c0;
+  color: white;
+  transform: scale(1.1);
+}
+
+.influencer-register-step.completed .influencer-register-step-circle {
+  border-color: #10b981;
+  background: #10b981;
+  color: white;
+}
+
+.influencer-register-step-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #64748b;
+  text-align: center;
+}
+
+.influencer-register-step.active .influencer-register-step-label {
+  color: #3b82f6;
+  font-weight: 600;
+}
+
+.influencer-register-step.completed .influencer-register-step-label {
+  color: #10b981;
+}
+
+/* Form Container */
+.influencer-register-form-container {
+  max-width: 800px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  border: 1px solid #f1f5f9;
+}
+
+.influencer-register-form-content {
+  padding: 2.5rem;
+}
+
+.influencer-register-form-step {
+  display: none;
+  animation: fadeIn 0.5s ease;
+}
+
+.influencer-register-form-step.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Form Grid */
+.influencer-register-form-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.influencer-register-form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.influencer-register-social-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+/* Form Elements */
+.influencer-register-form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.influencer-register-form-label {
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.influencer-register-form-input,
+.influencer-register-form-select,
+.influencer-register-form-textarea {
+  padding: 0.875rem 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  background: white;
+  color: #374151;
+}
+
+.influencer-register-form-input:focus,
+.influencer-register-form-select:focus,
+.influencer-register-form-textarea:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.1);
+  transform: translateY(-1px);
+}
+
+.influencer-register-form-select {
+  height: 120px;
+  resize: vertical;
+}
+
+.influencer-register-form-textarea {
+  resize: vertical;
+  min-height: 100px;
+  font-family: inherit;
+}
+
+.influencer-register-social-input {
+  font-size: 0.9rem;
+}
+
+.influencer-register-file-hint {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-top: 0.25rem;
+}
+
+/* File Upload */
+.influencer-register-file-upload {
+  border: 2px dashed #d1d5db;
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.influencer-register-file-upload:hover {
+  border-color: #3b82f6;
+  background: #f8fafc;
+}
+
+.influencer-register-file-upload label {
+  cursor: pointer;
+  display: block;
+}
+
+.influencer-register-file-text {
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.25rem;
+}
+
+/* Image Previews */
+.influencer-register-image-previews {
+  margin-top: 1rem;
+}
+
+.influencer-register-image-preview {
+  width: 120px;
+  height: 120px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 2px solid #e5e7eb;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.influencer-register-image-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Buttons */
+.influencer-register-nav-buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 2.5rem;
+  padding-top: 2rem;
+  border-top: 1px solid #f1f5f9;
+}
+
+.influencer-register-btn {
+  padding: 0.875rem 2rem;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.influencer-register-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.influencer-register-btn-prev {
+  background: #f8fafc;
+  color: #64748b;
+  border: 2px solid #e2e8f0;
+}
+
+.influencer-register-btn-prev:hover:not(:disabled) {
+  background: #f1f5f9;
+  color: #475569;
+  transform: translateY(-1px);
+}
+
+.influencer-register-btn-next,
+.influencer-register-btn-submit {
+  background: linear-gradient(135deg, #3b82f6 0%, #3b82f6 100%);
+  color: white;
+  margin-left: auto;
+}
+
+.influencer-register-btn-next:hover:not(:disabled),
+.influencer-register-btn-submit:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(236, 72, 153, 0.3);
+}
+
+.influencer-register-btn-submit {
+  min-width: 180px;
+  justify-content: center;
+}
+
+/* Loading Animation */
+.influencer-register-loading {
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Action Buttons */
+.influencer-register-delete-btn {
+  display: block;
+  margin: 2rem auto;
+  padding: 0.75rem 1.5rem;
+  background: #fee2e2;
+  color: #1565c0;
+  border: 2px solid #fecaca;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.influencer-register-delete-btn:hover {
+  background: #fecaca;
+  transform: translateY(-1px);
+}
+
+.influencer-register-action-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.influencer-register-action-btn {
+  padding: 0.75rem 1.5rem;
+  background: white;
+  color: #3b82f6;
+  border: 2px solid #3b82f6;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.influencer-register-action-btn:hover {
+  background: #3b82f6;
+  color: white;
+  transform: translateY(-1px);
+}
+
+/* Review Step Styles */
+.influencer-register-review-title {
+  margin-bottom: 1.5rem;
+  color: #1e293b;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.influencer-register-review-section {
+  background: #f8fafc;
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid #f1f5f9;
+  margin-bottom: 1rem;
+}
+
+.influencer-register-review-section-title {
+  color: #1565c0;
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.influencer-register-review-section p {
+  margin: 0.5rem 0;
+  color: #4b5563;
+  line-height: 1.5;
+}
+
+/* Dialog Styles */
+.influencer-dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.influencer-dialog {
+  background: white;
+  border-radius: 20px;
+  padding: 2.5rem;
+  max-width: 500px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  animation: dialogSlideIn 0.3s ease;
+}
+
+.influencer-dialog-danger {
+  max-width: 600px;
+  text-align: left;
+}
+
+.influencer-dialog-success-icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 1.5rem;
+  background: linear-gradient(135deg, #10b981, #059669);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.influencer-dialog-success-icon svg {
+  width: 40px;
+  height: 40px;
+}
+
+.influencer-dialog-warning-icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 1.5rem;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.influencer-dialog-warning-icon svg {
+  width: 40px;
+  height: 40px;
+}
+
+.influencer-dialog-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 1rem;
+}
+
+.influencer-dialog-message {
+  color: #64748b;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+}
+
+.influencer-dialog-danger-content {
+  margin-bottom: 2rem;
+}
+
+.influencer-dialog-risks {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-top: 1rem;
+}
+
+.influencer-dialog-risks h4 {
+  color: #dc2626;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  font-size: 0.95rem;
+}
+
+.influencer-dialog-risks ul {
+  color: #991b1b;
+  padding-left: 1.5rem;
+  text-align: left;
+}
+
+.influencer-dialog-risks li {
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.influencer-dialog-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.influencer-dialog-btn {
+  padding: 0.875rem 1.5rem;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 140px;
+}
+
+.influencer-dialog-btn-primary {
+  background: linear-gradient(135deg, #3b82f6, #3b82f6);
+  color: white;
+}
+
+.influencer-dialog-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(236, 72, 153, 0.3);
+}
+
+.influencer-dialog-btn-danger {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+}
+
+.influencer-dialog-btn-danger:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
+}
+
+.influencer-dialog-btn-secondary {
+  background: #f8fafc;
+  color: #64748b;
+  border: 2px solid #e2e8f0;
+}
+
+.influencer-dialog-btn-secondary:hover {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+/* Enhanced Loading State */
+.influencer-register-loading-full {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 1rem;
+}
+
+.influencer-register-loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid #e2e8f0;
+  border-top: 4px solid #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .influencer-register-pro {
+    padding: 1rem 0.5rem;
+    min-height: calc(100vh - 74px);
+  }
+  
+  .influencer-register-title {
+    font-size: 2rem;
+  }
+  
+  .influencer-register-progress {
+    padding: 0 1rem;
+  }
+  
+  .influencer-register-step-circle {
+    width: 40px;
+    height: 40px;
+    font-size: 0.9rem;
+  }
+  
+  .influencer-register-form-content {
+    padding: 1.5rem;
+  }
+  
+  .influencer-register-form-grid-2 {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .influencer-register-social-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .influencer-register-nav-buttons {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .influencer-register-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .influencer-register-action-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .influencer-register-action-btn {
+    width: 200px;
+  }
+  
+  .influencer-dialog-actions {
+    flex-direction: column;
+  }
+  
+  .influencer-dialog-btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .influencer-register-progress {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+  
+  .influencer-register-progress-line,
+  .influencer-register-progress-line-active {
+    display: none;
+  }
+  
+  .influencer-register-step {
+    flex-direction: row;
+    gap: 1rem;
+    width: 100%;
+  }
+  
+  .influencer-register-step-label {
+    text-align: left;
+  }
+}
+
+.influencer-location-suggestions {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+  border: 1px solid #ddd;
+  background: #fff;
+  border-radius: 6px;
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+.influencer-location-suggestions li {
+  padding: 8px 10px;
+  cursor: pointer;
+}
+
+.influencer-location-suggestions li:hover {
+  background: #f2f2f2;
+}
+
+.influencer-checkbox-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.influencer-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+
+/* ===============================
+   Input with inline action button
+   =============================== */
+
+.input-with-action {
+  position: relative;
+  width: 100%;
+}
+
+/* Input keeps SAME style */
+.input-with-action .influencer-register-form-input {
+  padding-right: 140px; /* space for Detect button */
+}
+
+/* Detect button inside input */
+.input-action-btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 32px;
+  padding: 0 14px;
+  border-radius: 8px;
+  border: none;
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+/* Hover */
+.input-action-btn:hover {
+  background: #e2e8f0;
+}
+
+/* Focus — SAME glow as input */
+.input-with-action:focus-within .influencer-register-form-input {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  transform: translateY(-1px);
+}
+
+/* Disable button if needed */
+.input-action-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+
+/* disable upload look like brand email */
+.influencer-image-disabled {
+  pointer-events: none;
+  opacity: 0.55;
+  filter: grayscale(0.6);
+}
+
+/* disabled input style */
+.influencer-register-form-input:disabled {
+  background: #f3f4f6;
+  border-color: #e5e7eb;
+  color: #9ca3af;
+  cursor: not-allowed;
+}

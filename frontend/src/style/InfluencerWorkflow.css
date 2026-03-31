@@ -1,0 +1,105 @@
+.influencer-workflow-container.vertical-mode {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: left;
+}
+
+.workflow-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  text-align: center;
+  color: #7c3aed; /* purple tone for influencer side */
+}
+
+.progress-container {
+  position: relative;
+  width: 20px;
+  height: 300px;
+  background: #e5e7eb;
+  border-radius: 12px;
+  margin: 0 auto 2rem auto;
+}
+
+.progress-bar {
+  width: 100%;
+  background: #7c3aed;
+  border-radius: 12px;
+  position: absolute;
+  bottom: 0;
+  transition: height 0.5s ease;
+}
+
+.progress-text {
+  position: absolute;
+  top: 50%;
+  left: 30px;
+  transform: translateY(-50%);
+  font-weight: 600;
+  color: #7c3aed;
+}
+
+.steps-vertical-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  max-height: 600px;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  position: relative;
+  padding-left: 50px;
+}
+
+.workflow-step-card-vertical {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  position: relative;
+  cursor: pointer;
+}
+
+.step-icon-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.vertical-line {
+  width: 4px;
+  flex-grow: 1;
+  background: #7c3aed;
+  margin-top: 0.5rem;
+  border-radius: 2px;
+}
+
+.step-icon {
+  font-size: 2rem;
+  color: #7c3aed;
+  z-index: 1;
+}
+
+.step-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.step-tooltip {
+  background: #7c3aed;
+  color: #fff;
+  padding: 0.5rem;
+  font-size: 0.85rem;
+  border-radius: 8px;
+  margin-top: 0.5rem;
+  width: 250px;
+  text-align: left;
+}
+
+.step-complete-icon {
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  font-size: 1.5rem;
+  color: green;
+}

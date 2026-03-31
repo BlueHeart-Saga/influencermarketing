@@ -1,0 +1,222 @@
+/* style/BrandAutomation.css */
+.premium-automation-container {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.premium-automation-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 32px;
+  padding: 24px;
+  background: #2563eb;
+  border-radius: 16px;
+  color: white;
+}
+
+.premium-automation-header .MuiSvgIcon-root {
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+}
+
+.premium-card {
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s, box-shadow 0.2s;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.premium-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+.premium-card-header {
+  padding: 20px 24px;
+  background: linear-gradient(to right, #f8f9fa, #ffffff);
+}
+
+.premium-card-content {
+  padding: 24px;
+  flex: 1;
+}
+
+.premium-tab {
+  min-height: 64px;
+  font-weight: 600;
+}
+
+.premium-tab .MuiSvgIcon-root {
+  margin-right: 8px;
+}
+
+/* Contact list styles */
+.contact-list-container {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.contact-item {
+  border-bottom: 1px solid #f0f0f0;
+  transition: background-color 0.2s;
+}
+
+.contact-item:hover {
+  background-color: #f8f9fa;
+}
+
+.contact-item-selected {
+  background-color: #e3f2fd;
+  border-left: 4px solid #1976d2;
+}
+
+/* Bulk controls */
+.bulk-controls-panel {
+  background: linear-gradient(to right, #f5f7ff, #ffffff);
+  border: 2px dashed #c5cae9;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+/* Template cards */
+.template-card {
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 2px solid transparent;
+}
+
+.template-card:hover {
+  border-color: #1976d2;
+  transform: scale(1.02);
+}
+
+.template-card-selected {
+  border-color: #1976d2;
+  background-color: #e3f2fd;
+}
+
+/* Usage stats */
+.usage-stat-card {
+  padding: 24px;
+  text-align: center;
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+.usage-stat-card .MuiSvgIcon-root {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+/* Message editor */
+.message-editor {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 16px;
+  min-height: 200px;
+}
+
+.message-editor-toolbar {
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 8px;
+  margin-bottom: 16px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .premium-automation-container {
+    padding: 16px;
+  }
+  
+  .premium-automation-header {
+    flex-direction: column;
+    text-align: center;
+    padding: 20px;
+  }
+  
+  .premium-automation-header .MuiSvgIcon-root {
+    margin-bottom: 16px;
+  }
+}
+
+/* Add to your existing styles */
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a1a1a1;
+}
+
+/* Template preview */
+.template-preview {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 20px;
+  margin-top: 10px;
+}
+
+/* Email editor */
+.email-editor {
+  min-height: 200px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 16px;
+  background: white;
+}
+
+/* Stats cards hover effect */
+.stat-card:hover {
+  transform: translateY(-4px);
+  transition: transform 0.3s ease;
+}
+
+/* Gradient animations */
+.gradient-bg {
+  background: #2563eb;
+  background-size: 400% 400%;
+  animation: gradient 15s ease infinite;
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Loading animation */
+.loading-spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

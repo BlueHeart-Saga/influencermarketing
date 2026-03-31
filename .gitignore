@@ -1,0 +1,108 @@
+# ======================
+# 🔐 ENV FILES (Secrets)
+# ======================
+.env
+*.env
+backend/.env
+frontend/.env
+mobile/.env
+
+# ======================
+# 📦 NODE MODULES
+# ======================
+node_modules/
+frontend/node_modules/
+mobile/node_modules/
+
+# ======================
+# ⚛️ FRONTEND BUILD
+# ======================
+frontend/build/
+frontend/dist/
+
+# ======================
+# 📱 MOBILE (Expo / React Native)
+# ======================
+mobile/.expo/
+mobile/.expo-shared/
+mobile/android/
+mobile/ios/
+mobile/build/
+mobile/dist/
+
+
+# ======================
+# 🐍 PYTHON (BACKEND)
+# ======================
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+backend/__pycache__/
+backend/.venv/
+venv/
+env/
+
+# ======================
+# 📂 UPLOADS (IMPORTANT)
+# ======================
+uploads/
+backend/uploads/
+backend/uploads/images/
+backend/uploads/videos/
+backend/uploads/profile/
+backend/uploads/chat_media/
+
+# ======================
+# 🧾 LOG FILES
+# ======================
+*.log
+logs/
+
+# ======================
+# 🧱 CACHE / TEMP FILES
+# ======================
+.cache/
+.tmp/
+.temp/
+*.cache
+
+# ======================
+# 🗄️ DATABASE FILES
+# ======================
+*.sqlite
+*.sqlite3
+*.db
+
+# ======================
+# ⚙️ OS FILES
+# ======================
+.DS_Store
+Thumbs.db
+
+# ======================
+# 🧠 EDITOR FILES
+# ======================
+.vscode/
+.idea/
+*.iml
+
+# ======================
+# 📦 BUILD / DIST
+# ======================
+build/
+dist/
+
+# ======================
+# 🧪 TEST / COVERAGE
+# ======================
+coverage/
+htmlcov/
+.pytest_cache/
+
+# ======================
+# 🔧 MISC
+# ======================
+*.bak
+*.swp
+*.swo

@@ -1,0 +1,162 @@
+/* BrandIntegration.css */
+.bi-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.bi-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.bi-title {
+  font-size: 2.5rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+}
+
+.bi-subtitle {
+  font-size: 1.1rem;
+  color: #666;
+  max-width: 700px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.bi-integration-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.bi-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #eaeaea;
+}
+
+.bi-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+}
+
+.bi-card-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.bi-icon {
+  font-size: 2rem;
+  margin-right: 0.75rem;
+}
+
+.bi-card-title {
+  font-size: 1.4rem;
+  margin: 0;
+  color: #333;
+  font-weight: 600;
+}
+
+.bi-card-description {
+  color: #666;
+  margin: 0 0 1.25rem 0;
+  line-height: 1.5;
+  flex-grow: 1;
+}
+
+.bi-card-status {
+  margin-bottom: 1.25rem;
+  font-weight: 500;
+}
+
+.bi-status {
+  font-weight: 600;
+}
+
+.bi-status-connected {
+  color: #10b981;
+}
+
+.bi-status-connecting {
+  color: #f59e0b;
+}
+
+.bi-status-disconnected {
+  color: #ef4444;
+}
+
+.bi-card-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.bi-btn {
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex: 1;
+}
+
+.bi-btn-connect {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.bi-btn-connect:hover {
+  background-color: #2563eb;
+}
+
+.bi-btn-manage {
+  background-color: #10b981;
+  color: white;
+}
+
+.bi-btn-manage:hover {
+  background-color: #059669;
+}
+
+.bi-btn-disconnect {
+  background-color: #f3f4f6;
+  color: #4b5563;
+}
+
+.bi-btn-disconnect:hover {
+  background-color: #e5e7eb;
+}
+
+.bi-btn-connecting {
+  background-color: #fef3c7;
+  color: #d97706;
+  cursor: not-allowed;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .bi-container {
+    padding: 1.5rem;
+  }
+  
+  .bi-title {
+    font-size: 2rem;
+  }
+  
+  .bi-integration-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .bi-card-actions {
+    flex-direction: column;
+  }
+}

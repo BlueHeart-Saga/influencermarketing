@@ -1,0 +1,237 @@
+/* --- Premium Zoho-Style Feedback Widget --- */
+
+.feedback-container {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  z-index: 99999;
+  font-family: "Inter", sans-serif;
+}
+
+/* Floating Button */
+.feedback-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #4f46e5;
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  padding: 14px 22px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 10px 25px rgba(79, 70, 229, 0.3);
+  transition: all 0.25s ease;
+}
+
+.feedback-toggle-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 35px rgba(79, 70, 229, 0.4);
+}
+
+.feedback-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(21, 21, 21, 0.4);
+  backdrop-filter: blur(3px);
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  padding: 28px;
+  z-index: 9999;
+}
+
+/* Panel Style */
+.feedback-modal {
+  width: 420px;
+  max-width: 95vw;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(15px);
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.25);
+  animation: fadeSlideUp 0.35s ease forwards;
+}
+
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.feedback-header {
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  padding: 22px;
+  color: #fff;
+  position: relative;
+}
+
+.feedback-header h3 {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.feedback-header p {
+  margin: 4px 0 0;
+  opacity: 0.9;
+  font-size: 0.88rem;
+}
+
+.close-btn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: rgba(255, 255, 255, 0.25);
+  border: none;
+  color: white;
+  padding: 6px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.close-btn:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+/* Tabs */
+.feedback-tabs {
+  display: flex;
+  border-bottom: 1px solid #efefef;
+  background: #fafafa;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 14px 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #777;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+  transition: 0.25s;
+}
+
+.tab-btn:hover {
+  background: #f3f0ff;
+  color: #4f46e5;
+}
+
+.tab-btn.active {
+  color: #4f46e5;
+  border-bottom: 3px solid #4f46e5;
+}
+
+/* Form */
+.feedback-form {
+  padding: 22px;
+}
+
+.form-group {
+  margin-bottom: 18px;
+}
+
+.form-group label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #333;
+  margin-bottom: 6px;
+  display: block;
+}
+
+.form-group textarea {
+  width: 100%;
+  padding: 13px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  font-size: 1rem;
+  resize: vertical;
+  background: #fafafa;
+  transition: 0.2s;
+}
+
+.form-group textarea:focus {
+  outline: none;
+  border-color: #4f46e5;
+  background: #fff;
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.15);
+}
+
+/* Submit Button */
+.submit-btn {
+  width: 100%;
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  border: none;
+  color: #fff;
+  padding: 14px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  box-shadow: 0 8px 20px rgba(79, 70, 229, 0.25);
+  transition: 0.3s;
+}
+
+.submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(79, 70, 229, 0.35);
+}
+
+.submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Success Message */
+.success-message {
+  text-align: center;
+  padding: 30px 0 40px;
+}
+
+.success-message i {
+  font-size: 3rem;
+  color: #4caf50;
+  margin-bottom: 15px;
+}
+
+.success-message p {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #222;
+}
+
+/* Mobile UI */
+@media (max-width: 480px) {
+  .feedback-overlay {
+    padding: 12px;
+  }
+
+  .feedback-modal {
+    width: 100%;
+    border-radius: 16px;
+  }
+
+  .feedback-tabs {
+    flex-direction: row;
+  }
+
+  .tab-btn {
+    padding: 12px 4px;
+  }
+}
