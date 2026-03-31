@@ -31,7 +31,7 @@ jobs:
 
       # 5️⃣ 🚀 Deploy to Azure (FORCE refresh container)
       - name: Deploy to Azure Web App
-        uses: azure/webapps-deploy@v3
+        uses: azure/webapps-deploy@v4
         with:
           app-name: quickbox-backend-docker
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_BACKEND }}
