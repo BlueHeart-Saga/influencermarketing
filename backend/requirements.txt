@@ -47,3 +47,5 @@ aiosmtplib
 
 python-socketio
 jinja2
+
+azure-storage-blob
