@@ -218,6 +218,10 @@ app.include_router(chating_router, tags=["chating"])
 def root():
     return {"message": "Hello from Azure!"}
 
+@app.get("/test")
+def test():
+    return {"status": "working"}
+
 @app.get("/healthz")
 def health():
     return {"status": "ok"}
@@ -227,19 +231,16 @@ def health():
 # -----------------------------
 @app.on_event("startup")
 async def startup_event():
-    """Start background tasks on application startup"""
     try:
-        # Import and start autopay scheduler
-        from scheduler.autopay_scheduler import AutopayScheduler
         import asyncio
-        
-        # Start the scheduler in the background
+        from scheduler.autopay_scheduler import AutopayScheduler
+
         scheduler = AutopayScheduler()
         asyncio.create_task(scheduler.start())
-        
-        print("✅ Autopay scheduler started successfully")
+
+        print("Scheduler started")
     except Exception as e:
-        print(f"❌ Failed to start autopay scheduler: {e}")
+        print("Scheduler error:", e)
         
         
 import socketio
