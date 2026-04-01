@@ -16,7 +16,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2️⃣ Set up Docker Buildx
+      # 2️⃣ Setup Docker
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -27,19 +27,16 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # 4️⃣ Build & Push (WITH TAGS)
+      # 4️⃣ Build & Push with UNIQUE TAG
       - name: Build and Push Docker Image
         run: |
-          docker build -t blueheartsaga/influencer-backend:latest ./backend
           docker build -t blueheartsaga/influencer-backend:${{ github.sha }} ./backend
-          
-          docker push blueheartsaga/influencer-backend:latest
           docker push blueheartsaga/influencer-backend:${{ github.sha }}
 
-      # 5️⃣ Deploy to Azure
+      # 5️⃣ Deploy to Azure (NO CACHE ISSUE)
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
           app-name: quickbox-backend-docker
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_BACKEND }}
-          images: blueheartsaga/influencer-backend:latest
+          images: blueheartsaga/influencer-backend:${{ github.sha }}
