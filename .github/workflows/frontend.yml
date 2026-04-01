@@ -37,7 +37,7 @@ jobs:
           echo "REACT_APP_GOOGLE_CLIENT_ID=${{ secrets.REACT_APP_GOOGLE_CLIENT_ID }}" >> .env
           echo "REACT_APP_STRIPE_PUBLISHABLE_KEY=${{ secrets.REACT_APP_STRIPE_PUBLISHABLE_KEY }}" >> .env
           echo "REACT_APP_RAZORPAY_KEY_ID=${{ secrets.REACT_APP_RAZORPAY_KEY_ID }}" >> .env
-          echo "REACT_APP_API_KEY=${{ secrets.REACT_APP_API_KEY }}" > .env
+          echo "REACT_APP_API_KEY=${{ secrets.REACT_APP_API_KEY }}" >> .env
           echo "GENERATE_SOURCEMAP=false" >> .env
 
       # 4️⃣ Install dependencies
