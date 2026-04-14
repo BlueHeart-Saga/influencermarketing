@@ -1,4 +1,9 @@
 import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
 from .base import StorageProvider
 from .fs_storage import FileSystemStorage
 from .azure_storage import AzureBlobStorage

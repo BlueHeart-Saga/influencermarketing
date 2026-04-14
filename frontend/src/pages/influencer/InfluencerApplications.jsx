@@ -15,7 +15,7 @@ import {
   Email, CalendarToday, Business, Message,
   Visibility, Refresh, AttachMoney,
   Campaign, CheckCircle, Pending, Cancel,
-  TrendingUp, Launch, Image as ImageIcon, Clear, Search, 
+  TrendingUp, Launch, Image as ImageIcon, Clear, Search,
   ExpandLess, ExpandMore, Sort, Tune, Person, Chat, Send,
   AttachFile, Delete, AccountCircle, Work, Star,
   Description, Payment, DoneAll, PendingActions,
@@ -32,6 +32,23 @@ import { AuthContext } from "../../context/AuthContext";
 import { styled } from '@mui/material/styles';
 import { format, parseISO, isAfter, subDays, differenceInDays } from 'date-fns';
 import { TabContext, TabPanel, TabList } from "@mui/lab";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faBullseye,
+  faUser,
+  faChartPie,
+  faArrowsRotate,
+  faFileContract,
+  faMoneyBillWave,
+  faCalendarDays,
+  faUserTag,
+  faCircleCheck,
+  faFolderOpen,
+  faRocket,
+  faAward,
+  faHandshake,
+  faMessage
+} from '@fortawesome/free-solid-svg-icons';
 
 // Add this with your other keyframes/styled components
 import { keyframes } from '@mui/system';
@@ -74,7 +91,7 @@ const StatusChip = styled(Chip)(({ status, theme }) => {
     rejected: theme.palette.error.main,
     default: theme.palette.grey[500]
   };
-  
+
   return {
     backgroundColor: colorMap[status] || colorMap.default,
     color: 'white',
@@ -255,11 +272,11 @@ const ProfileImage = ({ userId, profileType, alt, onClick, size = 40 }) => {
       try {
         setLoading(true);
         const response = await profileAPI.getProfileById(userId);
-        
+
         if (response && response.profile) {
           const profileData = response.profile;
           setUserData(profileData);
-          
+
           let imageId = null;
           if (profileType === 'influencer' && profileData.profile_picture) {
             imageId = profileData.profile_picture;
@@ -306,9 +323,9 @@ const ProfileImage = ({ userId, profileType, alt, onClick, size = 40 }) => {
 
   if (error || !imageUrl) {
     return (
-      <Avatar 
-        sx={{ 
-          width: size, 
+      <Avatar
+        sx={{
+          width: size,
           height: size,
           bgcolor: 'primary.light',
           color: 'primary.main',
@@ -346,11 +363,11 @@ const ProfileImage = ({ userId, profileType, alt, onClick, size = 40 }) => {
           <CircularProgress size={size * 0.5} />
         </Box>
       )}
-      <Avatar 
+      <Avatar
         src={imageUrl}
         alt={getDisplayName()}
-        sx={{ 
-          width: size, 
+        sx={{
+          width: size,
           height: size,
           cursor: onClick ? 'pointer' : 'default',
           boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
@@ -398,8 +415,8 @@ const UserInfo = ({ userId, profileType, showEmail = true, size = 40, showRating
   };
 
   const getDisplayName = () => {
-    if (!userData) return 'Loading...';
-    
+    if (!userData) return 'Brio User';
+
     if (profileType === 'influencer') {
       return userData.nickname || userData.full_name || 'Unknown Influencer';
     } else {
@@ -409,7 +426,7 @@ const UserInfo = ({ userId, profileType, showEmail = true, size = 40, showRating
 
   const getUsername = () => {
     if (!userData) return null;
-    
+
     if (profileType === 'influencer') {
       if (userData.nickname && userData.full_name && userData.nickname !== userData.full_name) {
         return userData.full_name;
@@ -437,7 +454,7 @@ const UserInfo = ({ userId, profileType, showEmail = true, size = 40, showRating
       <Box display="flex" alignItems="center" gap={2}>
         <CircularProgress size={24} />
         <Typography variant="body2" color="text.secondary">
-          Loading...
+          Brio User
         </Typography>
       </Box>
     );
@@ -455,10 +472,10 @@ const UserInfo = ({ userId, profileType, showEmail = true, size = 40, showRating
         size={size}
       />
       <Box flex={1}>
-        <Typography 
-          variant="subtitle1" 
+        <Typography
+          variant="subtitle1"
           fontWeight="700"
-          sx={{ 
+          sx={{
             cursor: 'pointer',
             '&:hover': { color: 'primary.main', textDecoration: 'underline' }
           }}
@@ -502,11 +519,11 @@ const CampaignImage = ({ fileId, alt, onClick, height = 240, width = '100%' }) =
 
   const getImageUrl = () => {
     if (!fileId) return null;
-    
+
     if (fileId.startsWith('http') || fileId.startsWith('data:') || fileId.startsWith('blob:')) {
       return fileId;
     }
-    
+
     return `${process.env.REACT_APP_API_URL || 'http://localhost:8000'}/api/campaigns/image/${fileId}`;
   };
 
@@ -515,8 +532,8 @@ const CampaignImage = ({ fileId, alt, onClick, height = 240, width = '100%' }) =
   if (!imageUrl || error) {
     return (
       <CardActionArea onClick={onClick}>
-        <Box 
-          sx={{ 
+        <Box
+          sx={{
             width: width,
             height: height,
             background: 'linear-gradient(135deg, #667eea 0%, #1565c0 100%)',
@@ -538,8 +555,8 @@ const CampaignImage = ({ fileId, alt, onClick, height = 240, width = '100%' }) =
     <CardActionArea onClick={onClick}>
       <Box sx={{ position: 'relative', width: width, height: height, mb: 2 }}>
         {loading && (
-          <Box 
-            sx={{ 
+          <Box
+            sx={{
               position: 'absolute',
               top: 0,
               left: 0,
@@ -584,11 +601,11 @@ const CampaignVideo = ({ fileId, alt, onClick, height = 240, width = '100%' }) =
 
   const getVideoUrl = () => {
     if (!fileId) return null;
-    
+
     if (fileId.startsWith('http') || fileId.startsWith('data:') || fileId.startsWith('blob:')) {
       return fileId;
     }
-    
+
     return `${process.env.REACT_APP_API_URL || 'http://localhost:8000'}/api/campaigns/video/${fileId}`;
   };
 
@@ -597,8 +614,8 @@ const CampaignVideo = ({ fileId, alt, onClick, height = 240, width = '100%' }) =
   if (!videoUrl || error) {
     return (
       <CardActionArea onClick={onClick}>
-        <Box 
-          sx={{ 
+        <Box
+          sx={{
             width: width,
             height: height,
             background: 'linear-gradient(135deg, #667eea 0%, #1565c0 100%)',
@@ -620,8 +637,8 @@ const CampaignVideo = ({ fileId, alt, onClick, height = 240, width = '100%' }) =
     <CardActionArea onClick={onClick}>
       <Box sx={{ position: 'relative', width: width, height: height, mb: 2 }}>
         {loading && (
-          <Box 
-            sx={{ 
+          <Box
+            sx={{
               position: 'absolute',
               top: 0,
               left: 0,
@@ -692,12 +709,10 @@ const CampaignVideo = ({ fileId, alt, onClick, height = 240, width = '100%' }) =
 };
 
 // Campaign Detail Section Component
-// Campaign Detail Section Component
 const CampaignDetailSection = ({ application }) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  // Add comprehensive null checking
   if (!application) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" py={6}>
@@ -708,42 +723,7 @@ const CampaignDetailSection = ({ application }) => {
     );
   }
 
-  // Use application data directly since all campaign info is included
   const campaignData = application;
-
-  const getCurrencySymbol = (currency = 'USD') => {
-    const symbols = {
-      USD: '$',
-      EUR: '€',
-      GBP: '£',
-      INR: '₹',
-      JPY: '¥'
-    };
-    return symbols[currency] || '$';
-  };
-
-  const formatCurrency = (amount, currency = 'USD') => {
-    const symbol = getCurrencySymbol(currency);
-    const amountNumber = typeof amount === 'number' ? amount : parseFloat(amount || 0);
-    return `${symbol}${amountNumber.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-  };
-
-  const getDaysRemaining = (deadline) => {
-    if (!deadline) return null;
-    try {
-      const today = new Date();
-      const deadlineDate = new Date(deadline);
-      const days = differenceInDays(deadlineDate, today);
-      return days > 0 ? days : 0;
-    } catch (error) {
-      console.error('Error calculating days remaining:', error);
-      return null;
-    }
-  };
-
-  const daysRemaining = getDaysRemaining(campaignData.campaign_deadline);
-
-  // Safe data access with fallbacks
   const campaignTitle = campaignData.campaign_title || 'Untitled Campaign';
   const campaignStatus = campaignData.campaign_status || 'active';
   const campaignCategory = campaignData.campaign_category || 'Uncategorized';
@@ -751,319 +731,186 @@ const CampaignDetailSection = ({ application }) => {
   const campaignRequirements = campaignData.campaign_requirements || 'No specific requirements provided.';
   const campaignBudget = campaignData.campaign_budget || 0;
   const campaignCurrency = campaignData.campaign_currency || 'USD';
-  const campaignDeadline = campaignData.campaign_deadline;
-  const campaignCreatedAt = campaignData.campaign_created_at;
-  const campaignImageId = campaignData.campaign_image_id;
-  const campaignVideoId = campaignData.campaign_video_id;
-  const brandId = campaignData.brand_id;
-  const brandEmail = campaignData.brand_email;
 
   return (
     <Box>
-      {/* Campaign Header */}
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" component="h1" gutterBottom fontWeight="800" color="primary">
+      {/* Header Section */}
+      <Box sx={{
+        p: 4,
+        background: 'linear-gradient(135deg, #f8faff 0%, #ffffff 100%)',
+        borderRadius: '24px',
+        border: '1px solid rgba(0,0,0,0.05)',
+        mb: 4
+      }}>
+        <Typography variant="h3" fontWeight="900" color="primary" gutterBottom>
           {campaignTitle}
         </Typography>
         <Box display="flex" alignItems="center" gap={2} flexWrap="wrap">
-          <Chip 
-            label={campaignStatus.toUpperCase()} 
-            color={
-              campaignStatus === 'active' ? 'success' :
-              campaignStatus === 'paused' ? 'warning' :
-              campaignStatus === 'completed' ? 'primary' : 'default'
-            }
-            size="small"
+          <Chip
+            label={campaignStatus.toUpperCase()}
+            sx={{
+              fontWeight: 800,
+              bgcolor: campaignStatus === 'active' ? 'success.main' : 'warning.main',
+              color: 'white'
+            }}
           />
-          <Typography variant="body1" color="text.secondary">
-            Category: {campaignCategory}
-          </Typography>
-          {daysRemaining !== null && (
-            <Chip 
-              icon={<Schedule />}
-              label={`${daysRemaining} days remaining`}
-              color={daysRemaining < 7 ? 'error' : daysRemaining < 30 ? 'warning' : 'success'}
-              variant="outlined"
-              size="small"
-            />
-          )}
+          <Chip
+            icon={<FontAwesomeIcon icon={faBullseye} style={{ fontSize: '0.8rem' }} />}
+            label={campaignCategory}
+            variant="outlined"
+            sx={{ fontWeight: 700, borderRadius: '8px' }}
+          />
         </Box>
       </Box>
 
-      <Grid container spacing={3}>
-        {/* Campaign Media */}
-        {(campaignImageId || campaignVideoId) && (
-          <Grid item xs={12}>
-            <CampaignDetailCard>
-              <Typography variant="h6" gutterBottom fontWeight="700" color="primary">
-                Campaign Media
-              </Typography>
-              <CampaignMediaSection>
-                {campaignImageId && (
-                  <Box sx={{ minWidth: 300, flex: 1 }}>
-                    <CampaignImage
-                      fileId={campaignImageId}
-                      alt={campaignTitle}
-                      height={200}
-                    />
-                    <Typography variant="caption" color="text.secondary" align="center" display="block">
-                      Campaign Image
-                    </Typography>
-                  </Box>
-                )}
-                {campaignVideoId && (
-                  <Box sx={{ minWidth: 300, flex: 1 }}>
-                    <CampaignVideo
-                      fileId={campaignVideoId}
-                      alt={campaignTitle}
-                      height={200}
-                    />
-                    <Typography variant="caption" color="text.secondary" align="center" display="block">
-                      Campaign Video
-                    </Typography>
-                  </Box>
-                )}
-              </CampaignMediaSection>
-            </CampaignDetailCard>
-          </Grid>
-        )}
-
-        {/* Campaign Description */}
-        <Grid item xs={12} md={6}>
-          <CampaignDetailCard>
-            <Typography variant="h6" gutterBottom fontWeight="700" color="primary">
-              Campaign Description
+      {/* Financials & Status Section */}
+      <Box sx={{ mb: 4 }}>
+        <Typography variant="h6" fontWeight="800" color="primary" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
+          <FontAwesomeIcon icon={faMoneyBillWave} />
+          Campaign Parameters
+        </Typography>
+        <Box sx={{
+          p: 4,
+          bgcolor: '#ffffff',
+          borderRadius: '24px',
+          border: '1px solid rgba(0,0,0,0.04)',
+          boxShadow: '0 10px 40px rgba(0,0,0,0.03)',
+          display: 'flex',
+          flexDirection: { xs: 'column', md: 'row' },
+          gap: 4,
+          alignItems: 'center'
+        }}>
+          <Box sx={{
+            p: 3,
+            bgcolor: 'success.light',
+            borderRadius: '20px',
+            textAlign: 'center',
+            minWidth: '200px'
+          }}>
+            <Typography variant="h4" fontWeight="900" color="#047857">
+              {campaignCurrency} {campaignBudget?.toLocaleString()}
             </Typography>
-            <Typography variant="body1" sx={{ lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
-              {campaignDescription}
+            <Typography variant="caption" fontWeight="700" sx={{ color: '#047857', opacity: 0.8 }}>
+              OFFERED BUDGET
             </Typography>
-          </CampaignDetailCard>
-        </Grid>
-
-        {/* Campaign Requirements */}
-        <Grid item xs={12} md={6}>
-          <CampaignDetailCard>
-            <Typography variant="h6" gutterBottom fontWeight="700" color="primary">
-              Requirements
-            </Typography>
-            <Typography variant="body1" sx={{ lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
-              {campaignRequirements}
-            </Typography>
-          </CampaignDetailCard>
-        </Grid>
-
-        {/* Campaign Details */}
-        <Grid item xs={12}>
-          <CampaignDetailCard>
-            <Typography variant="h6" gutterBottom fontWeight="700" color="primary">
-              Campaign Details
-            </Typography>
-            <Grid container spacing={3}>
-              <Grid item xs={12} sm={6} md={3}>
-                <StatRow>
-                  <MonetizationOnIcon />
-                  <Box>
-                    <Typography variant="body2" fontWeight="600" color="text.secondary">
-                      Budget
-                    </Typography>
-                    <Typography variant="h6" fontWeight="800" color="primary">
-                      {formatCurrency(campaignBudget, campaignCurrency)}
-                    </Typography>
+          </Box>
+          <Divider orientation="vertical" flexItem sx={{ display: { xs: 'none', md: 'block' } }} />
+          <Box sx={{ flex: 1 }}>
+            <Grid container spacing={2}>
+              {[
+                { icon: <FontAwesomeIcon icon={faCalendarDays} />, label: 'Deadline', value: campaignData.campaign_deadline ? format(new Date(campaignData.campaign_deadline), 'PPP') : 'N/A' },
+                { icon: <FontAwesomeIcon icon={faRocket} />, label: 'Priority', value: campaignData.priority || 'Standard' },
+                { icon: <FontAwesomeIcon icon={faAward} />, label: 'Platform', value: campaignData.platform || 'All' }
+              ].map((item, i) => (
+                <Grid item xs={12} sm={4} key={i}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                    <Box sx={{ color: 'primary.main', opacity: 0.8 }}>{item.icon}</Box>
+                    <Box>
+                      <Typography variant="caption" color="text.secondary" fontWeight="700">{item.label}</Typography>
+                      <Typography variant="body2" fontWeight="800">{item.value}</Typography>
+                    </Box>
                   </Box>
-                </StatRow>
-              </Grid>
-              <Grid item xs={12} sm={6} md={3}>
-                <StatRow>
-                  <Category />
-                  <Box>
-                    <Typography variant="body2" fontWeight="600" color="text.secondary">
-                      Category
-                    </Typography>
-                    <Typography variant="h6" fontWeight="800">
-                      {campaignCategory}
-                    </Typography>
-                  </Box>
-                </StatRow>
-              </Grid>
-              <Grid item xs={12} sm={6} md={3}>
-                <StatRow>
-                  <Schedule />
-                  <Box>
-                    <Typography variant="body2" fontWeight="600" color="text.secondary">
-                      Deadline
-                    </Typography>
-                    <Typography variant="h6" fontWeight="800">
-                      {campaignDeadline ? 
-                        new Date(campaignDeadline).toLocaleDateString() : 'N/A'
-                      }
-                    </Typography>
-                  </Box>
-                </StatRow>
-              </Grid>
-              <Grid item xs={12} sm={6} md={3}>
-                <StatRow>
-                  <Flag />
-                  <Box>
-                    <Typography variant="body2" fontWeight="600" color="text.secondary">
-                      Status
-                    </Typography>
-                    <Typography variant="h6" fontWeight="800">
-                      {campaignStatus.charAt(0).toUpperCase() + campaignStatus.slice(1)}
-                    </Typography>
-                  </Box>
-                </StatRow>
-              </Grid>
+                </Grid>
+              ))}
             </Grid>
-          </CampaignDetailCard>
-        </Grid>
+          </Box>
+        </Box>
+      </Box>
 
-        {/* Timeline Information */}
-        <Grid item xs={12} md={6}>
-          <CampaignDetailCard>
-            <Typography variant="h6" gutterBottom fontWeight="700" color="primary">
-              Timeline
-            </Typography>
-            <Box sx={{ '& > *': { mb: 2 } }}>
-              <StatRow>
-                <CalendarToday />
-                <Box>
-                  <Typography variant="body2" fontWeight="600" color="text.secondary">
-                    Campaign Created
-                  </Typography>
-                  <Typography variant="body1" fontWeight="600">
-                    {campaignCreatedAt ? 
-                      new Date(campaignCreatedAt).toLocaleDateString() : 'N/A'
-                    }
-                  </Typography>
-                </Box>
-              </StatRow>
-              <StatRow>
-                <Assignment />
-                <Box>
-                  <Typography variant="body2" fontWeight="600" color="text.secondary">
-                    You Applied
-                  </Typography>
-                  <Typography variant="body1" fontWeight="600">
-                    {campaignData.applied_at ? 
-                      new Date(campaignData.applied_at).toLocaleDateString() : 'N/A'
-                    }
-                  </Typography>
-                </Box>
-              </StatRow>
-              {campaignData.contract_signed_at && (
-                <StatRow>
-                  <Description />
-                  <Box>
-                    <Typography variant="body2" fontWeight="600" color="text.secondary">
-                      Contract Signed
-                    </Typography>
-                    <Typography variant="body1" fontWeight="600">
-                      {new Date(campaignData.contract_signed_at).toLocaleDateString()}
-                    </Typography>
-                  </Box>
-                </StatRow>
-              )}
-              {campaignData.media_submitted_at && (
-                <StatRow>
-                  <ImageIcon />
-                  <Box>
-                    <Typography variant="body2" fontWeight="600" color="text.secondary">
-                      Media Submitted
-                    </Typography>
-                    <Typography variant="body1" fontWeight="600">
-                      {new Date(campaignData.media_submitted_at).toLocaleDateString()}
-                    </Typography>
-                  </Box>
-                </StatRow>
-              )}
-            </Box>
-          </CampaignDetailCard>
-        </Grid>
+      {/* Description Section */}
+      <Box sx={{ mb: 4 }}>
+        <Typography variant="h6" fontWeight="800" color="primary" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
+          <FontAwesomeIcon icon={faChartPie} />
+          Strategic Overview
+        </Typography>
+        <Box sx={{
+          p: 4,
+          bgcolor: '#ffffff',
+          borderRadius: '24px',
+          border: '1px solid rgba(0,0,0,0.04)',
+          lineHeight: 1.8,
+          color: 'text.primary',
+          fontSize: '1rem',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.02)'
+        }}>
+          {campaignDescription}
+        </Box>
+      </Box>
 
-        {/* Brand Information */}
-        <Grid item xs={12} md={6}>
-          <CampaignDetailCard>
-            <Typography variant="h6" gutterBottom fontWeight="700" color="primary">
-              Brand Information
-            </Typography>
-            {brandId ? (
-              <Box 
-                sx={{ 
-                  p: 3, 
-                  backgroundColor: 'rgba(102, 126, 234, 0.08)', 
-                  borderRadius: '16px',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease',
-                  '&:hover': {
-                    backgroundColor: 'rgba(102, 126, 234, 0.12)',
-                    transform: 'translateX(4px)',
-                  }
-                }}
-              >
-                <UserInfo
-                  userId={brandId}
-                  profileType="brand"
-                  showEmail={true}
-                  showRating={true}
-                  size={60}
-                />
-              </Box>
-            ) : (
-              <Box sx={{ p: 3, backgroundColor: 'grey.50', borderRadius: '16px' }}>
-                <Typography variant="body2" color="text.secondary">
-                  Brand information not available
-                </Typography>
-              </Box>
-            )}
-            {brandEmail && (
-              <Box sx={{ mt: 2, p: 2, backgroundColor: 'grey.50', borderRadius: '12px' }}>
-                <Typography variant="body2" fontWeight="600" color="text.secondary">
-                  Contact Email:
-                </Typography>
-                <Typography variant="body1" fontWeight="600">
-                  {brandEmail}
-                </Typography>
-              </Box>
-            )}
-          </CampaignDetailCard>
-        </Grid>
-      </Grid>
+      {/* Requirements Section */}
+      <Box sx={{ mb: 4 }}>
+        <Typography variant="h6" fontWeight="800" color="primary" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
+          <FontAwesomeIcon icon={faFileContract} />
+          Deliverables & Requirements
+        </Typography>
+        <Box sx={{
+          p: 4,
+          background: 'linear-gradient(135deg, #fff9f0 0%, #ffffff 100%)',
+          borderRadius: '24px',
+          border: '1px solid rgba(245, 158, 11, 0.1)',
+          lineHeight: 1.8,
+          color: 'text.primary'
+        }}>
+          {campaignRequirements}
+        </Box>
+      </Box>
+
+      {/* Brand Section */}
+      <Box>
+        <Typography variant="h6" fontWeight="800" color="primary" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
+          <FontAwesomeIcon icon={faUserTag} />
+          Partner Brand
+        </Typography>
+        <Box sx={{
+          p: 4,
+          background: '#ffffff',
+          borderRadius: '24px',
+          border: '1px solid rgba(0,0,0,0.05)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          transition: 'transform 0.3s ease',
+          '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 10px 40px rgba(0,0,0,0.05)' }
+        }}>
+          <UserInfo
+            userId={campaignData.brand_id}
+            profileType="brand"
+            showEmail={true}
+            showRating={true}
+            size={80}
+          />
+          <Button
+            variant="contained"
+            startIcon={<FontAwesomeIcon icon={faHandshake} />}
+            onClick={() => window.open(`/brand/profile/view/brand/${campaignData.brand_id}`, '_blank')}
+            sx={{
+              borderRadius: '14px',
+              px: 4,
+              py: 1.5,
+              fontWeight: 800,
+              display: { xs: 'none', md: 'flex' }
+            }}
+          >
+            Visit Profile
+          </Button>
+        </Box>
+      </Box>
     </Box>
   );
 };
 
 // Contract Acceptance Dialog Component
-// Contract Acceptance Dialog Component
 const ContractAcceptanceDialog = ({ open, onClose, application, onAcceptContract }) => {
   const [accepting, setAccepting] = useState(false);
-  const [campaignDetails, setCampaignDetails] = useState(null);
   const [localError, setLocalError] = useState('');
   const [localSuccess, setLocalSuccess] = useState('');
   const { user } = useContext(AuthContext);
 
-  useEffect(() => {
-    const fetchCampaignDetails = async () => {
-      if (application?.campaign_id) {
-        try {
-          const response = await campaignAPI.getCampaignById(application.campaign_id);
-          setCampaignDetails(response);
-        } catch (error) {
-          console.error('Error fetching campaign details:', error);
-        }
-      }
-    };
-
-    if (open && application) {
-      fetchCampaignDetails();
-    }
-  }, [open, application]);
-
   const handleAcceptContract = async () => {
     setAccepting(true);
     setLocalError('');
-    
+
     try {
-      // Get current user ID
       let currentUserId = user?._id || user?.id;
       if (!currentUserId) {
         const storedUser = JSON.parse(localStorage.getItem('user'));
@@ -1076,90 +923,18 @@ const ContractAcceptanceDialog = ({ open, onClose, application, onAcceptContract
         return;
       }
 
-      const contractData = {
-        campaign_id: application.campaign_id,
-        influencer_id: currentUserId,
-        terms_accepted: true,
-        signed_at: new Date().toISOString()
-      };
-
-      console.log('Sending contract acceptance:', contractData);
-      
-      // Call the parent's onAcceptContract function
       await onAcceptContract(application);
-      
       setLocalSuccess('Contract accepted successfully!');
-      
-      // Close dialog after a short delay
-      setTimeout(() => {
-        onClose();
-      }, 1500);
-      
+      setTimeout(() => onClose(), 1500);
     } catch (err) {
       console.error('Contract acceptance failed:', err);
-      const errorDetail = err.response?.data?.detail || err.message;
-      setLocalError(`Contract acceptance failed: ${errorDetail}`);
+      setLocalError(`Contract acceptance failed: ${err.response?.data?.detail || err.message}`);
     } finally {
       setAccepting(false);
     }
   };
 
-  // Add null check for application
-  if (!application) {
-    return (
-      <Dialog
-        open={open}
-        onClose={onClose}
-        maxWidth="md"
-        fullWidth
-        PaperProps={{ 
-          sx: { 
-            borderRadius: '20px',
-            background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
-          }
-        }}
-      >
-        <DialogTitle sx={{ 
-          background: 'linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%)', 
-          color: 'white',
-          fontWeight: 700,
-          py: 3
-        }}>
-          <Box display="flex" alignItems="center" justifyContent="space-between">
-            <Box display="flex" alignItems="center" gap={2}>
-              <Description sx={{ fontSize: 28 }} />
-              <Typography variant="h5">Contract Agreement</Typography>
-            </Box>
-            <IconButton onClick={onClose} sx={{ color: 'white' }}>
-              <Close />
-            </IconButton>
-          </Box>
-        </DialogTitle>
-        <DialogContent>
-          <Box display="flex" justifyContent="center" alignItems="center" py={4}>
-            <Typography variant="h6" color="text.secondary">
-              No application data available
-            </Typography>
-          </Box>
-        </DialogContent>
-        <DialogActions sx={{ p: 3 }}>
-          <Button 
-            onClick={onClose}
-            sx={{ 
-              borderRadius: '12px', 
-              px: 4,
-              fontWeight: 600
-            }}
-          >
-            Close
-          </Button>
-        </DialogActions>
-      </Dialog>
-    );
-  }
-
-  // Use application data directly
-  const campaignData = application;
+  if (!application) return null;
 
   return (
     <Dialog
@@ -1167,161 +942,71 @@ const ContractAcceptanceDialog = ({ open, onClose, application, onAcceptContract
       onClose={onClose}
       maxWidth="md"
       fullWidth
-      PaperProps={{ 
-        sx: { 
-          borderRadius: '20px',
-          background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
-        }
+      PaperProps={{
+        sx: { borderRadius: '24px', overflow: 'hidden' }
       }}
     >
-      <DialogTitle sx={{ 
-        background: 'linear-gradient(135deg, #2563eb 0%, #2563eb 100%)', 
+      <DialogTitle sx={{
+        background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
         color: 'white',
-        fontWeight: 700,
+        fontWeight: 800,
         py: 3
       }}>
         <Box display="flex" alignItems="center" justifyContent="space-between">
           <Box display="flex" alignItems="center" gap={2}>
-            <Description sx={{ fontSize: 28 }} />
-            <Typography variant="h5">Contract Agreement</Typography>
+            <FontAwesomeIcon icon={faFileContract} size="lg" />
+            <Typography variant="h5">Digital Contract Signature</Typography>
           </Box>
           <IconButton onClick={onClose} sx={{ color: 'white' }}>
             <Close />
           </IconButton>
         </Box>
       </DialogTitle>
-      
-      <DialogContent dividers sx={{ p: 4 }}>
-        {/* Error/Success messages */}
-        {localError && (
-          <Alert severity="error" sx={{ mb: 3, borderRadius: '8px' }}>
-            {localError}
-          </Alert>
-        )}
-        
-        {localSuccess && (
-          <Alert severity="success" sx={{ mb: 3, borderRadius: '8px' }}>
-            {localSuccess}
-          </Alert>
-        )}
-        
-        <Box mb={4}>
-          <Typography variant="h4" gutterBottom color="primary" fontWeight="700">
-            Congratulations! 🎉
-          </Typography>
-          <Typography variant="h6" gutterBottom>
-            Your application for <strong style={{ color: '#9C27B0' }}>{campaignData?.campaign_title}</strong> has been approved!
-          </Typography>
-          <Typography variant="body1" color="text.secondary">
-            Please review and accept the contract agreement to proceed with the campaign.
-          </Typography>
-        </Box>
+      <DialogContent sx={{ p: 4 }}>
+        {localError && <Alert severity="error" sx={{ mb: 3, borderRadius: '12px' }}>{localError}</Alert>}
+        {localSuccess && <Alert severity="success" sx={{ mb: 3, borderRadius: '12px' }}>{localSuccess}</Alert>}
 
-        <Box sx={{ p: 3, bgcolor: 'success.light', borderRadius: '16px', mb: 3 }}>
-          <Typography variant="h6" gutterBottom color="success.dark" fontWeight="600">
-            Campaign Details:
-          </Typography>
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
-              <Typography variant="body1" fontWeight="600">Budget:</Typography>
-              <Typography variant="body2">
-                {campaignData?.campaign_currency || 'USD'} {campaignData?.campaign_budget}
-              </Typography>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Typography variant="body1" fontWeight="600">Deadline:</Typography>
-              <Typography variant="body2">
-                {campaignData?.campaign_deadline ? new Date(campaignData.campaign_deadline).toLocaleDateString() : 'N/A'}
-              </Typography>
-            </Grid>
-            <Grid item xs={12}>
-              <Typography variant="body1" fontWeight="600">Requirements:</Typography>
-              <Typography variant="body2">
-                {campaignData?.campaign_requirements || 'No specific requirements provided.'}
-              </Typography>
-            </Grid>
-          </Grid>
-        </Box>
+        <Typography variant="h6" fontWeight="700" gutterBottom color="primary">
+          Collaboration with {application.brand_name || 'Brand Partner'}
+        </Typography>
 
-        <Box sx={{ p: 3, borderRadius: '16px' }}>
-          <Typography variant="body1" color="info.dark" fontWeight="600">
-            Contract Terms & Conditions:
-          </Typography>
+        <Typography variant="body1" sx={{ mb: 4, color: 'text.secondary' }}>
+          By signing this agreement, you agree to the terms for <strong>{application.campaign_title}</strong>.
+          Budget: <strong>{application.campaign_currency} {application.campaign_budget?.toLocaleString()}</strong>.
+        </Typography>
+
+        <Box sx={{ p: 3, bgcolor: 'rgba(0,0,0,0.02)', borderRadius: '16px', border: '1px dashed rgba(0,0,0,0.1)', mb: 4 }}>
+          <Typography variant="subtitle2" fontWeight="800" gutterBottom>LEGAL TERMS:</Typography>
           <List dense>
-            <ListItem>
-              <ListItemIcon>
-                <CheckCircle color="success" />
-              </ListItemIcon>
-              <ListItemText 
-                primary="Content Delivery" 
-                secondary="Deliver high-quality media content as per campaign requirements"
-              />
-            </ListItem>
-            <ListItem>
-              <ListItemIcon>
-                <CheckCircle color="success" />
-              </ListItemIcon>
-              <ListItemText 
-                primary="Timeline Compliance" 
-                secondary="Submit all deliverables before the campaign deadline"
-              />
-            </ListItem>
-            <ListItem>
-              <ListItemIcon>
-                <CheckCircle color="success" />
-              </ListItemIcon>
-              <ListItemText 
-                primary="Payment Terms" 
-                secondary={`Payment of ${campaignData?.campaign_currency || 'USD'} ${campaignData?.campaign_budget} upon successful completion`}
-              />
-            </ListItem>
-            <ListItem>
-              <ListItemIcon>
-                <CheckCircle color="success" />
-              </ListItemIcon>
-              <ListItemText 
-                primary="Content Usage" 
-                secondary="Brand receives rights to use submitted content for marketing purposes"
-              />
-            </ListItem>
+            {[
+              "Full usage rights for submitted media content.",
+              "Delivery by specified campaign deadlines.",
+              "Confidentiality regarding metrics and strategy."
+            ].map((text, i) => (
+              <ListItem key={i}>
+                <ListItemIcon><FontAwesomeIcon icon={faCircleCheck} color="#10b981" /></ListItemIcon>
+                <ListItemText primary={text} />
+              </ListItem>
+            ))}
           </List>
         </Box>
 
-        <Typography variant="body2" color="text.secondary" sx={{ mt: 3, fontStyle: 'italic' }}>
-          By accepting this contract, you agree to deliver the required media content according to the campaign specifications and timeline.
-        </Typography>
+        <Box sx={{ textAlign: 'center' }}>
+          <Button
+            variant="contained"
+            disabled={accepting || localSuccess}
+            onClick={handleAcceptContract}
+            startIcon={accepting ? <CircularProgress size={20} /> : <FontAwesomeIcon icon={faHandshake} />}
+            sx={{
+              borderRadius: '16px', px: 6, py: 2, fontWeight: 800,
+              background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+              boxShadow: '0 10px 20px rgba(16, 185, 129, 0.3)'
+            }}
+          >
+            {accepting ? 'Processing...' : localSuccess ? 'Accepted' : 'Sign Agreement'}
+          </Button>
+        </Box>
       </DialogContent>
-
-      <DialogActions sx={{ p: 3, gap: 2 }}>
-        <Button 
-          onClick={onClose}
-          sx={{ 
-            borderRadius: '12px', 
-            px: 4,
-            fontWeight: 600
-          }}
-          disabled={accepting}
-        >
-          Review Later
-        </Button>
-        <Button
-          variant="contained"
-          onClick={handleAcceptContract}
-          disabled={accepting || !!localSuccess}
-          startIcon={accepting ? <CircularProgress size={20} /> : <CheckCircle />}
-          sx={{ 
-            borderRadius: '12px', 
-            px: 4,
-            fontWeight: 600,
-            background: 'linear-gradient(135deg, #2563eb 0%, #2563eb 100%)',
-            '&:hover': {
-              background: 'linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%)',
-            }
-          }}
-        >
-          {accepting ? 'Accepting...' : localSuccess ? 'Accepted ✓' : 'Accept Contract'}
-        </Button>
-      </DialogActions>
     </Dialog>
   );
 };
@@ -1335,14 +1020,14 @@ const MediaSubmissionDialog = ({ open, onClose, application, onSubmitMedia }) =>
 
   const handleFileChange = (event) => {
     const selectedFiles = Array.from(event.target.files);
-    
+
     // Validate file types and sizes
     const validFiles = selectedFiles.filter(file => {
-      const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 
-                          'video/mp4', 'video/mpeg', 'video/ogg', 'video/webm',
-                          'audio/mpeg', 'audio/wav', 'audio/ogg',
-                          'application/pdf', 'application/msword', 
-                          'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+      const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp',
+        'video/mp4', 'video/mpeg', 'video/ogg', 'video/webm',
+        'audio/mpeg', 'audio/wav', 'audio/ogg',
+        'application/pdf', 'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
       const maxSize = 100 * 1024 * 1024; // 100MB
 
       if (!validTypes.includes(file.type)) {
@@ -1357,14 +1042,14 @@ const MediaSubmissionDialog = ({ open, onClose, application, onSubmitMedia }) =>
     });
 
     setFiles(prev => [...prev, ...validFiles]);
-    
+
     // Create previews for images
     const newPreviews = validFiles.map(file => ({
       file,
       preview: file.type.startsWith('image/') ? URL.createObjectURL(file) : null,
-      type: file.type.startsWith('image/') ? 'image' : 
-            file.type.startsWith('video/') ? 'video' : 
-            file.type.startsWith('audio/') ? 'audio' : 'document'
+      type: file.type.startsWith('image/') ? 'image' :
+        file.type.startsWith('video/') ? 'video' :
+          file.type.startsWith('audio/') ? 'audio' : 'document'
     }));
     setPreviews(prev => [...prev, ...newPreviews]);
   };
@@ -1372,15 +1057,15 @@ const MediaSubmissionDialog = ({ open, onClose, application, onSubmitMedia }) =>
   const removeFile = (index) => {
     const newFiles = [...files];
     const newPreviews = [...previews];
-    
+
     // Revoke object URL if it exists
     if (newPreviews[index]?.preview) {
       URL.revokeObjectURL(newPreviews[index].preview);
     }
-    
+
     newFiles.splice(index, 1);
     newPreviews.splice(index, 1);
-    
+
     setFiles(newFiles);
     setPreviews(newPreviews);
   };
@@ -1434,15 +1119,15 @@ const MediaSubmissionDialog = ({ open, onClose, application, onSubmitMedia }) =>
       onClose={handleClose}
       maxWidth="lg"
       fullWidth
-      PaperProps={{ 
-        sx: { 
+      PaperProps={{
+        sx: {
           borderRadius: '20px',
           background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
         }
       }}
     >
-      <DialogTitle sx={{ 
-        background: 'linear-gradient(135deg, #FF9800 0%, #F57C00 100%)', 
+      <DialogTitle sx={{
+        background: 'linear-gradient(135deg, #FF9800 0%, #F57C00 100%)',
         color: 'white',
         fontWeight: 700,
         py: 3
@@ -1457,7 +1142,7 @@ const MediaSubmissionDialog = ({ open, onClose, application, onSubmitMedia }) =>
           </IconButton>
         </Box>
       </DialogTitle>
-      
+
       <DialogContent dividers sx={{ p: 4 }}>
         <Box mb={4}>
           <Typography variant="h6" gutterBottom fontWeight="600">
@@ -1484,8 +1169,8 @@ const MediaSubmissionDialog = ({ open, onClose, application, onSubmitMedia }) =>
               component="span"
               startIcon={<AttachFile />}
               fullWidth
-              sx={{ 
-                py: 3, 
+              sx={{
+                py: 3,
                 mb: 3,
                 borderRadius: '12px',
                 border: '2px dashed',
@@ -1506,7 +1191,7 @@ const MediaSubmissionDialog = ({ open, onClose, application, onSubmitMedia }) =>
               </Box>
             </Button>
           </label>
-          
+
           {files.length > 0 && (
             <Typography variant="body1" color="primary" sx={{ mb: 3, fontWeight: 600 }}>
               {files.length} file(s) selected • Total: {(files.reduce((acc, file) => acc + file.size, 0) / 1024 / 1024).toFixed(2)} MB
@@ -1529,7 +1214,7 @@ const MediaSubmissionDialog = ({ open, onClose, application, onSubmitMedia }) =>
                           {preview.file.name}
                         </Typography>
                       </Box>
-                      
+
                       {preview.preview && (
                         <img
                           src={preview.preview}
@@ -1542,11 +1227,11 @@ const MediaSubmissionDialog = ({ open, onClose, application, onSubmitMedia }) =>
                           }}
                         />
                       )}
-                      
+
                       <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 1 }}>
                         Size: {(preview.file.size / 1024 / 1024).toFixed(2)} MB
                       </Typography>
-                      
+
                       <IconButton
                         size="small"
                         onClick={() => removeFile(index)}
@@ -1589,10 +1274,10 @@ const MediaSubmissionDialog = ({ open, onClose, application, onSubmitMedia }) =>
       </DialogContent>
 
       <DialogActions sx={{ p: 3, gap: 2 }}>
-        <Button 
+        <Button
           onClick={handleClose}
-          sx={{ 
-            borderRadius: '12px', 
+          sx={{
+            borderRadius: '12px',
             px: 4,
             fontWeight: 600
           }}
@@ -1604,8 +1289,8 @@ const MediaSubmissionDialog = ({ open, onClose, application, onSubmitMedia }) =>
           onClick={handleSubmit}
           disabled={uploading || files.length === 0}
           startIcon={uploading ? <CircularProgress size={20} /> : <Send />}
-          sx={{ 
-            borderRadius: '12px', 
+          sx={{
+            borderRadius: '12px',
             px: 4,
             fontWeight: 600,
             background: 'linear-gradient(135deg, #FF9800 0%, #F57C00 100%)',
@@ -1635,18 +1320,18 @@ const MediaFilesViewer = ({ open, onClose, application }) => {
         setError('');
         try {
           console.log('Fetching media files for application:', application);
-          
+
           // Try multiple API endpoints
           let mediaData = [];
-          
+
           try {
             // First try: Get campaign media files
             const response = await campaignAPI.getCampaignMediaFiles(application.campaign_id);
             console.log('Campaign media API response:', response);
-            
+
             if (response && Array.isArray(response)) {
               // Filter media files for this specific influencer
-              mediaData = response.filter(media => 
+              mediaData = response.filter(media =>
                 media.influencer_id === application.influencer_id
               );
             }
@@ -1659,10 +1344,10 @@ const MediaFilesViewer = ({ open, onClose, application }) => {
             try {
               const influencerResponse = await campaignAPI.getInfluencerMediaFiles();
               console.log('Influencer media API response:', influencerResponse);
-              
+
               if (influencerResponse && Array.isArray(influencerResponse)) {
                 // Filter for this specific campaign
-                mediaData = influencerResponse.filter(media => 
+                mediaData = influencerResponse.filter(media =>
                   media.campaign_id === application.campaign_id
                 );
               }
@@ -1714,7 +1399,7 @@ const MediaFilesViewer = ({ open, onClose, application }) => {
     try {
       console.log('Downloading file:', fileId, filename);
       const response = await campaignAPI.downloadMediaFile(fileId);
-      
+
       // Create download link
       const url = window.URL.createObjectURL(response);
       const link = document.createElement('a');
@@ -1726,7 +1411,7 @@ const MediaFilesViewer = ({ open, onClose, application }) => {
       window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error('Error downloading file:', error);
-      
+
       // Fallback: Try direct download URL
       const downloadUrl = `${process.env.REACT_APP_API_URL || 'http://localhost:8000'}/api/media/${fileId}/download`;
       window.open(downloadUrl, '_blank');
@@ -1740,12 +1425,12 @@ const MediaFilesViewer = ({ open, onClose, application }) => {
 
   const getMediaViewUrl = (media) => {
     if (!media.file_id) return null;
-    
+
     // Use the view endpoint for browser-compatible files
     if (media.media_type === 'image' || media.media_type === 'video' || media.media_type === 'audio') {
       return `${process.env.REACT_APP_API_URL || 'http://localhost:8000'}/api/media/${media.file_id}/view`;
     }
-    
+
     // For documents, use download endpoint
     return `${process.env.REACT_APP_API_URL || 'http://localhost:8000'}/api/media/${media.file_id}/download`;
   };
@@ -1759,16 +1444,16 @@ const MediaFilesViewer = ({ open, onClose, application }) => {
         onClose={onClose}
         maxWidth="lg"
         fullWidth
-        PaperProps={{ 
-          sx: { 
+        PaperProps={{
+          sx: {
             borderRadius: '20px',
             background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
             minHeight: '600px'
           }
         }}
       >
-        <DialogTitle sx={{ 
-          background: 'linear-gradient(135deg, #2196F3 0%, #1976D2 100%)', 
+        <DialogTitle sx={{
+          background: 'linear-gradient(135deg, #2196F3 0%, #1976D2 100%)',
           color: 'white',
           fontWeight: 700,
           py: 3
@@ -1786,7 +1471,7 @@ const MediaFilesViewer = ({ open, onClose, application }) => {
             </IconButton>
           </Box>
         </DialogTitle>
-        
+
         <DialogContent dividers sx={{ p: 4 }}>
           <Box mb={4}>
             <Typography variant="h6" gutterBottom>
@@ -1832,8 +1517,8 @@ const MediaFilesViewer = ({ open, onClose, application }) => {
             <Grid container spacing={3}>
               {mediaFiles.map((media, index) => (
                 <Grid item xs={12} sm={6} md={4} key={media.file_id || index}>
-                  <Card sx={{ 
-                    borderRadius: '16px', 
+                  <Card sx={{
+                    borderRadius: '16px',
                     overflow: 'hidden',
                     transition: 'all 0.3s ease',
                     '&:hover': {
@@ -1853,7 +1538,7 @@ const MediaFilesViewer = ({ open, onClose, application }) => {
                           </Typography>
                         </Box>
                       </Box>
-                      
+
                       {media.description && (
                         <Typography variant="body2" sx={{ mb: 2, fontStyle: 'italic' }}>
                           "{media.description}"
@@ -1866,7 +1551,7 @@ const MediaFilesViewer = ({ open, onClose, application }) => {
                         </Typography>
                       )}
                     </CardContent>
-                    
+
                     <CardActions sx={{ p: 2, pt: 0, gap: 1 }}>
                       <Button
                         size="small"
@@ -1895,10 +1580,10 @@ const MediaFilesViewer = ({ open, onClose, application }) => {
         </DialogContent>
 
         <DialogActions sx={{ p: 3 }}>
-          <Button 
+          <Button
             onClick={onClose}
-            sx={{ 
-              borderRadius: '12px', 
+            sx={{
+              borderRadius: '12px',
               px: 4,
               fontWeight: 600
             }}
@@ -1933,9 +1618,9 @@ const MediaFilesViewer = ({ open, onClose, application }) => {
                 <img
                   src={getMediaViewUrl(selectedMedia)}
                   alt={selectedMedia.filename}
-                  style={{ 
-                    maxWidth: '100%', 
-                    maxHeight: '70vh', 
+                  style={{
+                    maxWidth: '100%',
+                    maxHeight: '70vh',
                     objectFit: 'contain',
                     borderRadius: '8px'
                   }}
@@ -1947,8 +1632,8 @@ const MediaFilesViewer = ({ open, onClose, application }) => {
               ) : selectedMedia.media_type === 'video' ? (
                 <video
                   controls
-                  style={{ 
-                    maxWidth: '100%', 
+                  style={{
+                    maxWidth: '100%',
                     maxHeight: '70vh',
                     borderRadius: '8px'
                   }}
@@ -1986,7 +1671,7 @@ const MediaFilesViewer = ({ open, onClose, application }) => {
                   </Button>
                 </Box>
               )}
-              
+
               {selectedMedia.description && (
                 <Box sx={{ p: 3, borderTop: '1px solid', borderColor: 'divider' }}>
                   <Typography variant="body1" color="text.secondary">
@@ -1999,6 +1684,93 @@ const MediaFilesViewer = ({ open, onClose, application }) => {
         )}
       </Dialog>
     </>
+  );
+};
+
+// Application Media Gallery (Inline View)
+const ApplicationMediaGallery = ({ application }) => {
+  const [mediaFiles, setMediaFiles] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const fetchMedia = async () => {
+      if (!application) return;
+      setLoading(true);
+      setError('');
+      try {
+        const response = await campaignAPI.getCampaignMediaFiles(application.campaign_id);
+        if (response && Array.isArray(response)) {
+          const userMedia = response.filter(m => m.influencer_id === application.influencer_id);
+          setMediaFiles(userMedia);
+          if (userMedia.length === 0 && application.submitted_media) {
+            setMediaFiles(application.submitted_media);
+          }
+        } else if (application.submitted_media) {
+          setMediaFiles(application.submitted_media);
+        }
+      } catch (err) {
+        console.error('Fetch error:', err);
+        if (application.submitted_media) {
+          setMediaFiles(application.submitted_media);
+        } else {
+          setError('Failed to load media files');
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchMedia();
+  }, [application]);
+
+  if (loading) return (
+    <Box display="flex" justifyContent="center" py={8} flexDirection="column" alignItems="center" gap={2}>
+      <CircularProgress thickness={5} size={40} />
+      <Typography variant="body2" color="text.secondary">Fetching creative assets...</Typography>
+    </Box>
+  );
+
+  if (mediaFiles.length === 0) return (
+    <Box textAlign="center" py={8} bgcolor="#f8faff" borderRadius="24px" border="2px dashed" borderColor="divider">
+      <FontAwesomeIcon icon={faFolderOpen} style={{ fontSize: '3rem', color: '#cbd5e1', marginBottom: '1rem' }} />
+      <Typography color="text.secondary" fontWeight="700">No media assets submitted yet.</Typography>
+    </Box>
+  );
+
+  return (
+    <Box>
+      <Grid container spacing={3}>
+        {mediaFiles.map((media, index) => (
+          <Grid item xs={12} sm={6} md={3} key={media.file_id || index}>
+            <Box sx={{
+              position: 'relative',
+              borderRadius: '20px',
+              overflow: 'hidden',
+              boxShadow: '0 10px 30px rgba(0,0,0,0.08)',
+              border: '1px solid rgba(0,0,0,0.05)',
+              background: '#ffffff',
+              transition: 'all 0.3s ease',
+              aspectRatio: '1/1',
+              '&:hover': { transform: 'translateY(-5px)', boxShadow: '0 15px 45px rgba(0,0,0,0.12)' }
+            }}>
+              {media.media_type === 'image' ? (
+                <img
+                  src={`${process.env.REACT_APP_API_URL || 'http://localhost:8000'}/api/campaigns/image/${media.file_id}`}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                />
+              ) : (
+                <Box display="flex" alignItems="center" justifyContent="center" height="100%" bgcolor="#f1f5f9">
+                  <FontAwesomeIcon icon={media.media_type === 'video' ? faRocket : faFileContract} style={{ fontSize: '2.5rem', opacity: 0.3 }} />
+                </Box>
+              )}
+            </Box>
+            <Typography variant="caption" sx={{ mt: 1.5, display: 'block', px: 1, fontWeight: 700, color: 'text.secondary' }} noWrap>
+              {media.filename || `Asset ${index + 1}`}
+            </Typography>
+          </Grid>
+        ))}
+      </Grid>
+    </Box>
   );
 };
 
@@ -2022,7 +1794,7 @@ const InfluencerApplications = ({ applications: propApplications, onUpdate, load
   const [selectedImage, setSelectedImage] = useState(null);
   const [activeTab, setActiveTab] = useState('all');
   const [detailTab, setDetailTab] = useState('overview');
-  
+
   // Filter states
   const [filters, setFilters] = useState({
     search: '',
@@ -2036,9 +1808,9 @@ const InfluencerApplications = ({ applications: propApplications, onUpdate, load
     hasMessage: 'all',
     sortBy: 'newest'
   });
-  
+
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
-  
+
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const isTablet = useMediaQuery(theme.breakpoints.down('md'));
@@ -2055,9 +1827,9 @@ const InfluencerApplications = ({ applications: propApplications, onUpdate, load
       setInternalLoading(true);
       setError('');
       const response = await campaignAPI.getInfluencerApplications();
-      const appsData = Array.isArray(response) ? response : 
-                      response?.data ? response.data : 
-                      response?.applications ? response.applications : [];
+      const appsData = Array.isArray(response) ? response :
+        response?.data ? response.data :
+          response?.applications ? response.applications : [];
       setInternalApplications(appsData);
     } catch (err) {
       setError('Failed to fetch applications. Please check your connection.');
@@ -2137,10 +1909,10 @@ const InfluencerApplications = ({ applications: propApplications, onUpdate, load
       };
 
       console.log('Sending contract acceptance:', contractData);
-      
+
       const response = await campaignAPI.acceptContract(contractData);
       console.log('Contract acceptance response:', response);
-      
+
       setSuccess('Contract accepted successfully! You can now submit media files.');
       handleApplicationUpdate();
     } catch (err) {
@@ -2157,7 +1929,7 @@ const InfluencerApplications = ({ applications: propApplications, onUpdate, load
       if (description) {
         formData.append('description', description);
       }
-      
+
       // Append all files
       files.forEach(file => {
         formData.append('media_files', file);
@@ -2186,7 +1958,7 @@ const InfluencerApplications = ({ applications: propApplications, onUpdate, load
       // Search filter
       if (filters.search) {
         const searchLower = filters.search.toLowerCase();
-        const matchesSearch = 
+        const matchesSearch =
           (app.brand_name?.toLowerCase().includes(searchLower)) ||
           (app.campaign_title?.toLowerCase().includes(searchLower)) ||
           (app.message?.toLowerCase().includes(searchLower));
@@ -2238,7 +2010,7 @@ const InfluencerApplications = ({ applications: propApplications, onUpdate, load
     filtered.sort((a, b) => {
       const dateA = new Date(a.applied_at);
       const dateB = new Date(b.applied_at);
-      
+
       switch (filters.sortBy) {
         case 'newest':
           return dateB - dateA;
@@ -2259,7 +2031,7 @@ const InfluencerApplications = ({ applications: propApplications, onUpdate, load
   // Get unique brands and status counts for filter options
   const filterOptions = React.useMemo(() => {
     if (!applications || applications.length === 0) return { brands: [], statusCounts: {} };
-    
+
     const brands = [...new Set(applications.map(app => app.brand_name).filter(Boolean))].sort();
     const statusCounts = applications.reduce((acc, app) => {
       acc[app.status] = (acc[app.status] || 0) + 1;
@@ -2271,10 +2043,10 @@ const InfluencerApplications = ({ applications: propApplications, onUpdate, load
 
   // Tab counts
   const tabCounts = React.useMemo(() => {
-    if (!applications || applications.length === 0) return { 
-      all: 0, pending: 0, approved: 0, contracted: 0, media_submitted: 0, completed: 0, rejected: 0 
+    if (!applications || applications.length === 0) return {
+      all: 0, pending: 0, approved: 0, contracted: 0, media_submitted: 0, completed: 0, rejected: 0
     };
-    
+
     return {
       all: applications.length,
       pending: applications.filter(app => app.status === 'pending').length,
@@ -2297,139 +2069,139 @@ const InfluencerApplications = ({ applications: propApplications, onUpdate, load
   };
 
   const getStatusIcon = (status, application) => {
-  switch (status) {
-    case 'pending': return <Pending color="warning" />;
-    case 'approved': return <CheckCircle color="success" />;
-    case 'contracted': 
-      return application?.contract_signed ? 
-        <Description color="success" /> : 
-        <Description color="secondary" />;
-    case 'media_submitted': return <ImageIcon color="info" />;
-    case 'completed': return <DoneAll color="primary" />;
-    case 'rejected': return <Cancel color="error" />;
-    default: return <Campaign />;
-  }
-};
+    switch (status) {
+      case 'pending': return <Pending color="warning" />;
+      case 'approved': return <CheckCircle color="success" />;
+      case 'contracted':
+        return application?.contract_signed ?
+          <Description color="success" /> :
+          <Description color="secondary" />;
+      case 'media_submitted': return <ImageIcon color="info" />;
+      case 'completed': return <DoneAll color="primary" />;
+      case 'rejected': return <Cancel color="error" />;
+      default: return <Campaign />;
+    }
+  };
 
   const getStatusText = (status, application) => {
-  switch (status) {
-    case 'pending': return 'Under Review';
-    case 'approved': return 'Approved - Contract Ready';
-    case 'contracted': 
-      return application?.contract_signed ? 'Contract Signed ✓' : 'Contract Sent - Action Required';
-    case 'media_submitted': return 'Media Submitted';
-    case 'completed': return 'Completed';
-    case 'rejected': return 'Not Selected';
-    default: return status;
-  }
-};
+    switch (status) {
+      case 'pending': return 'Under Review';
+      case 'approved': return 'Approved - Contract Ready';
+      case 'contracted':
+        return application?.contract_signed ? 'Contract Signed ✓' : 'Contract Sent - Action Required';
+      case 'media_submitted': return 'Media Submitted';
+      case 'completed': return 'Completed';
+      case 'rejected': return 'Not Selected';
+      default: return status;
+    }
+  };
 
   const getApplicationActions = (app) => {
-  switch (app.status) {
-    case 'approved':
-      return (
-        <ContractButton
-          size="small"
-          startIcon={<Description />}
-          onClick={() => {
-            if (app) {
-              setSelectedApplicationForContract(app);
-              setContractAcceptanceDialogOpen(true);
-            }
-          }}
-        >
-          Review Contract
-        </ContractButton>
-      );
-    
-    // Fix: Check if contract is actually signed
-    case 'contracted':
-      if (app.contract_signed) {
-        // Contract is signed - show Submit Media button
-        return (
-          <MediaButton
-            size="small"
-            startIcon={<ImageIcon />}
-            onClick={() => {
-              setSelectedApplicationForMedia(app);
-              setMediaSubmissionDialogOpen(true);
-            }}
-          >
-            Submit Media
-          </MediaButton>
-        );
-      } else {
-        // Contract not signed yet - show Accept Contract button
+    switch (app.status) {
+      case 'approved':
         return (
           <ContractButton
             size="small"
             startIcon={<Description />}
             onClick={() => {
-              setSelectedApplicationForContract(app);
-              setContractAcceptanceDialogOpen(true);
+              if (app) {
+                setSelectedApplicationForContract(app);
+                setContractAcceptanceDialogOpen(true);
+              }
             }}
           >
-            Accept Contract First
+            Review Contract
           </ContractButton>
         );
-      }
-    
-    case 'media_submitted':
-      return (
-        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-          <Typography variant="caption" color="text.secondary" sx={{ alignSelf: 'center' }}>
-            Waiting for payment
+
+      // Fix: Check if contract is actually signed
+      case 'contracted':
+        if (app.contract_signed) {
+          // Contract is signed - show Submit Media button
+          return (
+            <MediaButton
+              size="small"
+              startIcon={<ImageIcon />}
+              onClick={() => {
+                setSelectedApplicationForMedia(app);
+                setMediaSubmissionDialogOpen(true);
+              }}
+            >
+              Submit Media
+            </MediaButton>
+          );
+        } else {
+          // Contract not signed yet - show Accept Contract button
+          return (
+            <ContractButton
+              size="small"
+              startIcon={<Description />}
+              onClick={() => {
+                setSelectedApplicationForContract(app);
+                setContractAcceptanceDialogOpen(true);
+              }}
+            >
+              Accept Contract First
+            </ContractButton>
+          );
+        }
+
+      case 'media_submitted':
+        return (
+          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+            <Typography variant="caption" color="text.secondary" sx={{ alignSelf: 'center' }}>
+              Waiting for payment
+            </Typography>
+          </Box>
+        );
+
+      case 'completed':
+        return (
+          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+            <PaymentButton
+              size="small"
+              startIcon={<DoneAll />}
+              disabled
+            >
+              Completed
+            </PaymentButton>
+          </Box>
+        );
+
+      default:
+        return (
+          <Typography variant="caption" color="text.secondary">
+            {getStatusText(app.status)}
           </Typography>
-        </Box>
-      );
-    
-    case 'completed':
-      return (
-        <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-          <PaymentButton
-            size="small"
-            startIcon={<DoneAll />}
-            disabled
-          >
-            Completed
-          </PaymentButton>
-        </Box>
-      );
-    
-    default:
-      return (
-        <Typography variant="caption" color="text.secondary">
-          {getStatusText(app.status)}
-        </Typography>
-      );
-  }
-};
+        );
+    }
+  };
 
   const getWorkflowSteps = (application) => {
-  const steps = [
-    { label: 'Applied', completed: true, icon: <Assignment /> },
-    { label: 'Under Review', completed: ['approved', 'contracted', 'media_submitted', 'completed'].includes(application.status), icon: <PendingActions /> },
-    { label: 'Approved', completed: ['approved', 'contracted', 'media_submitted', 'completed'].includes(application.status), icon: <CheckCircle /> },
-    { 
-      label: application.contract_signed ? 'Contract Signed' : 'Contract Sent', 
-      completed: ['contracted', 'media_submitted', 'completed'].includes(application.status), 
-      icon: <Description />,
-      subtext: application.contract_signed_at ? 
-        `Signed: ${new Date(application.contract_signed_at).toLocaleDateString()}` : 
-        'Awaiting your signature'
-    },
-    { label: 'Media Submitted', completed: ['media_submitted', 'completed'].includes(application.status), icon: <ImageIcon /> },
-    { label: 'Payment', completed: ['completed'].includes(application.status), icon: <MonetizationOn /> }
-  ];
+    const steps = [
+      { label: 'Applied', completed: true, icon: <Assignment /> },
+      { label: 'Under Review', completed: ['approved', 'contracted', 'media_submitted', 'completed'].includes(application.status), icon: <PendingActions /> },
+      { label: 'Approved', completed: ['approved', 'contracted', 'media_submitted', 'completed'].includes(application.status), icon: <CheckCircle /> },
+      {
+        label: application.contract_signed ? 'Contract Signed' : 'Contract Sent',
+        completed: ['contracted', 'media_submitted', 'completed'].includes(application.status),
+        icon: <Description />,
+        subtext: application.contract_signed_at ?
+          `Signed: ${new Date(application.contract_signed_at).toLocaleDateString()}` :
+          'Awaiting your signature'
+      },
+      { label: 'Media Submitted', completed: ['media_submitted', 'completed'].includes(application.status), icon: <ImageIcon /> },
+      { label: 'Payment', completed: ['completed'].includes(application.status), icon: <MonetizationOn /> }
+    ];
 
-  if (application.status === 'rejected') {
-    steps[1].completed = false;
-    steps[1].label = 'Rejected';
-    steps[1].icon = <Cancel />;
-  }
+    if (application.status === 'rejected') {
+      steps[1].completed = false;
+      steps[1].label = 'Rejected';
+      steps[1].icon = <Cancel />;
+    }
 
-  return steps;
-};
+    return steps;
+  };
 
   const getActiveStep = (application) => {
     switch (application.status) {
@@ -2466,16 +2238,16 @@ const InfluencerApplications = ({ applications: propApplications, onUpdate, load
     setDetailTab('overview');
   };
 
-// Update the handleCloseDialogs function:
-const handleCloseDialogs = () => {
-  setDetailDialogOpen(false);
-  setContractAcceptanceDialogOpen(false);
-  setMediaSubmissionDialogOpen(false);
-  setMediaFilesDialogOpen(false);
-  setSelectedApplication(null);
-  setSelectedApplicationForContract(null);
-  setSelectedApplicationForMedia(null);
-};
+  // Update the handleCloseDialogs function:
+  const handleCloseDialogs = () => {
+    setDetailDialogOpen(false);
+    setContractAcceptanceDialogOpen(false);
+    setMediaSubmissionDialogOpen(false);
+    setMediaFilesDialogOpen(false);
+    setSelectedApplication(null);
+    setSelectedApplicationForContract(null);
+    setSelectedApplicationForMedia(null);
+  };
 
   const handleViewBrandProfile = (brandId) => {
     navigate(`/influencer/profile/view/brand/${brandId}`);
@@ -2484,13 +2256,20 @@ const handleCloseDialogs = () => {
   const handleContactBrand = (application) => {
     const brandId = application.brand_id;
     if (brandId) {
-      navigate(`/influencer/collaborations?user=${brandId}&campaign=${application.campaign_id}`);
+      const params = new URLSearchParams({
+        user: brandId,
+        campaign: application.campaign_id,
+        title: application.campaign_title || application.title,
+        budget: application.campaign_budget || application.budget || '',
+        currency: application.campaign_currency || application.currency || 'USD'
+      });
+      navigate(`/influencer/collaborations?${params.toString()}`);
     }
   };
 
   const getActiveFilterCount = () => {
-    return Object.values(filters).filter(value => 
-      value !== '' && 
+    return Object.values(filters).filter(value =>
+      value !== '' &&
       !(Array.isArray(value) && value.length === 0) &&
       !(typeof value === 'object' && value.start === null && value.end === null)
     ).length;
@@ -2505,8 +2284,8 @@ const handleCloseDialogs = () => {
           Filters
         </Typography>
         <Badge badgeContent={getActiveFilterCount()} color="primary">
-          <Button 
-            size="small" 
+          <Button
+            size="small"
             onClick={clearAllFilters}
             startIcon={<Clear />}
             sx={{ fontWeight: 600 }}
@@ -2515,7 +2294,7 @@ const handleCloseDialogs = () => {
           </Button>
         </Badge>
       </Box>
-      
+
       {/* Global Search */}
       <SearchBar>
         <Search sx={{ color: 'text.secondary', mr: 1 }} />
@@ -2558,9 +2337,9 @@ const handleCloseDialogs = () => {
                       {getStatusText(status)}
                     </Typography>
                   </Box>
-                  <Chip 
-                    label={filterOptions.statusCounts[status] || 0} 
-                    size="small" 
+                  <Chip
+                    label={filterOptions.statusCounts[status] || 0}
+                    size="small"
                     sx={{ height: 20, minWidth: 30, fontSize: '0.7rem' }}
                   />
                 </Box>
@@ -2612,7 +2391,7 @@ const handleCloseDialogs = () => {
           backdropFilter: 'blur(8px)'
         }}
       >
-        <Box sx={{ 
+        <Box sx={{
           position: 'relative',
           maxWidth: '90vw',
           maxHeight: '90vh',
@@ -2636,9 +2415,9 @@ const handleCloseDialogs = () => {
           <img
             src={imageUrl}
             alt={alt}
-            style={{ 
-              maxWidth: '100%', 
-              maxHeight: '100%', 
+            style={{
+              maxWidth: '100%',
+              maxHeight: '100%',
               objectFit: 'contain',
               borderRadius: '12px',
               boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)'
@@ -2662,8 +2441,8 @@ const handleCloseDialogs = () => {
               icon={step.icon}
               sx={{
                 '& .MuiStepLabel-label': {
-                  color: step.completed ? 'success.main' : 
-                         index === activeStep ? 'primary.main' : 'text.secondary',
+                  color: step.completed ? 'success.main' :
+                    index === activeStep ? 'primary.main' : 'text.secondary',
                   fontWeight: index === activeStep ? 700 : 500
                 }
               }}
@@ -2682,15 +2461,15 @@ const handleCloseDialogs = () => {
 
   if (loading) {
     return (
-      <Box 
-        display="flex" 
-        justifyContent="center" 
-        alignItems="center" 
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
         minHeight="calc(100vh - 80px)"
-        Height= "calc(100vh - 80px)"
+        height="calc(100vh - 80px)"
         flexDirection="column"
-        sx={{ 
-          background: 'linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%)', 
+        sx={{
+          background: 'linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%)',
           borderRadius: '20px',
           mx: 2
         }}
@@ -2709,20 +2488,20 @@ const handleCloseDialogs = () => {
   if (error && !loading) {
     return (
       <Container maxWidth="lg" sx={{ py: 4 }}>
-        <Alert 
-          severity="error" 
-          sx={{ 
-            mb: 3, 
+        <Alert
+          severity="error"
+          sx={{
+            mb: 3,
             borderRadius: '16px',
             background: 'linear-gradient(135deg, #ffeaea 0%, #ffcece 100%)',
             color: '#d32f2f',
             fontWeight: 600,
             py: 2
-          }} 
+          }}
           action={
-            <Button 
-              color="inherit" 
-              size="small" 
+            <Button
+              color="inherit"
+              size="small"
               onClick={handleApplicationUpdate}
               sx={{ fontWeight: 700 }}
             >
@@ -2742,10 +2521,10 @@ const handleCloseDialogs = () => {
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
       {/* Header */}
-      <Box 
-        display="flex" 
-        justifyContent="space-between" 
-        alignItems="center" 
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
         mb={4}
         flexDirection={isMobile ? 'column' : 'row'}
         gap={isMobile ? 3 : 0}
@@ -2771,8 +2550,8 @@ const handleCloseDialogs = () => {
             startIcon={<Refresh />}
             onClick={handleApplicationUpdate}
             disabled={loading}
-            sx={{ 
-              borderRadius: '12px', 
+            sx={{
+              borderRadius: '12px',
               backgroundColor: 'rgba(255,255,255,0.2)',
               color: 'white',
               borderColor: 'rgba(255,255,255,0.3)',
@@ -2788,20 +2567,20 @@ const handleCloseDialogs = () => {
           </Button>
 
           <Button
-    variant="outlined"
-    startIcon={<FilterList />}
-    onClick={() => setFilterDrawerOpen(true)}
-    sx={{ 
-      borderRadius: '12px', 
-      backgroundColor: 'rgba(255,255,255,0.2)',
-      color: 'white',
-      borderColor: 'rgba(255,255,255,0.3)',
-      px: 3,
-      fontWeight: 600,
-    }}
-  >
-    Filters ({getActiveFilterCount()})
-  </Button>
+            variant="outlined"
+            startIcon={<FilterList />}
+            onClick={() => setFilterDrawerOpen(true)}
+            sx={{
+              borderRadius: '12px',
+              backgroundColor: 'rgba(255,255,255,0.2)',
+              color: 'white',
+              borderColor: 'rgba(255,255,255,0.3)',
+              px: 3,
+              fontWeight: 600,
+            }}
+          >
+            Filters ({getActiveFilterCount()})
+          </Button>
         </Box>
       </Box>
 
@@ -2812,85 +2591,85 @@ const handleCloseDialogs = () => {
           onChange={(e, newValue) => setActiveTab(newValue)}
           variant="scrollable"
           scrollButtons="auto"
-          sx={{ 
-            '& .MuiTab-root': { 
-              fontSize: '0.9rem', 
-              fontWeight: 700, 
-              py: 3, 
+          sx={{
+            '& .MuiTab-root': {
+              fontSize: '0.9rem',
+              fontWeight: 700,
+              py: 3,
               minHeight: '70px',
               textTransform: 'none'
-            } 
+            }
           }}
         >
-          <Tab 
+          <Tab
             label={
               <Box display="flex" alignItems="center">
                 <Work sx={{ mr: 1.5, fontSize: 24 }} />
                 All Applications
                 <Chip label={tabCounts.all} size="small" sx={{ ml: 1.5, fontWeight: 700 }} />
               </Box>
-            } 
-            value="all" 
+            }
+            value="all"
           />
-          <Tab 
+          <Tab
             label={
               <Box display="flex" alignItems="center">
                 <Pending sx={{ mr: 1.5, fontSize: 24 }} />
                 Under Review
                 <Chip label={tabCounts.pending} size="small" sx={{ ml: 1.5, fontWeight: 700 }} color="warning" />
               </Box>
-            } 
-            value="pending" 
+            }
+            value="pending"
           />
-          <Tab 
+          <Tab
             label={
               <Box display="flex" alignItems="center">
                 <CheckCircle sx={{ mr: 1.5, fontSize: 24 }} />
                 Approved
                 <Chip label={tabCounts.approved} size="small" sx={{ ml: 1.5, fontWeight: 700 }} color="success" />
               </Box>
-            } 
-            value="approved" 
+            }
+            value="approved"
           />
-          <Tab 
+          <Tab
             label={
               <Box display="flex" alignItems="center">
                 <Description sx={{ mr: 1.5, fontSize: 24 }} />
                 Contracted
                 <Chip label={tabCounts.contracted} size="small" sx={{ ml: 1.5, fontWeight: 700 }} color="secondary" />
               </Box>
-            } 
-            value="contracted" 
+            }
+            value="contracted"
           />
-          <Tab 
+          <Tab
             label={
               <Box display="flex" alignItems="center">
                 <ImageIcon sx={{ mr: 1.5, fontSize: 24 }} />
                 Media Ready
                 <Chip label={tabCounts.media_submitted} size="small" sx={{ ml: 1.5, fontWeight: 700 }} color="info" />
               </Box>
-            } 
-            value="media_submitted" 
+            }
+            value="media_submitted"
           />
-          <Tab 
+          <Tab
             label={
               <Box display="flex" alignItems="center">
                 <DoneAll sx={{ mr: 1.5, fontSize: 24 }} />
                 Completed
                 <Chip label={tabCounts.completed} size="small" sx={{ ml: 1.5, fontWeight: 700 }} color="primary" />
               </Box>
-            } 
-            value="completed" 
+            }
+            value="completed"
           />
-          <Tab 
+          <Tab
             label={
               <Box display="flex" alignItems="center">
                 <Cancel sx={{ mr: 1.5, fontSize: 24 }} />
                 Rejected
                 <Chip label={tabCounts.rejected} size="small" sx={{ ml: 1.5, fontWeight: 700 }} color="error" />
               </Box>
-            } 
-            value="rejected" 
+            }
+            value="rejected"
           />
         </Tabs>
       </Paper>
@@ -2906,8 +2685,8 @@ const handleCloseDialogs = () => {
 
         {/* Applications Content */}
         <Grid item xs={12}>
-  {/* Filter Toggle Button - Show on all screens */}
-  {/* <Button
+          {/* Filter Toggle Button - Show on all screens */}
+          {/* <Button
     fullWidth={isMobile}
     variant="outlined"
     startIcon={<FilterList />}
@@ -2925,13 +2704,13 @@ const handleCloseDialogs = () => {
 
           {/* Alerts */}
           {error && (
-            <Alert 
-              severity="error" 
-              sx={{ 
-                mb: 3, 
+            <Alert
+              severity="error"
+              sx={{
+                mb: 3,
                 borderRadius: '12px',
                 fontWeight: 600
-              }} 
+              }}
               onClose={() => setError('')}
             >
               {error}
@@ -2939,13 +2718,13 @@ const handleCloseDialogs = () => {
           )}
 
           {success && (
-            <Alert 
-              severity="success" 
-              sx={{ 
-                mb: 3, 
+            <Alert
+              severity="success"
+              sx={{
+                mb: 3,
                 borderRadius: '12px',
                 fontWeight: 600
-              }} 
+              }}
               onClose={() => setSuccess('')}
             >
               {success}
@@ -2992,457 +2771,457 @@ const handleCloseDialogs = () => {
 
           {/* Applications List */}
           {filteredApplications.length === 0 ? (
-  <Paper sx={{ 
-    textAlign: 'center', 
-    py: 10,
-    background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
-    borderRadius: '20px',
-    boxShadow: '0 12px 40px rgba(0, 0, 0, 0.1)',
-    border: '2px dashed rgba(102, 126, 234, 0.3)'
-  }}>
-    <CardContent>
-      <Campaign sx={{ fontSize: 80, color: 'grey.400', mb: 3, opacity: 0.7 }} />
-      <Typography variant="h4" color="text.secondary" gutterBottom fontWeight="700">
-        {applications.length === 0 ? 
-          "No Applications Yet" : 
-          "No Matching Applications"
-        }
-      </Typography>
-      <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 500, mx: 'auto', mb: 4, fontSize: '1.1rem' }}>
-        {applications.length === 0 ? 
-          "Start your influencer journey by applying to exciting brand campaigns!" :
-          "Try adjusting your filters to see more results"
-        }
-      </Typography>
-      {applications.length === 0 ? (
-        <GradientButton
-          startIcon={<Launch />}
-          onClick={() => navigate('/influencer/campaigns')}
-          size="large"
-        >
-          Browse Available Campaigns
-        </GradientButton>
-      ) : (
-        <GradientButton
-          startIcon={<Clear />}
-          onClick={clearAllFilters}
-          size="large"
-        >
-          Clear All Filters
-        </GradientButton>
-      )}
-    </CardContent>
-  </Paper>
-) : (
-  <Grid 
-    container 
-    spacing={3}
-    sx={{
-      display: 'grid',
-      gridTemplateColumns: {
-        xs: '1fr',
-        sm: 'repeat(1, 1fr)',
-        md: 'repeat(2, 1fr)',
-        lg: 'repeat(3, 1fr)'
-      },
-      gap: 3,
-      '& .MuiGrid-item': {
-        padding: 0,
-        width: '100%',
-        display: 'flex'
-      }
-    }}
-  >
-    {filteredApplications.map((app, index) => (                  
-      <Grid 
-        item 
-        key={`${app.campaign_id}-${app.influencer_id}-${index}`}
-        sx={{ 
-          animation: `${fadeIn} 0.5s ease`,
-          animationDelay: `${index * 0.1}s`,
-          animationFillMode: 'both',
-          display: 'flex',
-          minWidth: 0
-        }}
-      >
-        <Card 
-          sx={{ 
-            width: '100%',
-            height: '100%',
-            borderRadius: '16px', 
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)',
-            overflow: 'hidden',
-            transition: 'all 0.3s ease',
-            background: 'linear-gradient(145deg, #ffffff, #f8f9fa)',
-            border: '1px solid rgba(255, 255, 255, 0.6)',
-            backdropFilter: 'blur(10px)',
-            display: 'flex',
-            flexDirection: 'column',
-            p: 0,
-            '&:hover': {
-              transform: 'translateY(-4px)',
-              boxShadow: '0 12px 48px rgba(0, 0, 0, 0.15)',
-              borderColor: 'primary.light'
-            },
-          }}
-        >
-          {/* Campaign Image Section - Full Width */}
-          <Box sx={{ position: 'relative', width: '100%', height: '160px' }}>
-            {app.campaign_image_id ? (
-              <CardActionArea 
-                onClick={() => handleImageClick(app.campaign_image_id, app.campaign_title)}
-                sx={{ height: '100%' }}
-              >
-                <CardMedia
-                  component="img"
-                  image={`${process.env.REACT_APP_API_URL || 'http://localhost:8000'}/api/campaigns/image/${app.campaign_image_id}`}
-                  alt={app.campaign_title}
-                  sx={{ 
-                    width: '100%',
-                    height: '160px',
-                    objectFit: 'cover',
-                    transition: 'transform 0.3s ease',
-                    '&:hover': {
-                      transform: 'scale(1.05)'
-                    }
-                  }}
-                />
-                <Box 
-                  sx={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    background: 'linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.4) 100%)',
-                    display: 'flex',
-                    alignItems: 'flex-end',
-                    padding: 2,
-                  }}
-                >
-                  {/* Application Status Badge */}
-                  <Box sx={{ position: 'absolute', top: 12, right: 12, zIndex: 1 }}>
-                    <StatusChip
-                      label={getStatusText(app.status)}
-                      status={app.status}
-                      icon={getStatusIcon(app.status)}
-                    />
-                  </Box>
-                </Box>
-              </CardActionArea>
-            ) : (
-              <Box 
-                sx={{ 
+            <Paper sx={{
+              textAlign: 'center',
+              py: 10,
+              background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
+              borderRadius: '20px',
+              boxShadow: '0 12px 40px rgba(0, 0, 0, 0.1)',
+              border: '2px dashed rgba(102, 126, 234, 0.3)'
+            }}>
+              <CardContent>
+                <Campaign sx={{ fontSize: 80, color: 'grey.400', mb: 3, opacity: 0.7 }} />
+                <Typography variant="h4" color="text.secondary" gutterBottom fontWeight="700">
+                  {applications.length === 0 ?
+                    "No Applications Yet" :
+                    "No Matching Applications"
+                  }
+                </Typography>
+                <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 500, mx: 'auto', mb: 4, fontSize: '1.1rem' }}>
+                  {applications.length === 0 ?
+                    "Start your influencer journey by applying to exciting brand campaigns!" :
+                    "Try adjusting your filters to see more results"
+                  }
+                </Typography>
+                {applications.length === 0 ? (
+                  <GradientButton
+                    startIcon={<Launch />}
+                    onClick={() => navigate('/influencer/campaigns')}
+                    size="large"
+                  >
+                    Browse Available Campaigns
+                  </GradientButton>
+                ) : (
+                  <GradientButton
+                    startIcon={<Clear />}
+                    onClick={clearAllFilters}
+                    size="large"
+                  >
+                    Clear All Filters
+                  </GradientButton>
+                )}
+              </CardContent>
+            </Paper>
+          ) : (
+            <Grid
+              container
+              spacing={3}
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: {
+                  xs: '1fr',
+                  sm: 'repeat(1, 1fr)',
+                  md: 'repeat(2, 1fr)',
+                  lg: 'repeat(3, 1fr)'
+                },
+                gap: 3,
+                '& .MuiGrid-item': {
+                  padding: 0,
                   width: '100%',
-                  height: '160px',
-                  background: 'linear-gradient(135deg, #667eea 0%, #1565c0 100%)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                }}
-              >
-                <Campaign sx={{ fontSize: 64, color: 'white', opacity: 0.7 }} />
-              </Box>
-            )}
-          </Box>
-
-          {/* Card Content Section */}
-          <CardContent 
-            sx={{ 
-              flex: 1,
-              display: 'flex',
-              flexDirection: 'column',
-              p: 3,
-              '&:last-child': { pb: 3 }
-            }}
-          >
-            {/* Title with Application Count Badge */}
-            <Box 
-              display="flex" 
-              justifyContent="space-between" 
-              alignItems="flex-start" 
-              mb={2}
-              sx={{ 
-                minHeight: '32px', 
-                position: 'relative',
-                gap: 1
-              }}
-            >
-              <Typography 
-                variant="h6" 
-                sx={{ 
-                  fontWeight: 600,
-                  flex: 1,
-                  pr: 1,
-                  display: '-webkit-box',
-                  WebkitLineClamp: 2,
-                  WebkitBoxOrient: 'vertical',
-                  overflow: 'hidden',
-                  lineHeight: 1.3,
-                  minHeight: '2.6em'
-                }}
-              >
-                {app.campaign_title || 'Untitled Campaign'}
-              </Typography>
-              
-              {/* Applied Date Badge */}
-              <Chip
-                label={app.applied_at ? new Date(app.applied_at).toLocaleDateString() : 'N/A'}
-                size="small"
-                sx={{
-                  fontWeight: 500,
-                  fontSize: '0.7rem',
-                  backgroundColor: 'rgba(102, 126, 234, 0.1)',
-                  color: 'primary.main',
-                  flexShrink: 0
-                }}
-              />
-            </Box>
-
-            {/* Brand Profile Section */}
-            <Box 
-              display="flex" 
-              alignItems="center" 
-              mb={2} 
-              sx={{ 
-                p: 1.5, 
-                backgroundColor: 'rgba(102, 126, 234, 0.08)', 
-                borderRadius: '10px',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease',
-                '&:hover': {
-                  backgroundColor: 'rgba(102, 126, 234, 0.12)',
-                  transform: 'translateX(2px)',
+                  display: 'flex'
                 }
               }}
-              onClick={() => handleViewBrandProfile(app.brand_id)}
             >
-              <ProfileImage
-                userId={app.brand_id}
-                profileType="brand"
-                size={40}
-              />
-              <Box sx={{ ml: 1.5, flex: 1, minWidth: 0 }}>
-                <Typography variant="subtitle2" fontWeight="600" noWrap>
-                  {app.brand_name || 'Unknown Brand'}
-                </Typography>
-                <Typography variant="caption" color="text.secondary" noWrap>
-                  {app.campaign_category || 'General'}
-                </Typography>
-              </Box>
-              {/* <IconButton size="small" sx={{ color: 'primary.main' }}>
+              {filteredApplications.map((app, index) => (
+                <Grid
+                  item
+                  key={`${app.campaign_id}-${app.influencer_id}-${index}`}
+                  sx={{
+                    animation: `${fadeIn} 0.5s ease`,
+                    animationDelay: `${index * 0.1}s`,
+                    animationFillMode: 'both',
+                    display: 'flex',
+                    minWidth: 0
+                  }}
+                >
+                  <Card
+                    sx={{
+                      width: '100%',
+                      height: '100%',
+                      borderRadius: '16px',
+                      boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)',
+                      overflow: 'hidden',
+                      transition: 'all 0.3s ease',
+                      background: 'linear-gradient(145deg, #ffffff, #f8f9fa)',
+                      border: '1px solid rgba(255, 255, 255, 0.6)',
+                      backdropFilter: 'blur(10px)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      p: 0,
+                      '&:hover': {
+                        transform: 'translateY(-4px)',
+                        boxShadow: '0 12px 48px rgba(0, 0, 0, 0.15)',
+                        borderColor: 'primary.light'
+                      },
+                    }}
+                  >
+                    {/* Campaign Image Section - Full Width */}
+                    <Box sx={{ position: 'relative', width: '100%', height: '160px' }}>
+                      {app.campaign_image_id ? (
+                        <CardActionArea
+                          onClick={() => handleImageClick(app.campaign_image_id, app.campaign_title)}
+                          sx={{ height: '100%' }}
+                        >
+                          <CardMedia
+                            component="img"
+                            image={`${process.env.REACT_APP_API_URL || 'http://localhost:8000'}/api/campaigns/image/${app.campaign_image_id}`}
+                            alt={app.campaign_title}
+                            sx={{
+                              width: '100%',
+                              height: '160px',
+                              objectFit: 'cover',
+                              transition: 'transform 0.3s ease',
+                              '&:hover': {
+                                transform: 'scale(1.05)'
+                              }
+                            }}
+                          />
+                          <Box
+                            sx={{
+                              position: 'absolute',
+                              top: 0,
+                              left: 0,
+                              right: 0,
+                              bottom: 0,
+                              background: 'linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.4) 100%)',
+                              display: 'flex',
+                              alignItems: 'flex-end',
+                              padding: 2,
+                            }}
+                          >
+                            {/* Application Status Badge */}
+                            <Box sx={{ position: 'absolute', top: 12, right: 12, zIndex: 1 }}>
+                              <StatusChip
+                                label={getStatusText(app.status)}
+                                status={app.status}
+                                icon={getStatusIcon(app.status)}
+                              />
+                            </Box>
+                          </Box>
+                        </CardActionArea>
+                      ) : (
+                        <Box
+                          sx={{
+                            width: '100%',
+                            height: '160px',
+                            background: 'linear-gradient(135deg, #667eea 0%, #1565c0 100%)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            cursor: 'pointer',
+                          }}
+                        >
+                          <Campaign sx={{ fontSize: 64, color: 'white', opacity: 0.7 }} />
+                        </Box>
+                      )}
+                    </Box>
+
+                    {/* Card Content Section */}
+                    <CardContent
+                      sx={{
+                        flex: 1,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        p: 3,
+                        '&:last-child': { pb: 3 }
+                      }}
+                    >
+                      {/* Title with Application Count Badge */}
+                      <Box
+                        display="flex"
+                        justifyContent="space-between"
+                        alignItems="flex-start"
+                        mb={2}
+                        sx={{
+                          minHeight: '32px',
+                          position: 'relative',
+                          gap: 1
+                        }}
+                      >
+                        <Typography
+                          variant="h6"
+                          sx={{
+                            fontWeight: 600,
+                            flex: 1,
+                            pr: 1,
+                            display: '-webkit-box',
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden',
+                            lineHeight: 1.3,
+                            minHeight: '2.6em'
+                          }}
+                        >
+                          {app.campaign_title || 'Untitled Campaign'}
+                        </Typography>
+
+                        {/* Applied Date Badge */}
+                        <Chip
+                          label={app.applied_at ? new Date(app.applied_at).toLocaleDateString() : 'N/A'}
+                          size="small"
+                          sx={{
+                            fontWeight: 500,
+                            fontSize: '0.7rem',
+                            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                            color: 'primary.main',
+                            flexShrink: 0
+                          }}
+                        />
+                      </Box>
+
+                      {/* Brand Profile Section */}
+                      <Box
+                        display="flex"
+                        alignItems="center"
+                        mb={2}
+                        sx={{
+                          p: 1.5,
+                          backgroundColor: 'rgba(102, 126, 234, 0.08)',
+                          borderRadius: '10px',
+                          cursor: 'pointer',
+                          transition: 'all 0.3s ease',
+                          '&:hover': {
+                            backgroundColor: 'rgba(102, 126, 234, 0.12)',
+                            transform: 'translateX(2px)',
+                          }
+                        }}
+                        onClick={() => handleViewBrandProfile(app.brand_id)}
+                      >
+                        <ProfileImage
+                          userId={app.brand_id}
+                          profileType="brand"
+                          size={40}
+                        />
+                        <Box sx={{ ml: 1.5, flex: 1, minWidth: 0 }}>
+                          <Typography variant="subtitle2" fontWeight="600" noWrap>
+                            {app.brand_name || 'Unknown Brand'}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary" noWrap>
+                            {app.campaign_category || 'General'}
+                          </Typography>
+                        </Box>
+                        {/* <IconButton size="small" sx={{ color: 'primary.main' }}>
                 <Visibility fontSize="small" />
               </IconButton> */}
-            </Box>
+                      </Box>
 
-            <Divider sx={{ my: 2 }} />
+                      <Divider sx={{ my: 2 }} />
 
-            {/* Campaign Details Grid */}
-            <Box 
-              sx={{ 
-                display: 'grid',
-                gridTemplateColumns: 'repeat(2, 1fr)',
-                gap: 2,
-                mb: 2
-              }}
-            >
-              {/* Budget */}
-              <Box display="flex" alignItems="center" sx={{ minHeight: '24px' }}>
-                <AttachMoney sx={{ fontSize: 18, mr: 1.5, color: 'success.main', flexShrink: 0 }} />
-                <Box sx={{ minWidth: 0 }}>
-                  <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.75rem' }}>
-                    Budget
-                  </Typography>
-                  <Typography variant="body2" sx={{ fontWeight: 600, color: 'success.main' }}>
-                    {app.campaign_currency || 'USD'} {app.campaign_budget}
-                  </Typography>
-                </Box>
-              </Box>
+                      {/* Campaign Details Grid */}
+                      <Box
+                        sx={{
+                          display: 'grid',
+                          gridTemplateColumns: 'repeat(2, 1fr)',
+                          gap: 2,
+                          mb: 2
+                        }}
+                      >
+                        {/* Budget */}
+                        <Box display="flex" alignItems="center" sx={{ minHeight: '24px' }}>
+                          <AttachMoney sx={{ fontSize: 18, mr: 1.5, color: 'success.main', flexShrink: 0 }} />
+                          <Box sx={{ minWidth: 0 }}>
+                            <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.75rem' }}>
+                              Budget
+                            </Typography>
+                            <Typography variant="body2" sx={{ fontWeight: 600, color: 'success.main' }}>
+                              {app.campaign_currency || 'USD'} {app.campaign_budget}
+                            </Typography>
+                          </Box>
+                        </Box>
 
-              {/* Deadline */}
-              <Box display="flex" alignItems="center" sx={{ minHeight: '24px' }}>
-                <CalendarToday sx={{ fontSize: 18, mr: 1.5, color: 'warning.main', flexShrink: 0 }} />
-                <Box sx={{ minWidth: 0 }}>
-                  <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.75rem' }}>
-                    Deadline
-                  </Typography>
-                  <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                    {app.campaign_deadline ? new Date(app.campaign_deadline).toLocaleDateString() : 'N/A'}
-                  </Typography>
-                </Box>
-              </Box>
+                        {/* Deadline */}
+                        <Box display="flex" alignItems="center" sx={{ minHeight: '24px' }}>
+                          <CalendarToday sx={{ fontSize: 18, mr: 1.5, color: 'warning.main', flexShrink: 0 }} />
+                          <Box sx={{ minWidth: 0 }}>
+                            <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.75rem' }}>
+                              Deadline
+                            </Typography>
+                            <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                              {app.campaign_deadline ? new Date(app.campaign_deadline).toLocaleDateString() : 'N/A'}
+                            </Typography>
+                          </Box>
+                        </Box>
 
-              {/* Category */}
-              <Box display="flex" alignItems="center" sx={{ minHeight: '24px' }}>
-                <Category sx={{ fontSize: 18, mr: 1.5, color: 'primary.main', flexShrink: 0 }} />
-                <Box sx={{ minWidth: 0 }}>
-                  <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.75rem' }}>
-                    Category
-                  </Typography>
-                  <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                    {app.campaign_category || 'General'}
-                  </Typography>
-                </Box>
-              </Box>
+                        {/* Category */}
+                        <Box display="flex" alignItems="center" sx={{ minHeight: '24px' }}>
+                          <Category sx={{ fontSize: 18, mr: 1.5, color: 'primary.main', flexShrink: 0 }} />
+                          <Box sx={{ minWidth: 0 }}>
+                            <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.75rem' }}>
+                              Category
+                            </Typography>
+                            <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                              {app.campaign_category || 'General'}
+                            </Typography>
+                          </Box>
+                        </Box>
 
-              {/* Status */}
-              <Box display="flex" alignItems="center" sx={{ minHeight: '24px' }}>
-                <Flag sx={{ fontSize: 18, mr: 1.5, color: 'info.main', flexShrink: 0 }} />
-                <Box sx={{ minWidth: 0 }}>
-                  <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.75rem' }}>
-                    Campaign Status
-                  </Typography>
-                  <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                    {app.campaign_status?.charAt(0).toUpperCase() + app.campaign_status?.slice(1) || 'Active'}
-                  </Typography>
-                </Box>
-              </Box>
-            </Box>
+                        {/* Status */}
+                        <Box display="flex" alignItems="center" sx={{ minHeight: '24px' }}>
+                          <Flag sx={{ fontSize: 18, mr: 1.5, color: 'info.main', flexShrink: 0 }} />
+                          <Box sx={{ minWidth: 0 }}>
+                            <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.75rem' }}>
+                              Campaign Status
+                            </Typography>
+                            <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                              {app.campaign_status?.charAt(0).toUpperCase() + app.campaign_status?.slice(1) || 'Active'}
+                            </Typography>
+                          </Box>
+                        </Box>
+                      </Box>
 
-            {/* Mini Workflow Status */}
-            <Box sx={{ mb: 2, p: 1.5, backgroundColor: 'rgba(0, 0, 0, 0.02)', borderRadius: '8px' }}>
-              <Typography variant="caption" fontWeight="600" color="text.secondary" display="block" mb={1}>
-                APPLICATION STATUS:
-              </Typography>
-              <Box display="flex" alignItems="center" justifyContent="space-between">
-                <Typography variant="body2" fontWeight="600" color="primary">
-                  {getStatusText(app.status)}
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  {app.applied_at ? `Applied: ${new Date(app.applied_at).toLocaleDateString()}` : ''}
-                </Typography>
-              </Box>
-              
-              {/* Tiny Progress Line */}
-              <Box sx={{ mt: 1, position: 'relative', height: 4, backgroundColor: 'grey.200', borderRadius: 2 }}>
-                <Box 
-                  sx={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    height: '100%',
-                    width: `${(getActiveStep(app) / 5) * 100}%`,
-                    background: 'linear-gradient(90deg, #667eea 0%, #1565c0 100%)',
-                    borderRadius: 2,
-                    transition: 'width 0.5s ease'
-                  }}
-                />
-              </Box>
-            </Box>
+                      {/* Mini Workflow Status */}
+                      <Box sx={{ mb: 2, p: 1.5, backgroundColor: 'rgba(0, 0, 0, 0.02)', borderRadius: '8px' }}>
+                        <Typography variant="caption" fontWeight="600" color="text.secondary" display="block" mb={1}>
+                          APPLICATION STATUS:
+                        </Typography>
+                        <Box display="flex" alignItems="center" justifyContent="space-between">
+                          <Typography variant="body2" fontWeight="600" color="primary">
+                            {getStatusText(app.status)}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            {app.applied_at ? `Applied: ${new Date(app.applied_at).toLocaleDateString()}` : ''}
+                          </Typography>
+                        </Box>
 
-            {/* Application Message (if exists) */}
-            {app.message && (
-              <Box 
-                sx={{ 
-                  mb: 2, 
-                  p: 1.5, 
-                  backgroundColor: 'rgba(102, 126, 234, 0.05)', 
-                  borderRadius: '10px',
-                  borderLeft: '3px solid',
-                  borderLeftColor: 'primary.main'
-                }}
-              >
-                <Typography variant="caption" fontWeight="600" color="primary" display="block" mb={0.5}>
-                  YOUR MESSAGE:
-                </Typography>
-                <Typography 
-                  variant="body2" 
-                  sx={{ 
-                    fontStyle: 'italic',
-                    display: '-webkit-box',
-                    WebkitLineClamp: 2,
-                    WebkitBoxOrient: 'vertical',
-                    overflow: 'hidden',
-                    lineHeight: 1.4,
-                    color: 'text.secondary'
-                  }}
-                >
-                  "{app.message}"
-                </Typography>
-              </Box>
-            )}
+                        {/* Tiny Progress Line */}
+                        <Box sx={{ mt: 1, position: 'relative', height: 4, backgroundColor: 'grey.200', borderRadius: 2 }}>
+                          <Box
+                            sx={{
+                              position: 'absolute',
+                              top: 0,
+                              left: 0,
+                              height: '100%',
+                              width: `${(getActiveStep(app) / 5) * 100}%`,
+                              background: 'linear-gradient(90deg, #667eea 0%, #1565c0 100%)',
+                              borderRadius: 2,
+                              transition: 'width 0.5s ease'
+                            }}
+                          />
+                        </Box>
+                      </Box>
 
-            {/* Bottom Actions Section */}
-            <Box 
-              display="flex" 
-              gap={1} 
-              sx={{ 
-                mt: 'auto',
-                pt: 2,
-                borderTop: '1px solid',
-                borderColor: 'divider'
-              }}
-            >
-              <Button
-                variant="outlined"
-                size="small"
-                startIcon={<Visibility />}
-                onClick={() => handleViewDetails(app)}
-                sx={{ 
-                  borderRadius: '8px',
-                  flex: 1,
-                  minHeight: '36px'
-                }}
-              >
-                View Details
-              </Button>
-              
-              <IconButton
-                size="small"
-                onClick={() => handleContactBrand(app)}
-                sx={{ 
-                  borderRadius: '8px',
-                  background: 'rgba(25, 118, 210, 0)',
-                  '&:hover': { background: 'rgba(25, 118, 210, 0.2)' }
-                }}
-              >
-                <Message fontSize="small" />
-              </IconButton>
+                      {/* Application Message (if exists) */}
+                      {app.message && (
+                        <Box
+                          sx={{
+                            mb: 2,
+                            p: 1.5,
+                            backgroundColor: 'rgba(102, 126, 234, 0.05)',
+                            borderRadius: '10px',
+                            borderLeft: '3px solid',
+                            borderLeftColor: 'primary.main'
+                          }}
+                        >
+                          <Typography variant="caption" fontWeight="600" color="primary" display="block" mb={0.5}>
+                            YOUR MESSAGE:
+                          </Typography>
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              fontStyle: 'italic',
+                              display: '-webkit-box',
+                              WebkitLineClamp: 2,
+                              WebkitBoxOrient: 'vertical',
+                              overflow: 'hidden',
+                              lineHeight: 1.4,
+                              color: 'text.secondary'
+                            }}
+                          >
+                            "{app.message}"
+                          </Typography>
+                        </Box>
+                      )}
 
-              {/* View Media Button for relevant statuses */}
-              {(app.status === 'media_submitted' || app.status === 'completed') && (
-                <IconButton
-                  size="small"
-                  onClick={() => {
-                    setSelectedApplication(app);
-                    setMediaFilesDialogOpen(true);
-                  }}
-                  sx={{ 
-                    borderRadius: '8px',
-                    background: 'rgba(33, 150, 243, 0.1)',
-                    '&:hover': { background: 'rgba(33, 150, 243, 0.2)' }
-                  }}
-                >
-                  <ImageIcon fontSize="small" />
-                </IconButton>
-              )}
+                      {/* Bottom Actions Section */}
+                      <Box
+                        display="flex"
+                        gap={1}
+                        sx={{
+                          mt: 'auto',
+                          pt: 2,
+                          borderTop: '1px solid',
+                          borderColor: 'divider'
+                        }}
+                      >
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          startIcon={<Visibility />}
+                          onClick={() => handleViewDetails(app)}
+                          sx={{
+                            borderRadius: '8px',
+                            flex: 1,
+                            minHeight: '36px'
+                          }}
+                        >
+                          View Details
+                        </Button>
 
-              {/* Contract/Media Action Button */}
-              <Box sx={{ flex: 1 }}>
-                {getApplicationActions(app)}
-              </Box>
-            </Box>
-          </CardContent>
-        </Card>
+                        <IconButton
+                          size="small"
+                          onClick={() => handleContactBrand(app)}
+                          sx={{
+                            borderRadius: '8px',
+                            background: 'rgba(25, 118, 210, 0)',
+                            '&:hover': { background: 'rgba(25, 118, 210, 0.2)' }
+                          }}
+                        >
+                          <Message fontSize="small" />
+                        </IconButton>
+
+                        {/* View Media Button for relevant statuses */}
+                        {(app.status === 'media_submitted' || app.status === 'completed') && (
+                          <IconButton
+                            size="small"
+                            onClick={() => {
+                              setSelectedApplication(app);
+                              setMediaFilesDialogOpen(true);
+                            }}
+                            sx={{
+                              borderRadius: '8px',
+                              background: 'rgba(33, 150, 243, 0.1)',
+                              '&:hover': { background: 'rgba(33, 150, 243, 0.2)' }
+                            }}
+                          >
+                            <ImageIcon fontSize="small" />
+                          </IconButton>
+                        )}
+
+                        {/* Contract/Media Action Button */}
+                        <Box sx={{ flex: 1 }}>
+                          {getApplicationActions(app)}
+                        </Box>
+                      </Box>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+          )}
+        </Grid>
       </Grid>
-    ))}
-  </Grid>
-)}
-      </Grid>
-    </Grid>
 
       {/* Mobile Filter Drawer */}
       <Drawer
         anchor="right"
         open={filterDrawerOpen}
         onClose={() => setFilterDrawerOpen(false)}
-        sx={{ 
-          '& .MuiDrawer-paper': { 
-            width: isMobile ? '100%' : 400, 
+        sx={{
+          '& .MuiDrawer-paper': {
+            width: isMobile ? '100%' : 400,
             p: 3,
             background: 'linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%)',
-          } 
+          }
         }}
       >
         <Box display="flex" alignItems="center" justifyContent="space-between" mb={3}>
@@ -3462,111 +3241,142 @@ const handleCloseDialogs = () => {
         onClose={handleCloseDialogs}
         maxWidth="lg"
         fullWidth
-        sx={{
-          '& .MuiDialog-paper': {
+        PaperProps={{
+          sx: {
             borderRadius: '24px',
             overflow: 'hidden',
-            background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)',
-            maxHeight: '90vh'
+            background: '#ffffff',
+            maxHeight: '95vh'
           }
         }}
       >
-        <DialogTitle sx={{ 
-          background: 'linear-gradient(135deg, #1565c0 0%, #1565c0 100%)', 
+        <DialogTitle sx={{
+          background: 'linear-gradient(135deg, #1e3a8a 0%, #172554 100%)',
           color: 'white',
           fontWeight: 800,
-          py: 4
+          py: 3,
+          px: 4
         }}>
           <Box display="flex" alignItems="center" justifyContent="space-between">
-            <Typography variant="h4">
-              Application Details
-            </Typography>
-            <IconButton onClick={handleCloseDialogs} sx={{ color: 'white' }}>
+            <Box display="flex" alignItems="center" gap={3}>
+              <Box sx={{
+                bgcolor: 'rgba(255, 255, 255, 0.2)',
+                p: 2,
+                borderRadius: '16px',
+                display: 'flex'
+              }}>
+                <FontAwesomeIcon icon={faFolderOpen} size="lg" />
+              </Box>
+              <Box>
+                <Typography variant="h4" fontWeight="800">
+                  Application Intelligence
+                </Typography>
+                <Typography variant="body1" sx={{ opacity: 0.8, fontWeight: 500 }}>
+                  Reviewing collaboration path for {selectedApplication?.campaign_title || 'Active Campaign'}
+                </Typography>
+              </Box>
+            </Box>
+            <IconButton onClick={handleCloseDialogs} sx={{ color: 'white', bgcolor: 'rgba(255, 255, 255, 0.1)' }}>
               <Close />
             </IconButton>
           </Box>
         </DialogTitle>
-        <DialogContent dividers sx={{ p: 0, overflow: 'auto' }}>
+
+        <DialogContent sx={{ p: 0, border: 'none' }}>
           {selectedApplication && (
             <TabContext value={detailTab}>
-              <Box sx={{ borderBottom: 1, borderColor: 'divider', px: 3 }}>
+              <Box sx={{ borderBottom: 1, borderColor: 'divider', px: 4, bgcolor: '#f8fafc' }}>
                 <Tabs
                   value={detailTab}
                   onChange={(e, newValue) => setDetailTab(newValue)}
-                  sx={{ 
+                  sx={{
                     '& .MuiTab-root': {
-                      fontWeight: 600,
-                      fontSize: '1rem'
+                      fontWeight: 800,
+                      fontSize: '0.9rem',
+                      py: 3,
+                      color: 'text.secondary'
+                    },
+                    '& .Mui-selected': {
+                      color: 'primary.main !important'
                     }
                   }}
                 >
-                  <Tab label="Campaign Overview" value="overview" />
-                  <Tab label="Application Workflow" value="workflow" />
-                  <Tab label="Media Files" value="media" />
+                  <Tab icon={<FontAwesomeIcon icon={faBullseye} />} iconPosition="start" label="Campaign Strategy" value="overview" />
+                  <Tab icon={<FontAwesomeIcon icon={faArrowsRotate} />} iconPosition="start" label="Execution Workflow" value="workflow" />
+                  <Tab icon={<FontAwesomeIcon icon={faChartPie} />} iconPosition="start" label="Resource Vault" value="media" />
                 </Tabs>
               </Box>
 
-              <TabPanel value="overview" sx={{ p: 4 }}>
-                <CampaignDetailSection application={selectedApplication} />
-              </TabPanel>
+              <Box sx={{ p: 0, height: 'calc(95vh - 200px)', overflow: 'auto' }}>
+                <TabPanel value="overview" sx={{ p: 4 }}>
+                  <CampaignDetailSection application={selectedApplication} />
+                </TabPanel>
 
-              <TabPanel value="workflow" sx={{ p: 4 }}>
-                <Typography variant="h5" gutterBottom fontWeight="700" color="primary" mb={3}>
-                  Application Progress
-                </Typography>
-                <ApplicationWorkflow application={selectedApplication} />
-              </TabPanel>
-
-              <TabPanel value="media" sx={{ p: 4 }}>
-                <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
-                  <Typography variant="h5" fontWeight="700" color="primary">
-                    Submitted Media Files
+                <TabPanel value="workflow" sx={{ p: 4 }}>
+                  <Typography variant="h5" fontWeight="900" color="primary" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 4 }}>
+                    <FontAwesomeIcon icon={faArrowsRotate} />
+                    Collaboration Progression
                   </Typography>
-                  <Button
-                    variant="outlined"
-                    startIcon={<ImageIcon />}
-                    onClick={() => {
-                      handleCloseDialogs();
-                      setMediaFilesDialogOpen(true);
-                    }}
-                    sx={{ borderRadius: '10px', fontWeight: 600 }}
-                  >
-                    Open Media Manager
-                  </Button>
-                </Box>
-                <MediaFilesViewer 
-                  open={false} 
-                  onClose={() => {}} 
-                  application={selectedApplication} 
-                />
-              </TabPanel>
+                  <ApplicationWorkflow application={selectedApplication} />
+                </TabPanel>
+
+                <TabPanel value="media" sx={{ p: 4 }}>
+                  <Box sx={{ mb: 4, p: 4, background: 'linear-gradient(135deg, #f0f9ff 0%, #ffffff 100%)', borderRadius: '24px', border: '1px solid rgba(0,0,0,0.05)' }}>
+                    <Box display="flex" justifyContent="space-between" alignItems="center">
+                      <Box>
+                        <Typography variant="h5" fontWeight="900" color="primary">
+                          Creative Assets vault
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          Review and manage high-resolution deliverables submitted for this campaign.
+                        </Typography>
+                      </Box>
+                      <Button
+                        variant="contained"
+                        startIcon={<FontAwesomeIcon icon={faFolderOpen} />}
+                        onClick={() => {
+                          setMediaFilesDialogOpen(true);
+                        }}
+                        sx={{ borderRadius: '14px', px: 4, py: 1.5, fontWeight: 800 }}
+                      >
+                        Manage All Files
+                      </Button>
+                    </Box>
+                  </Box>
+
+                  <ApplicationMediaGallery application={selectedApplication} />
+                </TabPanel>
+              </Box>
             </TabContext>
           )}
         </DialogContent>
-        <DialogActions sx={{ p: 3 }}>
-          <Button 
+        <DialogActions sx={{ p: 4, bgcolor: '#f8fafc', borderTop: '1px solid rgba(0,0,0,0.05)' }}>
+          <Button
             onClick={handleCloseDialogs}
-            sx={{ 
-              borderRadius: '12px', 
-              px: 4,
-              fontWeight: 600
+            variant="outlined"
+            sx={{
+              borderRadius: '14px',
+              px: 6,
+              py: 1.5,
+              fontWeight: 800,
+              fontSize: '1rem'
             }}
           >
-            Close
+            Close Intelligent View
           </Button>
         </DialogActions>
       </Dialog>
 
       {/* Contract Acceptance Dialog */}
       <ContractAcceptanceDialog
-  open={contractAcceptanceDialogOpen}
-  onClose={() => {
-    setContractAcceptanceDialogOpen(false);
-    setSelectedApplicationForContract(null);
-  }}
-  application={selectedApplicationForContract}
-  onAcceptContract={handleAcceptContract}
-/>
+        open={contractAcceptanceDialogOpen}
+        onClose={() => {
+          setContractAcceptanceDialogOpen(false);
+          setSelectedApplicationForContract(null);
+        }}
+        application={selectedApplicationForContract}
+        onAcceptContract={handleAcceptContract}
+      />
 
       {/* Media Submission Dialog */}
       <MediaSubmissionDialog
@@ -3599,8 +3409,8 @@ const handleCloseDialogs = () => {
         <Alert
           onClose={() => { setError(''); setSuccess(''); }}
           severity={error ? 'error' : 'success'}
-          sx={{ 
-            width: '100%', 
+          sx={{
+            width: '100%',
             borderRadius: '12px',
             alignItems: 'center',
             fontWeight: 600,

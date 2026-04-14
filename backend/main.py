@@ -2,12 +2,13 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from auth.utils import get_current_user
 from database import db
-
+from bson import ObjectId
 
 # Import routers
 from auth.routes import router as auth_router
 # from auth.adminauth import router as admin_auth_router
 
+from routes.attachments import router as attachments_router
 from routes.logo import router as logo_router
 from routes import menu_routes, admin_routes, youtubeapi, aisearch
 from routes.campaign import router as campaign_router
@@ -103,9 +104,10 @@ app.add_middleware(
 # Routers
 # -----------------------------
 app.include_router(auth_router, prefix="/auth", tags=["Auth"])
+app.include_router(attachments_router, prefix="/attachments", tags=["Attachments"])
+app.include_router(logo_router, prefix="/api", tags=["Logo"])
 # app.include_router(admin_auth_router,  tags=["Admin Auth"])
 app.include_router(menu_routes.router, tags=["Menu & Navbar"])
-app.include_router(logo_router, prefix="/api", tags=["Logo"])
 app.include_router(admin_routes.router, prefix="/admin", tags=["Admin Users"])
 app.include_router(campaign_router, prefix="/api", tags=["Campaigns"])
 app.include_router(automation_router, tags=["Automation"])
@@ -267,6 +269,16 @@ async def connect(sid, environ, auth):
         user_id = payload.get("sub")
 
         connected_users[user_id] = sid
+        
+        # Broadcast online status
+        await sio.emit("user_online", {"user_id": user_id})
+        
+        # Update last_seen in DB as current time (online now)
+        from datetime import timezone, datetime
+        users_collection.update_one(
+            {"_id": ObjectId(user_id)},
+            {"$set": {"last_seen": datetime.now(timezone.utc), "is_online": True}}
+        )
 
         print("Socket connected:", user_id, sid)
         return True
@@ -278,7 +290,16 @@ async def connect(sid, environ, auth):
 async def disconnect(sid):
     for uid, s in list(connected_users.items()):
         if s == sid:
-            del connected_users[uid]
+            connected_users.pop(uid, None)
+            # Broadcast offline status
+            await sio.emit("user_offline", {"user_id": uid})
+            
+            # Update last_seen in DB
+            from datetime import timezone, datetime
+            users_collection.update_one(
+                {"_id": ObjectId(uid)},
+                {"$set": {"last_seen": datetime.now(timezone.utc), "is_online": False}}
+            )
             break
     print("Socket disconnected:", sid)
 

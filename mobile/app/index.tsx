@@ -196,7 +196,7 @@ export default function Onboarding() {
 
       {/* Skip Button */}
       {currentStep < steps.length - 1 && (
-        <Pressable 
+        <Pressable
           style={styles.skipButton}
           onPress={() => router.push("/platformdetails")}
         >
@@ -218,7 +218,7 @@ export default function Onboarding() {
           const StepComponent = step.component;
           return (
             <View key={step.id} style={styles.stepContainer}>
-              <StepComponent 
+              <StepComponent
                 image={step.image}
                 color={step.primaryColor}
                 secondaryColor={step.secondaryColor}
@@ -338,26 +338,26 @@ function StepWelcome({ image, color, secondaryColor, progress, isActive, nextCol
           ]}
         />
       ))}
-      
+
       <View style={styles.imageContainer}>
-        <Image 
+        <Image
           source={image}
           style={styles.image}
           resizeMode="contain"
         />
       </View>
-      
+
       <View style={styles.textContainer}>
         <View style={[styles.badge, { backgroundColor: color + '15' }]}>
           <MaterialCommunityIcons name="robot" size={16} color={color} />
           <Text style={[styles.badgeText, { color }]}>AI-POWERED</Text>
         </View>
-        
+
         <Text style={styles.title}>
           Welcome to{' '}
           <Text style={[styles.titleHighlight, { color }]}>Brio</Text>
         </Text>
-        
+
         <Text style={styles.description}>
           The smartest way to connect brands with creators — powered by AI, built for results.
         </Text>
@@ -428,26 +428,26 @@ function StepBrands({ image, color, secondaryColor, progress, isActive, nextColo
           ]}
         />
       ))}
-      
+
       <View style={styles.imageContainer}>
-        <Image 
+        <Image
           source={image}
           style={styles.image}
           resizeMode="contain"
         />
       </View>
-      
+
       <View style={styles.textContainer}>
         <View style={[styles.badge, { backgroundColor: color + '15' }]}>
           <Feather name="briefcase" size={16} color={color} />
           <Text style={[styles.badgeText, { color }]}>FOR BRANDS</Text>
         </View>
-        
+
         <Text style={styles.title}>
           Grow Your Brand{' '}
           <Text style={[styles.titleHighlight, { color }]}>Effortlessly</Text>
         </Text>
-        
+
         <Text style={styles.description}>
           Launch campaigns, discover top creators, and track ROI — all in one place.
         </Text>
@@ -531,26 +531,26 @@ function StepInfluencers({ image, color, secondaryColor, progress, isActive, nex
           ]}
         />
       ))}
-      
+
       <View style={styles.imageContainer}>
-        <Image 
+        <Image
           source={image}
           style={styles.image}
           resizeMode="contain"
         />
       </View>
-      
+
       <View style={styles.textContainer}>
         <View style={[styles.badge, { backgroundColor: color + '15' }]}>
           <Feather name="camera" size={16} color={color} />
           <Text style={[styles.badgeText, { color }]}>FOR CREATORS</Text>
         </View>
-        
+
         <Text style={styles.title}>
           Monetize Your{' '}
           <Text style={[styles.titleHighlight, { color }]}>Influence</Text>
         </Text>
-        
+
         <Text style={styles.description}>
           Connect with top brands, grow your audience, and earn — your way.
         </Text>
@@ -632,26 +632,26 @@ function StepAI({ image, color, secondaryColor, progress, isActive, nextColor })
           ]}
         />
       ))}
-      
+
       <View style={styles.imageContainer}>
-        <Image 
+        <Image
           source={image}
           style={styles.image}
           resizeMode="contain"
         />
       </View>
-      
+
       <View style={styles.textContainer}>
         <View style={[styles.badge, { backgroundColor: color + '15' }]}>
           <MaterialCommunityIcons name="brain" size={16} color={color} />
           <Text style={[styles.badgeText, { color }]}>INTELLIGENCE</Text>
         </View>
-        
+
         <Text style={styles.title}>
           Powered by{' '}
           <Text style={[styles.titleHighlight, { color }]}>AI</Text>
         </Text>
-        
+
         <Text style={styles.description}>
           Every feature is enhanced by machine learning to give you an unfair advantage.
         </Text>
@@ -715,55 +715,55 @@ function StepGetStarted({ image, color, secondaryColor, progress, isActive }) {
         }
       ]} />
 
-      {/* Celebration particles */}
-      {[...Array(16)].map((_, i) => {
-        const angle = (i / 16) * Math.PI * 2;
-        const distance = 80 + Math.sin(progress * Math.PI * 4 + i) * 30;
+      {/* Professional accent dots */}
+      {[...Array(20)].map((_, i) => {
+        const xPos = (i % 5) * (width / 4);
+        const yPos = Math.floor(i / 5) * (height / 10);
         return (
           <View
             key={i}
             style={[
               styles.celebParticle,
               {
-                backgroundColor: i % 2 === 0 ? color + '15' : secondaryColor + '15',
-                left: width / 2 + Math.cos(angle + progress * Math.PI * 2) * distance - 5,
-                top: height / 3 + Math.sin(angle + progress * Math.PI * 2) * distance - 5,
-                width: 8 + Math.sin(progress * Math.PI * 4 + i) * 6,
-                height: 8 + Math.cos(progress * Math.PI * 4 + i) * 6,
-                transform: [
-                  { scale: 0.6 + Math.sin(progress * Math.PI * 4 + i) * 0.4 }
-                ]
+                backgroundColor: color,
+                left: xPos + Math.sin(progress * Math.PI + i) * 10,
+                top: yPos + Math.cos(progress * Math.PI + i) * 10,
+                width: 4,
+                height: 4,
+                opacity: 0.1,
               }
             ]}
           />
         );
       })}
-      
+
       <View style={styles.imageContainer}>
-        <Image 
+        <Image
           source={image}
           style={styles.image}
           resizeMode="contain"
         />
       </View>
-      
+
       <View style={styles.textContainer}>
         <Text style={styles.title}>
           Ready to{' '}
           <Text style={[styles.titleHighlight, { color }]}>Grow?</Text>
         </Text>
-        
+
         <Text style={styles.description}>
           Join thousands of brands and creators already leveling up with AI.
         </Text>
       </View>
 
-      <View style={[styles.statsContainer, { backgroundColor: color + '08' }]}>
+      <View style={[styles.statsContainer, { borderColor: color + '20' }]}>
         {stats.map((stat, index) => {
           const IconComponent = stat.IconComponent;
           return (
             <View key={index} style={styles.statItem}>
-              <IconComponent name={stat.icon} size={24} color={color} />
+              <View style={[styles.statIconCircle, { backgroundColor: color + '10' }]}>
+                <IconComponent name={stat.icon} size={20} color={color} />
+              </View>
               <Text style={[styles.statValue, { color }]}>{stat.value}</Text>
               <Text style={styles.statLabel}>{stat.label}</Text>
             </View>
@@ -808,11 +808,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderRadius: 20,
     backgroundColor: WHITE,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
   },
   skipText: {
     color: BLUE,
@@ -921,16 +918,11 @@ const styles = StyleSheet.create({
   featureChip: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: WHITE,
+    backgroundColor: '#f8fafc',
     borderRadius: 30,
     paddingVertical: 12,
     paddingHorizontal: 18,
     gap: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
-    elevation: 2,
     borderWidth: 1,
   },
   featureLabel: {
@@ -948,15 +940,10 @@ const styles = StyleSheet.create({
   },
   toolCard: {
     width: (width - 96) / 2,
-    backgroundColor: WHITE,
+    backgroundColor: '#f8fafc',
     borderRadius: 20,
     padding: 20,
     alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 4,
     borderWidth: 1,
   },
   toolName: {
@@ -972,14 +959,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     marginTop: 20,
     marginHorizontal: 32,
-    borderRadius: 30,
+    borderRadius: 24,
     paddingVertical: 24,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 4,
+    borderWidth: 1,
+    backgroundColor: WHITE,
     zIndex: 3,
+  },
+  statIconCircle: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 8,
   },
   statItem: {
     alignItems: "center",
@@ -996,22 +988,17 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   bottomNav: {
-  paddingHorizontal: 24,
-  paddingBottom: Platform.OS === "ios" ? 34 : 24,
-  paddingTop: 16,
+    paddingHorizontal: 24,
+    paddingBottom: Platform.OS === "ios" ? 34 : 24,
+    paddingTop: 16,
 
-  backgroundColor: 'transparent',   // ✅ clean
-  borderTopWidth: 0,               // ❌ remove border
-  elevation: 0,                    // ❌ remove Android shadow
-},
+    backgroundColor: 'transparent',   // ✅ clean
+    borderTopWidth: 0,               // ❌ remove border
+    elevation: 0,                    // ❌ remove Android shadow
+  },
   nextButton: {
     borderRadius: 16,
     overflow: "hidden",
-    shadowColor: BLUE,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 4,
   },
   nextButtonGradient: {
     flexDirection: "row",
@@ -1031,11 +1018,6 @@ const styles = StyleSheet.create({
   loginButton: {
     borderRadius: 16,
     overflow: "hidden",
-    shadowColor: BLUE,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 4,
   },
   loginGradient: {
     flexDirection: "row",

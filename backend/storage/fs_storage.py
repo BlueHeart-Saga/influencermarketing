@@ -10,13 +10,13 @@ class FileSystemStorage(StorageProvider):
         self.base_path = Path(base_path)
         self.base_path.mkdir(exist_ok=True)
     
-    def upload(self, file_data: Union[bytes, BinaryIO], filename: str, folder: str = "") -> str:
+    def upload(self, file_data: Union[bytes, BinaryIO], filename: str, folder: str = "", preserve_name: bool = False) -> str:
         # Create folder path
         folder_path = self.base_path / folder
         folder_path.mkdir(exist_ok=True, parents=True)
         
-        # Generate unique filename
-        unique_filename = f"{uuid.uuid4()}_{filename}"
+        # Generate unique filename or use original
+        unique_filename = filename if preserve_name else f"{uuid.uuid4()}_{filename}"
         file_path = folder_path / unique_filename
         
         # Save file

@@ -6,12 +6,12 @@ import InfluencerCampaigns from './InfluencerCampaigns';
 import InfluencerApplications from './InfluencerApplications';
 import AITools from "./AITools";
 import InfluencerAnalytics from "./InfluencerAnalytics";
-import { 
-  FiSearch, 
-  FiX, 
-  FiRefreshCw, 
-  FiAlertCircle, 
-  FiGrid, 
+import {
+  FiSearch,
+  FiX,
+  FiRefreshCw,
+  FiAlertCircle,
+  FiGrid,
   FiInbox,
   FiCheckCircle,
   FiTrendingUp,
@@ -24,12 +24,17 @@ import {
   FiFileText,
   FiMessageSquare,
   FiGlobe,
-  FiChevronDown, 
-  FiClock, 
-  FiCreditCard
+  FiChevronDown,
+  FiClock,
+  FiCreditCard,
+  FiSend,
+  FiXCircle,
+  FiCheck,
+  FiAward
 } from 'react-icons/fi';
 import '../../style/InfluencerDashboard.css';
 import axios from "axios";
+import { formatCurrency as globalFormatCurrency } from '../../utils/formatters';
 
 import API_BASE_URL from "../../config/api";
 
@@ -87,17 +92,17 @@ const CURRENCY_NAMES = {
 const POPULAR_CURRENCIES = ['USD', 'GBP', 'EUR', 'JPY', 'CAD', 'AUD', 'INR'];
 
 // Currency Converter Component
-const InfluencerCurrencyConverter = ({ 
-  selectedCurrency, 
-  onCurrencyChange, 
+const InfluencerCurrencyConverter = ({
+  selectedCurrency,
+  onCurrencyChange,
   earnings,
-  rates 
+  rates
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [showAllCurrencies, setShowAllCurrencies] = useState(false);
   const dropdownRef = useRef(null);
-  
+
   // Handle outside click to close dropdown
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -112,7 +117,7 @@ const InfluencerCurrencyConverter = ({
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
-  
+
   const calculateEarningsInCurrency = () => {
     if (!earnings || !rates || !selectedCurrency) return 0;
     const earningsAmount = typeof earnings === 'number' ? earnings : parseFloat(earnings) || 0;
@@ -121,9 +126,9 @@ const InfluencerCurrencyConverter = ({
     }
     return earningsAmount;
   };
-  
+
   const convertedEarnings = calculateEarningsInCurrency();
-  
+
   const filteredCurrencies = Object.keys(CURRENCY_SYMBOLS).filter(currencyCode => {
     if (!searchTerm) return true;
     return (
@@ -131,14 +136,9 @@ const InfluencerCurrencyConverter = ({
       CURRENCY_NAMES[currencyCode]?.toLowerCase().includes(searchTerm.toLowerCase())
     );
   });
-  
+
   const formatCurrency = (amount, currencyCode) => {
-    const symbol = CURRENCY_SYMBOLS[currencyCode] || currencyCode;
-    const formattedAmount = new Intl.NumberFormat('en-US', {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2
-    }).format(amount);
-    return `${symbol}${formattedAmount}`;
+    return globalFormatCurrency(amount, currencyCode, CURRENCY_SYMBOLS);
   };
 
   return (
@@ -150,7 +150,7 @@ const InfluencerCurrencyConverter = ({
             <span>Currency:</span>
           </div>
           <div className="influencer-currency-selector">
-            <button 
+            <button
               className="influencer-currency-toggle"
               onClick={() => setIsOpen(!isOpen)}
             >
@@ -160,7 +160,7 @@ const InfluencerCurrencyConverter = ({
               <span className="influencer-currency-code">{selectedCurrency}</span>
               <FiChevronDown size={16} className={isOpen ? 'influencer-rotate-180' : ''} />
             </button>
-            
+
             {isOpen && (
               <div className="influencer-currency-dropdown influencer-drop-shadow">
                 <div className="influencer-currency-search">
@@ -173,7 +173,7 @@ const InfluencerCurrencyConverter = ({
                     className="influencer-currency-search-input"
                   />
                   {searchTerm && (
-                    <button 
+                    <button
                       onClick={() => setSearchTerm('')}
                       className="influencer-clear-search"
                     >
@@ -181,7 +181,7 @@ const InfluencerCurrencyConverter = ({
                     </button>
                   )}
                 </div>
-                
+
                 <div className="influencer-currency-section">
                   <div className="influencer-currency-section-title">Popular</div>
                   <div className="influencer-currency-grid">
@@ -203,11 +203,11 @@ const InfluencerCurrencyConverter = ({
                     ))}
                   </div>
                 </div>
-                
+
                 <div className="influencer-currency-section">
                   <div className="influencer-currency-section-title">
                     All Currencies
-                    <button 
+                    <button
                       className="influencer-show-all-btn"
                       onClick={() => setShowAllCurrencies(!showAllCurrencies)}
                     >
@@ -317,7 +317,7 @@ const SearchResults = ({ results, onResultClick, searchQuery }) => {
             className="influencer-search-result-item"
             onClick={() => handleResultClick(result)}
           >
-            <div 
+            <div
               className="influencer-result-type-icon"
               style={{ backgroundColor: `${getResultColor(result.type)}15` }}
             >
@@ -327,7 +327,7 @@ const SearchResults = ({ results, onResultClick, searchQuery }) => {
               <h4>{result.title}</h4>
               <p>{result.description}</p>
               <div className="influencer-result-meta">
-                <span 
+                <span
                   className="influencer-result-type-badge"
                   style={{ color: getResultColor(result.type) }}
                 >
@@ -353,10 +353,10 @@ const SearchResults = ({ results, onResultClick, searchQuery }) => {
 };
 
 // Enhanced Search Bar Component
-const EnhancedSearchBar = ({ 
-  searchQuery, 
-  onSearchChange, 
-  onClearSearch, 
+const EnhancedSearchBar = ({
+  searchQuery,
+  onSearchChange,
+  onClearSearch,
   onSearchSubmit,
   showResults,
   searchResults,
@@ -407,8 +407,8 @@ const EnhancedSearchBar = ({
       </form>
 
       {showResults && (
-        <SearchResults 
-          results={searchResults} 
+        <SearchResults
+          results={searchResults}
           onResultClick={onResultClick}
           searchQuery={searchQuery}
         />
@@ -420,24 +420,19 @@ const EnhancedSearchBar = ({
 // StatCard Component
 const StatCard = ({ label, value, icon: Icon, color, subtitle, currency }) => {
   const { currency: selectedCurrency, rates } = useContext(CurrencyContext);
-  
+
   const formatCurrencyValue = (valueString) => {
     if (!valueString) return valueString;
     if (typeof valueString === 'string' && (valueString.startsWith('$') || /\d+[.,]\d{2}/.test(valueString))) {
       const amount = parseFloat(valueString.replace(/[^0-9.-]+/g, '')) || 0;
       if (rates && selectedCurrency && rates[selectedCurrency]) {
         const convertedAmount = amount * rates[selectedCurrency];
-        const symbol = CURRENCY_SYMBOLS[selectedCurrency] || selectedCurrency;
-        const formattedAmount = new Intl.NumberFormat('en-US', {
-          minimumFractionDigits: 0,
-          maximumFractionDigits: 2
-        }).format(convertedAmount);
-        return `${symbol}${formattedAmount}`;
+        return globalFormatCurrency(convertedAmount, selectedCurrency, CURRENCY_SYMBOLS);
       }
     }
     return valueString;
   };
-  
+
   const formattedValue = currency ? formatCurrencyValue(value) : value;
 
   return (
@@ -463,7 +458,7 @@ const InfluencerDashboard = () => {
   const [applications, setApplications] = useState([]);
   const [campaigns, setCampaigns] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');  
+  const [error, setError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
@@ -475,10 +470,13 @@ const InfluencerDashboard = () => {
     pending_earnings: 0,
     completed_withdrawals: 0
   });
-  
+
+  const [showActivityDropdown, setShowActivityDropdown] = useState(false);
+  const activityDropdownRef = useRef(null);
+
   const navigate = useNavigate();
   const { currency, changeCurrency, rates } = useContext(CurrencyContext);
-  
+
   const [stats, setStats] = useState({
     total: 0,
     pending: 0,
@@ -528,12 +526,27 @@ const InfluencerDashboard = () => {
   useEffect(() => {
     fetchEarningsSummary();
     fetchNotificationCount();
-    
+
     // Set up polling for real-time updates (every 30 seconds)
     const interval = setInterval(fetchNotificationCount, 30000);
-    
+
     return () => clearInterval(interval);
   }, [fetchNotificationCount]);
+
+  // Outside click for activity dropdown
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (activityDropdownRef.current && !activityDropdownRef.current.contains(event.target)) {
+        setShowActivityDropdown(false);
+      }
+    };
+    if (showActivityDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showActivityDropdown]);
 
   const convert = (amount) => {
     if (!rates || !currency || !rates[currency]) return amount;
@@ -542,12 +555,7 @@ const InfluencerDashboard = () => {
 
   // Format currency helper
   const formatCurrency = (amount, currencyCode = currency) => {
-    const symbol = CURRENCY_SYMBOLS[currencyCode] || currencyCode;
-    const formattedAmount = new Intl.NumberFormat('en-US', {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2
-    }).format(amount);
-    return `${symbol}${formattedAmount}`;
+    return globalFormatCurrency(amount, currencyCode, CURRENCY_SYMBOLS);
   };
 
   // Calculate earnings in selected currency
@@ -563,9 +571,9 @@ const InfluencerDashboard = () => {
     try {
       setLoading(true);
       setError('');
-      
+
       const response = await campaignAPI.getInfluencerApplications();
-      
+
       let applicationsData = [];
       if (response.data) {
         applicationsData = response.data;
@@ -574,14 +582,14 @@ const InfluencerDashboard = () => {
       } else if (response && typeof response === 'object') {
         applicationsData = response.applications || response.data || [];
       }
-      
+
       setApplications(Array.isArray(applicationsData) ? applicationsData : []);
-      
+
     } catch (err) {
       console.error('Fetch error:', err);
-      const errorMessage = err.response?.data?.message || 
-                          err.message || 
-                          'Failed to fetch applications. Please try again.';
+      const errorMessage = err.response?.data?.message ||
+        err.message ||
+        'Failed to fetch applications. Please try again.';
       setError(errorMessage);
       setApplications([]);
     } finally {
@@ -606,25 +614,25 @@ const InfluencerDashboard = () => {
   // Calculate stats
   useEffect(() => {
     if (!applications || !Array.isArray(applications)) {
-      setStats(prev => ({ 
-        ...prev, 
-        total: 0, 
-        pending: 0, 
-        accepted: 0, 
-        rejected: 0 
+      setStats(prev => ({
+        ...prev,
+        total: 0,
+        pending: 0,
+        accepted: 0,
+        rejected: 0
       }));
       return;
     }
 
-    const pending = applications.filter(app => 
+    const pending = applications.filter(app =>
       app.status?.toLowerCase() === 'pending'
     ).length;
-    
-    const accepted = applications.filter(app => 
+
+    const accepted = applications.filter(app =>
       ['approved', 'accepted', 'hired', 'contracted'].includes(app.status?.toLowerCase())
     ).length;
-    
-    const rejected = applications.filter(app => 
+
+    const rejected = applications.filter(app =>
       ['rejected', 'declined'].includes(app.status?.toLowerCase())
     ).length;
 
@@ -760,7 +768,7 @@ const InfluencerDashboard = () => {
   const handleSearch = (e) => {
     const query = e.target.value;
     setSearchQuery(query);
-    
+
     if (query.length > 0) {
       setShowSearchResults(true);
       performSearch(query);
@@ -792,7 +800,7 @@ const InfluencerDashboard = () => {
   const handleResultClick = (result) => {
     setShowSearchResults(false);
     setSearchQuery('');
-    
+
     if (result.route) {
       navigate(result.route);
       if (result.route === '/influencer/campaigns') {
@@ -880,7 +888,7 @@ const InfluencerDashboard = () => {
               >
                 <FiBell size={18} />
                 {unreadNotificationCount > 0 && (
-                  <span 
+                  <span
                     className="influencer-notification-badge"
                     style={{
                       position: 'absolute',
@@ -905,8 +913,8 @@ const InfluencerDashboard = () => {
                   </span>
                 )}
               </button>
-              <button 
-                className="influencer-btn-refresh" 
+              <button
+                className="influencer-btn-refresh"
                 onClick={() => {
                   fetchApplications();
                   fetchNotificationCount();
@@ -923,32 +931,32 @@ const InfluencerDashboard = () => {
       {/* Stats Section */}
       <section className="influencer-stats-section">
         <div className="influencer-stats-grid">
-          <StatCard 
-            label="Total Applications" 
-            value={stats.total} 
-            icon={FiGrid} 
-            color="#3B82F6" 
+          <StatCard
+            label="Total Applications"
+            value={stats.total}
+            icon={FiGrid}
+            color="#3B82F6"
             subtitle="All time"
           />
-          <StatCard 
-            label="Pending" 
-            value={stats.pending} 
-            icon={FiInbox} 
-            color="#F59E0B" 
+          <StatCard
+            label="Pending"
+            value={stats.pending}
+            icon={FiInbox}
+            color="#F59E0B"
             subtitle="Awaiting review"
           />
-          <StatCard 
-            label="Accepted" 
-            value={stats.accepted} 
-            icon={FiCheckCircle} 
-            color="#10B981" 
+          <StatCard
+            label="Accepted"
+            value={stats.accepted}
+            icon={FiCheckCircle}
+            color="#10B981"
             subtitle="Active campaigns"
           />
-          <StatCard 
-            label="Rejected" 
-            value={stats.rejected} 
-            icon={FiAlertCircle} 
-            color="#EF4444" 
+          <StatCard
+            label="Rejected"
+            value={stats.rejected}
+            icon={FiAlertCircle}
+            color="#EF4444"
             subtitle="Not selected"
           />
           <StatCard
@@ -975,14 +983,171 @@ const InfluencerDashboard = () => {
             subtitle="Awaiting clearance"
             currency
           />
-          <StatCard 
-            label="Success Rate" 
-            value={stats.total > 0 ? `${Math.round((stats.accepted / stats.total) * 100)}%` : '0%'} 
-            icon={FiTrendingUp} 
-            color="#06B6D4" 
+          <StatCard
+            label="Success Rate"
+            value={stats.total > 0 ? `${Math.round((stats.accepted / stats.total) * 100)}%` : '0%'}
+            icon={FiTrendingUp}
+            color="#06B6D4"
             subtitle="Application success"
           />
         </div>
+      </section>
+
+      {/* Influencer Recent Activity - Brand-level Design System */}
+      <section className="inf-ra-section">
+        <div className="inf-ra-card">
+          {/* Section Header */}
+          <div className="inf-ra-header">
+            <div className="inf-ra-header-left">
+              <div className="inf-ra-header-icon">
+                <FiAward size={18} />
+              </div>
+              <div>
+                <h2 className="inf-ra-title">Recent Activity</h2>
+                <p className="inf-ra-subtitle">Your latest collaboration updates</p>
+              </div>
+            </div>
+            {applications.length > 5 && (
+              <button
+                className="inf-ra-view-more-btn"
+                onClick={() => setShowActivityDropdown(true)}
+              >
+                View All
+              </button>
+            )}
+          </div>
+
+          {/* Activity Feed */}
+          <div className="inf-ra-list">
+            {applications.length === 0 ? (
+              <div className="inf-ra-empty">
+                <FiInbox size={32} />
+                <p>No recent activity yet</p>
+                <span>Your collaboration updates will appear here</span>
+              </div>
+            ) : (
+              applications.slice(0, 3).map((app, index) => {
+                const status = app.status?.toLowerCase();
+                const isAccepted = ['approved', 'accepted', 'hired', 'contracted'].includes(status);
+                const isRejected = ['rejected', 'declined'].includes(status);
+                const isPending = status === 'pending';
+
+                const ActivityIcon = isAccepted ? FiCheck : isRejected ? FiXCircle : FiSend;
+                const activityLabel = isAccepted
+                  ? 'Application Accepted'
+                  : isRejected
+                    ? 'Application Rejected'
+                    : 'Application Submitted';
+                const iconStatusKey = isAccepted ? 'accepted' : isRejected ? 'rejected' : 'pending';
+
+                return (
+                  <div key={index} className={`inf-ra-item inf-ra-item--${iconStatusKey}`}>
+                    {/* Activity Icon */}
+                    <div className={`inf-ra-icon inf-ra-icon--${iconStatusKey}`}>
+                      <ActivityIcon size={16} />
+                    </div>
+
+                    {/* Activity Content */}
+                    <div className="inf-ra-content">
+                      <div className="inf-ra-content-top">
+                        <span className="inf-ra-type-label">{activityLabel}</span>
+                        <span className={`inf-ra-badge inf-ra-badge--${iconStatusKey}`}>
+                          {isAccepted ? <FiCheck size={11} /> : isRejected ? <FiXCircle size={11} /> : <FiClock size={11} />}
+                          {app.status}
+                        </span>
+                      </div>
+                      <p className="inf-ra-campaign-name">
+                        {app.campaign_title || app.title || 'Campaign'}
+                      </p>
+                      <div className="inf-ra-meta">
+                        <span className="inf-ra-meta-date">
+                          <FiClock size={11} />
+                          {new Date(app.applied_at).toLocaleDateString('en-US', {
+                            month: 'short', day: 'numeric', year: 'numeric'
+                          })}
+                        </span>
+                        {(app.brand_profile_name || app.brand_name) && (
+                          <span className="inf-ra-meta-brand">
+                            <FiUsers size={11} />
+                            {app.brand_profile_name || app.brand_name}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+
+          {/* Footer view-more */}
+          {applications.length > 3 && (
+            <div className="inf-ra-footer">
+              <button
+                className="inf-ra-footer-btn"
+                onClick={() => setShowActivityDropdown(true)}
+              >
+                View {applications.length - 3} more activities
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Expanded Dropdown */}
+        {showActivityDropdown && (
+          <div className="inf-ra-dropdown inf-ra-dropdown-shadow" ref={activityDropdownRef}>
+            <div className="inf-ra-dropdown-header">
+              <div className="inf-ra-dropdown-title">
+                <FiAward size={16} />
+                <h4>All Recent Activity</h4>
+              </div>
+              <button className="inf-ra-close-btn" onClick={() => setShowActivityDropdown(false)}>
+                <FiX size={14} />
+              </button>
+            </div>
+
+            <div className="inf-ra-dropdown-list">
+              {applications.slice(0, 20).map((app, index) => {
+                const status = app.status?.toLowerCase();
+                const isAccepted = ['approved', 'accepted', 'hired', 'contracted'].includes(status);
+                const isRejected = ['rejected', 'declined'].includes(status);
+                const ActivityIcon = isAccepted ? FiCheck : isRejected ? FiXCircle : FiSend;
+                const iconStatusKey = isAccepted ? 'accepted' : isRejected ? 'rejected' : 'pending';
+
+                return (
+                  <div key={index} className="inf-ra-dropdown-row">
+                    <div className={`inf-ra-icon inf-ra-icon--${iconStatusKey}`}>
+                      <ActivityIcon size={14} />
+                    </div>
+                    <div className="inf-ra-dropdown-info">
+                      <p className="inf-ra-dropdown-campaign">
+                        {app.campaign_title || app.title || 'Campaign'}
+                      </p>
+                      <div className="inf-ra-dropdown-meta">
+                        <span>{new Date(app.applied_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                        {(app.brand_profile_name || app.brand_name) && (
+                          <span>· {app.brand_profile_name || app.brand_name}</span>
+                        )}
+                      </div>
+                    </div>
+                    <span className={`inf-ra-badge inf-ra-badge--${iconStatusKey}`}>
+                      {app.status}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="inf-ra-dropdown-footer">
+              <button
+                className="inf-ra-dropdown-footer-btn"
+                onClick={() => navigate('/influencer/activity')}
+              >
+                Visit full activity page
+              </button>
+            </div>
+          </div>
+        )}
       </section>
 
       {/* Main Content */}
@@ -1040,7 +1205,7 @@ const InfluencerDashboard = () => {
                 display: none;
               }
             `}</style>
-            
+
             <div style={{
               display: 'flex',
               gap: '4px',
@@ -1077,7 +1242,7 @@ const InfluencerDashboard = () => {
               ].map((tab) => {
                 const Icon = tab.icon;
                 const isActive = activeTab === tab.id;
-                
+
                 return (
                   <button
                     key={tab.id}
@@ -1125,18 +1290,18 @@ const InfluencerDashboard = () => {
                       transition: 'all 0.2s ease',
                       flexShrink: 0
                     }}>
-                      <Icon 
-                        size={16} 
+                      <Icon
+                        size={16}
                         color={isActive ? '#2563eb' : '#9ca3af'}
                       />
                     </div>
-                    
+
                     <span style={{
                       display: { sm: 'inline', xs: 'none' }
                     }}>
                       {tab.label}
                     </span>
-                    
+
                     {tab.badge > 0 && (
                       <span style={{
                         display: 'inline-flex',
@@ -1156,7 +1321,7 @@ const InfluencerDashboard = () => {
                         {tab.badge}
                       </span>
                     )}
-                    
+
                     {tab.newBadge && (
                       <span style={{
                         display: 'inline-flex',
@@ -1176,7 +1341,7 @@ const InfluencerDashboard = () => {
                         New
                       </span>
                     )}
-                    
+
                     {isActive && (
                       <div style={{
                         position: 'absolute',

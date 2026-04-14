@@ -47,6 +47,77 @@ messages_collection = db["messages"]
 message_reactions_collection = db["message_reactions"]
 chat_media_collection = db["chat_media"]
 
+# ============================================================
+# Serve Chat Media (Binary)
+# ============================================================
+@router.get("/media/{file_id:path}")
+async def get_chat_media(file_id: str):
+    """Serve chat media files by ID or path"""
+    try:
+        # Strip any folder prefixes or backslashes for clean identification
+        clean_id = file_id.replace("\\", "/")
+        base_name = clean_id.split("/")[-1]
+        
+        # Try retrieving with clean ID or folder-prefixed ID
+        try:
+            # First try the folder used in upload
+            content = storage_provider.download(f"chat_media/{base_name}")
+        except Exception:
+            try:
+                # Then try the raw file_id (which might already have the folder)
+                content = storage_provider.download(file_id)
+            except Exception:
+                # Finally try the base name directly in case folder is missing
+                content = storage_provider.download(base_name)
+
+        # Detect content type from filename
+        content_type = "application/octet-stream"
+        if base_name.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.webp')):
+            content_type = f"image/{base_name.split('.')[-1]}"
+            if 'jpg' in content_type: content_type = 'image/jpeg'
+        elif base_name.lower().endswith(('.mp4', '.mov', '.webm')):
+            content_type = f"video/{base_name.split('.')[-1]}"
+            if 'mov' in content_type: content_type = 'video/mp4'
+        elif base_name.lower().endswith('.pdf'):
+            content_type = 'application/pdf'
+
+        return StreamingResponse(
+            io.BytesIO(content),
+            media_type=content_type,
+            headers={"Content-Disposition": f"inline; filename={base_name}", "Cache-Control": "max-age=31536000"}
+        )
+    except Exception as e:
+        logger.error(f"❌ Chat media retrieval error: {e}")
+        raise HTTPException(status_code=404, detail="Chat media not found")
+
+@router.get("/media/{file_id:path}/thumbnail")
+async def get_chat_thumbnail(file_id: str):
+    """Serve chat media thumbnails"""
+    try:
+        clean_id = file_id.replace("\\", "/")
+        base_name = clean_id.split("/")[-1]
+        
+        try:
+            content = storage_provider.download(f"chat_thumbnails/thumb_{base_name}")
+        except Exception:
+            try:
+                content = storage_provider.download(f"chat_thumbnails/{base_name}")
+            except Exception:
+                content = storage_provider.download(file_id)
+
+        return StreamingResponse(
+            io.BytesIO(content),
+            media_type="image/jpeg",
+            headers={"Content-Disposition": f"inline; filename=thumb_{base_name}"}
+        )
+    except Exception:
+        raise HTTPException(status_code=404, detail="Thumbnail not found")
+
+@router.get("/media/{file_id:path}/preview")
+async def get_chat_preview(file_id: str):
+    """Serve chat previews (same as media but with preview headers)"""
+    return await get_chat_media(file_id)
+
 # Initialize GridFS (Deprecated)
 # fs = GridFS(db)
 fs = storage_provider
@@ -101,13 +172,25 @@ class ConversationType(str, Enum):
 
 # Pydantic Models for validation
 class ConversationCreateRequest(BaseModel):
-    brand_id: str
-    influencer_id: str
+    recipient_id: str
     
-    @validator('brand_id', 'influencer_id')
+    @validator('recipient_id')
     def validate_object_id(cls, v):
         if not ObjectId.is_valid(v):
             raise ValueError('Invalid ObjectId format')
+        return v
+
+class GroupCreateRequest(BaseModel):
+    name: str = Field(..., min_length=1, max_length=100)
+    participant_ids: List[str] = Field(..., min_items=1)
+    description: Optional[str] = None
+    avatar_url: Optional[str] = None
+    
+    @validator('participant_ids')
+    def validate_participants(cls, v):
+        for pid in v:
+            if not ObjectId.is_valid(pid):
+                raise ValueError(f'Invalid participant ID: {pid}')
         return v
 
 class MessageCreateRequest(BaseModel):
@@ -1339,125 +1422,119 @@ async def create_conversation(
     request: ConversationCreateRequest,
     current_user: dict = Depends(get_current_user)
 ):
-    """Create a new conversation or return existing one with validation"""
+    """Create a new direct conversation or return existing one"""
     try:
         user_id = str(current_user["_id"])
-        user_role = current_user.get("role")
+        recipient_id = request.recipient_id
         
-        # Check conversation limit
-        can_create, reason = await SubscriptionValidator.can_create_conversation(current_user)
-        if not can_create:
-            raise HTTPException(
-                status_code=402,
-                detail=reason,
-                headers={"X-Plan-Limit": "conversations"}
-            )
-        
-        # Validate users based on role
-        if user_role == "brand":
-            brand_id = user_id
-            influencer_id = request.influencer_id
-            
-            # Verify influencer exists and is active
-            influencer = await users_collection.find_one({
-                "_id": ObjectId(influencer_id), 
-                "role": "influencer",
-                "is_active": True
-            })
-            if not influencer:
-                raise HTTPException(status_code=404, detail="Influencer not found or inactive")
-            
-        elif user_role == "influencer":
-            brand_id = request.brand_id
-            influencer_id = user_id
-            
-            # Verify brand exists and is active
-            brand = await users_collection.find_one({
-                "_id": ObjectId(brand_id), 
-                "role": "brand",
-                "is_active": True
-            })
-            if not brand:
-                raise HTTPException(status_code=404, detail="Brand not found or inactive")
-        else:
-            raise HTTPException(status_code=400, detail="Invalid user role")
-        
+        if user_id == recipient_id:
+            raise HTTPException(status_code=400, detail="Cannot chat with yourself")
+
         # Check existing conversation
         existing = await conversations_collection.find_one({
-            "$or": [
-                {"brand_id": ObjectId(brand_id), "influencer_id": ObjectId(influencer_id)},
-                {"brand_id": ObjectId(influencer_id), "influencer_id": ObjectId(brand_id)}
-            ]
+            "participants.user_id": {"$all": [ObjectId(user_id), ObjectId(recipient_id)]},
+            "type": {"$ne": "group"}
         })
         
         if existing:
-            # Update last activity
             await conversations_collection.update_one(
                 {"_id": existing["_id"]},
                 {"$set": {"updated_at": datetime.utcnow()}}
             )
-            
+            created_at_dt = existing.get("created_at")
+            created_at_str = created_at_dt.isoformat() if hasattr(created_at_dt, "isoformat") else str(created_at_dt)
             return {
                 "conversation_id": str(existing["_id"]),
                 "already_exists": True,
-                "created_at": existing["created_at"].isoformat(),
-                "updated_at": datetime.utcnow().isoformat()
+                "created_at": created_at_str
             }
         
+        # Verify recipient
+        recipient = await users_collection.find_one({"_id": ObjectId(recipient_id)})
+        if not recipient:
+            raise HTTPException(status_code=404, detail="Recipient not found")
+            
         # Create new conversation
         conversation = {
-            "brand_id": ObjectId(brand_id),
-            "influencer_id": ObjectId(influencer_id),
+            "type": "direct",
             "participants": [
-                {"user_id": ObjectId(brand_id), "role": "brand", "joined_at": datetime.utcnow()},
-                {"user_id": ObjectId(influencer_id), "role": "influencer", "joined_at": datetime.utcnow()}
+                {"user_id": ObjectId(user_id), "role": current_user.get("role"), "joined_at": datetime.utcnow()},
+                {"user_id": ObjectId(recipient_id), "role": recipient.get("role"), "joined_at": datetime.utcnow()}
             ],
             "created_at": datetime.utcnow(),
             "updated_at": datetime.utcnow(),
             "last_message": "",
-            "last_message_type": "text",
-            "last_message_sender": None,
             "last_message_timestamp": datetime.utcnow(),
-            "unread_counts": {
-                brand_id: 0,
-                influencer_id: 0
-            },
-            "settings": {
-                "muted_by": [],
-                "archived_by": [],
-                "pinned_by": []
-            },
-            "metadata": {
-                "initiator": user_id,
-                "initiator_role": user_role,
-                "created_via": "direct"
-            }
+            "unread_counts": {user_id: 0, recipient_id: 0},
+            "metadata": {"initiator": user_id}
         }
         
+        # For backward compatibility with some queries that might use brand_id/influencer_id
+        if current_user.get("role") == "brand":
+            conversation["brand_id"] = ObjectId(user_id)
+            conversation["influencer_id"] = ObjectId(recipient_id)
+        else:
+            conversation["brand_id"] = ObjectId(recipient_id)
+            conversation["influencer_id"] = ObjectId(user_id)
+
         result = await conversations_collection.insert_one(conversation)
-        conversation_id = str(result.inserted_id)
-        
-        # Notify participants
-        notification_data = {
-            "type": "conversation_created",
-            "conversation_id": conversation_id,
-            "with_user": influencer_id if user_role == "brand" else brand_id,
-            "initiator": user_id,
-            "timestamp": datetime.utcnow().isoformat()
-        }
-        
-        await connection_manager.send_personal(brand_id, notification_data)
-        await connection_manager.send_personal(influencer_id, notification_data)
-        
         return {
-            "conversation_id": conversation_id,
+            "conversation_id": str(result.inserted_id),
             "already_exists": False,
-            "created_at": conversation["created_at"].isoformat(),
-            "participants": [
-                {"user_id": brand_id, "role": "brand"},
-                {"user_id": influencer_id, "role": "influencer"}
-            ]
+            "created_at": conversation["created_at"].isoformat()
         }
+    except Exception as e:
+        logger.error(f"Error creating conversation: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+@router.post("/groups", status_code=status.HTTP_201_CREATED)
+async def create_group(
+    request: GroupCreateRequest,
+    current_user: dict = Depends(get_current_user)
+):
+    """Create a new group conversation"""
+    try:
+        user_id = str(current_user["_id"])
+        participant_ids = list(set(request.participant_ids + [user_id]))
+        
+        # Build participants list
+        participants = []
+        unread_counts = {}
+        for pid in participant_ids:
+            user = await users_collection.find_one({"_id": ObjectId(pid)})
+            if user:
+                participants.append({
+                    "user_id": ObjectId(pid),
+                    "role": user.get("role"),
+                    "joined_at": datetime.utcnow(),
+                    "is_admin": pid == user_id
+                })
+                unread_counts[pid] = 0
+
+        group = {
+            "type": "group",
+            "name": request.name,
+            "description": request.description,
+            "avatar_url": request.avatar_url,
+            "participants": participants,
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow(),
+            "last_message": "",
+            "last_message_timestamp": datetime.utcnow(),
+            "unread_counts": unread_counts,
+            "metadata": {"creator": user_id}
+        }
+        
+        result = await conversations_collection.insert_one(group)
+        created_at_dt = group.get("created_at")
+        return {
+            "conversation_id": str(result.inserted_id),
+            "name": request.name,
+            "created_at": created_at_dt.isoformat() if hasattr(created_at_dt, "isoformat") else str(created_at_dt)
+        }
+    except Exception as e:
+        logger.error(f"Error creating group: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
         
     except HTTPException:
         raise
@@ -1550,54 +1627,36 @@ async def get_online_users(
 @router.get("/users/search")
 async def search_users(
     q: str = Query(..., min_length=1),
-    role: Optional[str] = Query(None, regex="^(brand|influencer)$"),
+    role: Optional[str] = Query(None, regex="^(brand|influencer|all)$"),
     current_user: dict = Depends(get_current_user),
     limit: int = Query(20, ge=1, le=50)
 ):
-    """Search for users with improved relevance scoring"""
+    """Search for users with improved relevance scoring across all roles"""
     try:
         current_user_id = str(current_user["_id"])
-        current_user_role = current_user.get("role")
         
         # Build search query
         query = {"_id": {"$ne": ObjectId(current_user_id)}, "is_active": True}
         
-        # Filter by opposite role by default
-        if not role:
-            if current_user_role == "brand":
-                query["role"] = "influencer"
-            elif current_user_role == "influencer":
-                query["role"] = "brand"
-        else:
+        # Filter by role if specified and not "all"
+        if role and role != "all":
             query["role"] = role
         
         # Create search conditions
         search_regex = {"$regex": q, "$options": "i"}
         search_conditions = [
             {"username": search_regex},
-            {"email": search_regex}
+            {"email": search_regex},
+            {"brand_profile.company_name": search_regex},
+            {"brand_profile.industry": search_regex},
+            {"influencer_profile.full_name": search_regex},
+            {"influencer_profile.niche": search_regex}
         ]
-        
-        # Add profile-specific searches
-        if query.get("role") == "brand":
-            search_conditions.extend([
-                {"brand_profile.company_name": search_regex},
-                {"brand_profile.industry": search_regex},
-                {"brand_profile.bio": search_regex},
-                {"brand_profile.location": search_regex}
-            ])
-        elif query.get("role") == "influencer":
-            search_conditions.extend([
-                {"influencer_profile.full_name": search_regex},
-                {"influencer_profile.niche": search_regex},
-                {"influencer_profile.bio": search_regex},
-                {"influencer_profile.location": search_regex}
-            ])
         
         query["$or"] = search_conditions
         
-        # Execute search with sorting
-        users_cursor = users_collection.find(query).limit(limit * 2)  # Get more for filtering
+        # Execute search
+        users_cursor = users_collection.find(query).limit(limit * 2)
         
         users = []
         async for user in users_cursor:
@@ -1605,10 +1664,8 @@ async def search_users(
             
             # Check if there's already a conversation
             existing_conversation = await conversations_collection.find_one({
-                "$or": [
-                    {"brand_id": ObjectId(current_user_id), "influencer_id": ObjectId(user_id_str)},
-                    {"brand_id": ObjectId(user_id_str), "influencer_id": ObjectId(current_user_id)}
-                ]
+                "participants.user_id": {"$all": [ObjectId(current_user_id), ObjectId(user_id_str)]},
+                "type": {"$ne": "group"}
             })
             
             # Get user presence
@@ -1623,73 +1680,49 @@ async def search_users(
                 "last_seen": presence.last_seen.isoformat() if presence else None,
                 "has_existing_conversation": existing_conversation is not None,
                 "existing_conversation_id": str(existing_conversation["_id"]) if existing_conversation else None,
-                "relevance_score": 0  # Will be calculated
+                "relevance_score": 0
             }
             
-            # Add profile data and calculate relevance score
+            # Add profile data and calculate relevance
             relevance_score = 0
-            
-            if user["role"] == "brand":
+            u_role = user.get("role") if isinstance(user, dict) else None
+            if u_role == "brand":
                 profile = user.get("brand_profile", {})
                 user_data.update({
                     "name": profile.get("company_name") or user.get("username"),
                     "profile_picture": profile.get("logo"),
                     "bio": profile.get("bio", "")[:150],
                     "industry": profile.get("industry"),
-                    "location": profile.get("location"),
-                    "website": profile.get("website")
+                    "location": profile.get("location")
                 })
-                
-                # Calculate relevance score
-                if q.lower() in (profile.get("company_name", "").lower() or ""):
-                    relevance_score += 10
-                if q.lower() in (profile.get("industry", "").lower() or ""):
-                    relevance_score += 5
-                if q.lower() in (profile.get("bio", "").lower() or ""):
-                    relevance_score += 3
-                
-            elif user["role"] == "influencer":
+                if q.lower() in (profile.get("company_name", "").lower()): relevance_score += 10
+            elif user.get("role") == "influencer":
                 profile = user.get("influencer_profile", {})
                 user_data.update({
                     "name": profile.get("full_name") or user.get("username"),
                     "profile_picture": profile.get("profile_picture"),
                     "bio": profile.get("bio", "")[:150],
                     "niche": profile.get("niche"),
-                    "location": profile.get("location"),
-                    "follower_count": profile.get("follower_count")
+                    "location": profile.get("location")
                 })
-                
-                # Calculate relevance score
-                if q.lower() in (profile.get("full_name", "").lower() or ""):
-                    relevance_score += 10
-                if q.lower() in (profile.get("niche", "").lower() or ""):
-                    relevance_score += 5
-                if q.lower() in (profile.get("bio", "").lower() or ""):
-                    relevance_score += 3
+                if q.lower() in (profile.get("full_name", "").lower()): relevance_score += 10
             
-            # Boost score for online users
-            if user_data["is_online"]:
-                relevance_score += 2
-            
-            # Boost score for users with existing conversations
-            if user_data["has_existing_conversation"]:
-                relevance_score += 1
-            
+            if user_data["is_online"]: relevance_score += 2
             user_data["relevance_score"] = relevance_score
             users.append(user_data)
         
-        # Sort by relevance score
         users.sort(key=lambda x: x["relevance_score"], reverse=True)
-        
-        # Return top results
         top_users = users[:limit]
         
         return {
             "users": top_users,
             "search_query": q,
-            "count": len(top_users),
-            "total_found": len(users)
+            "count": len(top_users)
         }
+        
+    except Exception as e:
+        logger.error(f"Error searching users: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
         
     except Exception as e:
         logger.error(f"Error searching users: {e}")
@@ -1818,80 +1851,91 @@ async def get_chatted_users(
     page: int = Query(1, ge=1),
     limit: int = Query(20, ge=1, le=100)
 ):
-    """Get users you've chatted with recently"""
+    """Get conversations (direct and group) you're part of"""
     try:
         user_id = str(current_user["_id"])
         
-        # Get conversations
-        conversations_cursor = conversations_collection.find({
+        # Get conversations where user is a participant
+        query = {
             "$or": [
+                {"participants.user_id": ObjectId(user_id)},
                 {"brand_id": ObjectId(user_id)},
                 {"influencer_id": ObjectId(user_id)}
             ]
-        }).sort("last_message_timestamp", -1)
+        }
         
-        # Paginate
+        conversations_cursor = conversations_collection.find(query).sort("last_message_timestamp", -1)
         conversations = await conversations_cursor.skip((page - 1) * limit).limit(limit).to_list(None)
+        total = await conversations_collection.count_documents(query)
         
-        total = await conversations_collection.count_documents({
-            "$or": [
-                {"brand_id": ObjectId(user_id)},
-                {"influencer_id": ObjectId(user_id)}
-            ]
-        })
-        
-        chatted_users = []
+        chatted_list = []
         for conv in conversations:
-            # Get other participant
-            other_user_id = conv["influencer_id"] if str(conv["brand_id"]) == user_id else conv["brand_id"]
-            other_user_id_str = str(other_user_id)
+            conv_id = str(conv["_id"])
+            is_group = conv.get("type") == "group"
             
-            # Get user info
-            user = await users_collection.find_one(
-                {"_id": other_user_id},
-                {"username": 1, "email": 1, "role": 1, "brand_profile": 1, "influencer_profile": 1}
-            )
+            if is_group:
+                # Group Chat info
+                entry = {
+                    "id": conv_id,
+                    "name": conv.get("name") or "Group Chat",
+                    "profile_picture": conv.get("avatar_url"),
+                    "type": "group",
+                    "conversation_id": conv_id,
+                    "last_message": conv.get("last_message", ""),
+                    "last_message_time": conv.get("last_message_timestamp").isoformat() if conv.get("last_message_timestamp") else None,
+                    "unread_count": conv.get("unread_counts", {}).get(user_id, 0),
+                    "participant_count": len(conv.get("participants", []))
+                }
+            else:
+                # Direct Chat info
+                # Get other participant
+                other_user_id = None
+                if "participants" in conv and isinstance(conv["participants"], list):
+                    for p in conv["participants"]:
+                        if str(p.get("user_id")) != user_id:
+                            other_user_id = p.get("user_id")
+                            break
+                
+                if not other_user_id:
+                    other_user_id = conv.get("influencer_id") if str(conv.get("brand_id")) == user_id else conv.get("brand_id")
+                
+                if not other_user_id:
+                    continue
+                    
+                other_user = await users_collection.find_one({"_id": ObjectId(other_user_id)})
+                if not other_user:
+                    continue
+                
+                name = "Unknown User"
+                picture = None
+                if other_user.get("role") == "brand":
+                    profile = other_user.get("brand_profile", {})
+                    name = profile.get("company_name") or other_user.get("username")
+                    picture = profile.get("logo")
+                else:
+                    profile = other_user.get("influencer_profile", {})
+                    name = profile.get("full_name") or other_user.get("username")
+                    picture = profile.get("profile_picture")
+                
+                presence = await connection_manager.get_user_presence(str(other_user_id))
+                
+                entry = {
+                    "id": str(other_user_id),
+                    "name": name,
+                    "profile_picture": picture,
+                    "role": other_user.get("role"),
+                    "type": "direct",
+                    "is_online": presence.is_online if presence else False,
+                    "conversation_id": conv_id,
+                    "last_message": conv.get("last_message", ""),
+                    "last_message_time": conv.get("last_message_timestamp").isoformat() if conv.get("last_message_timestamp") else None,
+                    "unread_count": conv.get("unread_counts", {}).get(user_id, 0)
+                }
             
-            if not user:
-                continue
+            chatted_list.append(entry)
             
-            # Get presence
-            presence = await connection_manager.get_user_presence(other_user_id_str)
-            
-            # Get unread count
-            unread_count = conv.get("unread_counts", {}).get(user_id, 0)
-            
-            user_data = {
-                "id": other_user_id_str,
-                "username": user.get("username"),
-                "role": user.get("role"),
-                "is_online": presence.is_online if presence else False,
-                "last_seen": presence.last_seen.isoformat() if presence else None,
-                "conversation_id": str(conv["_id"]),
-                "last_message": conv.get("last_message", ""),
-                "last_message_time": conv.get("last_message_timestamp").isoformat() if conv.get("last_message_timestamp") else None,
-                "unread_count": unread_count,
-                "conversation_created": conv["created_at"].isoformat()
-            }
-            
-            # Add profile data
-            if user["role"] == "brand":
-                profile = user.get("brand_profile", {})
-                user_data.update({
-                    "name": profile.get("company_name"),
-                    "profile_picture": profile.get("logo")
-                })
-            elif user["role"] == "influencer":
-                profile = user.get("influencer_profile", {})
-                user_data.update({
-                    "name": profile.get("full_name"),
-                    "profile_picture": profile.get("profile_picture")
-                })
-            
-            chatted_users.append(user_data)
-        
         return {
-            "chatted_users": chatted_users,
+            "chatted_users": chatted_list,
             "pagination": {
                 "page": page,
                 "limit": limit,
@@ -1899,6 +1943,9 @@ async def get_chatted_users(
                 "pages": (total + limit - 1) // limit
             }
         }
+    except Exception as e:
+        logger.error(f"Error getting chatted users: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
         
     except Exception as e:
         logger.error(f"Error getting chatted users: {e}")

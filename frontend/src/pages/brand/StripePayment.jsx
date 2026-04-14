@@ -54,7 +54,7 @@ import {
   Tooltip,
   Breadcrumbs
 } from '@mui/material';
-import { 
+import {
   FormControl,
   InputLabel,
   Select,
@@ -122,7 +122,7 @@ import {
   ExpandLess,
   OpenInNew
 } from '@mui/icons-material';
-import { 
+import {
   FiChevronDown,
   FiSearch,
   FiX,
@@ -205,9 +205,9 @@ const POPULAR_CURRENCIES = ['USD', 'GBP', 'EUR', 'JPY', 'CAD', 'AUD', 'INR'];
 // 💱 CURRENCY CONVERTER COMPONENT FOR STRIPE
 // =============================================
 
-const StripeCurrencyConverter = ({ 
-  selectedCurrency, 
-  onCurrencyChange, 
+const StripeCurrencyConverter = ({
+  selectedCurrency,
+  onCurrencyChange,
   totalAmount,
   rates,
   showLabel = true
@@ -215,15 +215,15 @@ const StripeCurrencyConverter = ({
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [showAllCurrencies, setShowAllCurrencies] = useState(false);
-  
+
   // Calculate converted amount
   const calculateConvertedAmount = () => {
     if (!totalAmount || !rates || !selectedCurrency) return 0;
-    
+
     const { amount, originalCurrency = 'USD' } = totalAmount;
-    
+
     if (!amount) return 0;
-    
+
     // Convert from original currency to selected currency
     if (rates[originalCurrency] && rates[selectedCurrency]) {
       // Convert to GBP first, then to selected currency
@@ -231,12 +231,12 @@ const StripeCurrencyConverter = ({
       const convertedAmount = amountInGBP * rates[selectedCurrency];
       return convertedAmount;
     }
-    
+
     return amount; // Fallback to original amount
   };
-  
+
   const convertedAmount = calculateConvertedAmount();
-  
+
   // Filter currencies based on search
   const filteredCurrencies = Object.keys(CURRENCY_SYMBOLS).filter(currencyCode => {
     if (!searchTerm) return true;
@@ -245,14 +245,14 @@ const StripeCurrencyConverter = ({
       CURRENCY_NAMES[currencyCode]?.toLowerCase().includes(searchTerm.toLowerCase())
     );
   });
-  
+
   const formatCurrency = (amount, currencyCode) => {
     const symbol = CURRENCY_SYMBOLS[currencyCode] || currencyCode;
     const formattedAmount = new Intl.NumberFormat('en-US', {
       minimumFractionDigits: 0,
       maximumFractionDigits: 2
     }).format(amount);
-    
+
     return `${symbol}${formattedAmount}`;
   };
 
@@ -272,9 +272,9 @@ const StripeCurrencyConverter = ({
           <FiGlobe size={12} color="#666" />
         </Box>
       )}
-      
+
       <Box className="stripe-currency-selector" sx={{ position: 'relative' }}>
-        <Button 
+        <Button
           className="stripe-currency-toggle"
           onClick={() => setIsOpen(!isOpen)}
           variant="outlined"
@@ -296,9 +296,9 @@ const StripeCurrencyConverter = ({
           </Typography>
           <FiChevronDown size={14} className={isOpen ? 'rotate-180' : ''} />
         </Button>
-        
+
         {isOpen && (
-          <Paper 
+          <Paper
             className="stripe-currency-dropdown"
             sx={{
               position: 'relative',
@@ -317,9 +317,9 @@ const StripeCurrencyConverter = ({
           >
             {/* Search Input */}
             <Box className="stripe-currency-search" sx={{ mb: 2 }}>
-              <Box sx={{ 
-                display: 'flex', 
-                alignItems: 'center', 
+              <Box sx={{
+                display: 'flex',
+                alignItems: 'center',
                 gap: 1,
                 p: 1,
                 borderRadius: '8px',
@@ -341,7 +341,7 @@ const StripeCurrencyConverter = ({
                   }}
                 />
                 {searchTerm && (
-                  <Button 
+                  <Button
                     onClick={() => setSearchTerm('')}
                     size="small"
                     sx={{ minWidth: 'auto', p: 0.5 }}
@@ -351,7 +351,7 @@ const StripeCurrencyConverter = ({
                 )}
               </Box>
             </Box>
-            
+
             {/* Popular currencies */}
             <Box className="stripe-currency-section" sx={{ mb: 2 }}>
               <Typography variant="caption" color="text.secondary" fontWeight="600" sx={{ mb: 1 }}>
@@ -377,14 +377,14 @@ const StripeCurrencyConverter = ({
                 ))}
               </Box>
             </Box>
-            
+
             {/* All currencies */}
             <Box className="stripe-currency-section">
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
                 <Typography variant="caption" color="text.secondary" fontWeight="600">
                   All Currencies
                 </Typography>
-                <Button 
+                <Button
                   className="stripe-show-all-btn"
                   onClick={() => setShowAllCurrencies(!showAllCurrencies)}
                   size="small"
@@ -393,7 +393,7 @@ const StripeCurrencyConverter = ({
                   {showAllCurrencies ? 'Show Less' : 'Show All'}
                 </Button>
               </Box>
-              
+
               <Box className="stripe-currency-list" sx={{ maxHeight: showAllCurrencies ? '300px' : '200px', overflow: 'auto' }}>
                 {(showAllCurrencies ? filteredCurrencies : filteredCurrencies.slice(0, 10)).map(currencyCode => (
                   <Button
@@ -423,7 +423,7 @@ const StripeCurrencyConverter = ({
                         {CURRENCY_NAMES[currencyCode] || currencyCode}
                       </Typography>
                     </Box>
-                    
+
                     {rates && rates[currencyCode] && totalAmount?.originalCurrency && (
                       <Typography variant="caption" color="text.secondary">
                         1 {totalAmount.originalCurrency} = {rates[currencyCode].toFixed(2)} {currencyCode}
@@ -436,7 +436,7 @@ const StripeCurrencyConverter = ({
           </Paper>
         )}
       </Box>
-      
+
       {/* Display converted amount */}
       {/* {totalAmount && totalAmount.amount && (
         <Box className="stripe-converted-total" sx={{ mt: 1 }}>
@@ -635,7 +635,7 @@ const ProfileImage = ({ userId, profileType, alt, onClick, size = 40, userData }
               continue;
             }
           }
-          
+
           // If no image found, use fallback
           setError(true);
         } else {
@@ -668,9 +668,9 @@ const ProfileImage = ({ userId, profileType, alt, onClick, size = 40, userData }
 
   if (error || !imageUrl) {
     return (
-      <Avatar 
-        sx={{ 
-          width: size, 
+      <Avatar
+        sx={{
+          width: size,
           height: size,
           background: '#2563eb',
           color: 'white',
@@ -709,11 +709,11 @@ const ProfileImage = ({ userId, profileType, alt, onClick, size = 40, userData }
           <CircularProgress size={size * 0.5} />
         </Box>
       )}
-      <Avatar 
+      <Avatar
         src={imageUrl}
         alt={getDisplayName()}
-        sx={{ 
-          width: size, 
+        sx={{
+          width: size,
           height: size,
           cursor: onClick ? 'pointer' : 'default',
           boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
@@ -844,10 +844,10 @@ const UserInfo = ({ userId, profileType, showEmail = true, size = 40, showStats 
       />
       <Box flex={1} minWidth={0}>
         <Box display="flex" alignItems="center" gap={1} flexWrap="wrap">
-          <Typography 
-            variant="subtitle2" 
+          <Typography
+            variant="subtitle2"
             fontWeight="700"
-            sx={{ 
+            sx={{
               cursor: 'pointer',
               '&:hover': { color: 'primary', textDecoration: 'underline' }
             }}
@@ -856,7 +856,7 @@ const UserInfo = ({ userId, profileType, showEmail = true, size = 40, showStats 
           >
             {getDisplayName()}
           </Typography>
-          
+
           {/* Verification Badge */}
           {profileData?.verified && (
             <Tooltip title="Verified Profile">
@@ -885,8 +885,8 @@ const UserInfo = ({ userId, profileType, showEmail = true, size = 40, showStats 
             )}
             {profileData?.followers && (
               <Typography variant="caption" color="text.secondary">
-                {profileData.followers >= 1000 
-                  ? `${(profileData.followers / 1000).toFixed(1)}K` 
+                {profileData.followers >= 1000
+                  ? `${(profileData.followers / 1000).toFixed(1)}K`
                   : profileData.followers
                 } followers
               </Typography>
@@ -913,10 +913,10 @@ const UserInfo = ({ userId, profileType, showEmail = true, size = 40, showStats 
       {/* Chat Button */}
       {onChat && (
         <Tooltip title="Send Message">
-          <IconButton 
-            size="small" 
+          <IconButton
+            size="small"
             onClick={handleChat}
-            sx={{ 
+            sx={{
               background: 'rgba(25, 118, 210, 0.1)',
               '&:hover': { background: 'rgba(25, 118, 210, 0.2)' }
             }}
@@ -947,7 +947,7 @@ const ChatLaunch = ({ userId, userName, size = "small" }) => {
         startIcon={<ChatIcon />}
         onClick={handleChat}
         variant="outlined"
-        sx={{ 
+        sx={{
           borderRadius: '8px',
           textTransform: 'none',
           fontWeight: 600
@@ -1038,8 +1038,8 @@ const CampaignDetails = ({ campaign, expanded = false, onExpand }) => {
               <Typography variant="caption" color="text.secondary">
                 Status
               </Typography>
-              <StatusChip 
-                label={campaign.status} 
+              <StatusChip
+                label={campaign.status}
                 status={campaign.status}
                 size="small"
               />
@@ -1052,7 +1052,7 @@ const CampaignDetails = ({ campaign, expanded = false, onExpand }) => {
       {isExpanded && (
         <Box sx={{ mt: 2, animation: `${slideInUp} 0.3s ease` }}>
           <Divider sx={{ mb: 2 }} />
-          
+
           {/* Campaign Description */}
           {campaign.description && (
             <Box sx={{ mb: 2 }}>
@@ -1088,8 +1088,8 @@ const CampaignDetails = ({ campaign, expanded = false, onExpand }) => {
                   <ListItemIcon>
                     <CalendarToday sx={{ fontSize: 16 }} />
                   </ListItemIcon>
-                  <ListItemText 
-                    primary="Created" 
+                  <ListItemText
+                    primary="Created"
                     secondary={campaign.created_at ? format(new Date(campaign.created_at), 'MMM dd, yyyy') : 'N/A'}
                   />
                 </ListItem>
@@ -1097,14 +1097,14 @@ const CampaignDetails = ({ campaign, expanded = false, onExpand }) => {
                   <ListItemIcon>
                     <Schedule sx={{ fontSize: 16 }} />
                   </ListItemIcon>
-                  <ListItemText 
-                    primary="Deadline" 
+                  <ListItemText
+                    primary="Deadline"
                     secondary={campaign.deadline ? format(new Date(campaign.deadline), 'MMM dd, yyyy') : 'N/A'}
                   />
                 </ListItem>
               </List>
             </Grid>
-            
+
             <Grid item xs={12} sm={6}>
               <Typography variant="subtitle2" fontWeight="600" gutterBottom>
                 Performance
@@ -1114,8 +1114,8 @@ const CampaignDetails = ({ campaign, expanded = false, onExpand }) => {
                   <ListItemIcon>
                     <Group sx={{ fontSize: 16 }} />
                   </ListItemIcon>
-                  <ListItemText 
-                    primary="Applications" 
+                  <ListItemText
+                    primary="Applications"
                     secondary={campaign.applications_count || campaign.applications?.length || 0}
                   />
                 </ListItem>
@@ -1123,8 +1123,8 @@ const CampaignDetails = ({ campaign, expanded = false, onExpand }) => {
                   <ListItemIcon>
                     <CheckCircle sx={{ fontSize: 16 }} />
                   </ListItemIcon>
-                  <ListItemText 
-                    primary="Approved" 
+                  <ListItemText
+                    primary="Approved"
                     secondary={campaign.approved_applications || 0}
                   />
                 </ListItem>
@@ -1147,11 +1147,11 @@ const CampaignImage = ({ fileId, alt, onClick, campaignData }) => {
 
   const getImageUrl = () => {
     if (!fileId) return null;
-    
+
     if (fileId.startsWith('http') || fileId.startsWith('data:') || fileId.startsWith('blob:')) {
       return fileId;
     }
-    
+
     return `${process.env.REACT_APP_API_URL || 'http://localhost:8000'}/api/campaigns/image/${fileId}`;
   };
 
@@ -1160,8 +1160,8 @@ const CampaignImage = ({ fileId, alt, onClick, campaignData }) => {
   if (!imageUrl || error) {
     return (
       <FixedImageContainer onClick={onClick}>
-        <Box 
-          sx={{ 
+        <Box
+          sx={{
             width: '100%',
             height: '100%',
             background: '#2563eb',
@@ -1223,7 +1223,7 @@ const CampaignImage = ({ fileId, alt, onClick, campaignData }) => {
           setError(true);
         }}
       />
-      
+
       {/* Campaign Budget Overlay */}
       {campaignData?.budget && (
         <Box
@@ -1323,17 +1323,17 @@ const MediaFilesDialog = ({ open, onClose, application, mediaFiles }) => {
         onClose={onClose}
         maxWidth="lg"
         fullWidth
-        PaperProps={{ 
-          sx: { 
-            borderRadius: '20px', 
+        PaperProps={{
+          sx: {
+            borderRadius: '20px',
             minHeight: '600px',
             background: 'linear-gradient(135deg, #ffffff 0%, #f8faff 100%)'
-          } 
+          }
         }}
       >
-        <DialogTitle sx={{ 
+        <DialogTitle sx={{
           background: 'linear-gradient(135deg, #FF9800 0%, #F57C00 100%)',
-          color: 'white', 
+          color: 'white',
           fontWeight: 700,
           py: 3
         }}>
@@ -1366,7 +1366,7 @@ const MediaFilesDialog = ({ open, onClose, application, mediaFiles }) => {
             </IconButton>
           </Box>
         </DialogTitle>
-        
+
         <DialogContent dividers sx={{ p: 4 }}>
           {mediaFiles.length === 0 ? (
             <Box textAlign="center" py={6}>
@@ -1377,8 +1377,8 @@ const MediaFilesDialog = ({ open, onClose, application, mediaFiles }) => {
               <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
                 No media files have been submitted for this campaign yet.
               </Typography>
-              <Button 
-                variant="outlined" 
+              <Button
+                variant="outlined"
                 startIcon={<ChatIcon />}
                 onClick={() => handleChat({ _id: application.influencer_id, username: application.influencer_name })}
               >
@@ -1389,9 +1389,9 @@ const MediaFilesDialog = ({ open, onClose, application, mediaFiles }) => {
             <Grid container spacing={3}>
               {mediaFiles.map((media, index) => (
                 <Grid item xs={12} sm={6} md={4} key={media.file_id || index}>
-                  <Card 
-                    sx={{ 
-                      cursor: 'pointer', 
+                  <Card
+                    sx={{
+                      cursor: 'pointer',
                       transition: 'all 0.3s ease',
                       border: `2px solid transparent`,
                       '&:hover': {
@@ -1413,7 +1413,7 @@ const MediaFilesDialog = ({ open, onClose, application, mediaFiles }) => {
                           </Typography>
                         </Box>
                       </Box>
-                      
+
                       {media.description && (
                         <Typography variant="body2" sx={{ mb: 1, fontStyle: 'italic', fontSize: '0.8rem' }} noWrap>
                           "{media.description}"
@@ -1426,7 +1426,7 @@ const MediaFilesDialog = ({ open, onClose, application, mediaFiles }) => {
                         </Typography>
                       )}
                     </CardContent>
-                    
+
                     <CardActions sx={{ p: 2, pt: 0, gap: 1 }}>
                       <Button
                         size="small"
@@ -1461,13 +1461,15 @@ const MediaFilesDialog = ({ open, onClose, application, mediaFiles }) => {
           )}
         </DialogContent>
 
-        <DialogActions sx={{ position: 'sticky',
-    bottom: 0,
-    background: '#fff',
-    borderTop: '1px solid #e0e0e0',
-    zIndex: 10,
-    p: 3, gap: 1 }}>
-          <Button 
+        <DialogActions sx={{
+          position: 'sticky',
+          bottom: 0,
+          background: '#fff',
+          borderTop: '1px solid #e0e0e0',
+          zIndex: 10,
+          p: 3, gap: 1
+        }}>
+          <Button
             variant="outlined"
             startIcon={<ChatIcon />}
             onClick={() => handleChat({ _id: application.influencer_id, username: application.influencer_name })}
@@ -1475,8 +1477,8 @@ const MediaFilesDialog = ({ open, onClose, application, mediaFiles }) => {
           >
             Message Influencer
           </Button>
-          <Button 
-            onClick={onClose} 
+          <Button
+            onClick={onClose}
             sx={{ borderRadius: '12px', px: 4 }}
           >
             Close
@@ -1504,14 +1506,14 @@ const MediaFilesDialog = ({ open, onClose, application, mediaFiles }) => {
                 </IconButton>
               </Box>
             </DialogTitle>
-            <DialogContent dividers sx={{ p: 0, overflowY: 'auto',textAlign: 'center', minHeight: '500px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <DialogContent dividers sx={{ p: 0, overflowY: 'auto', textAlign: 'center', minHeight: '500px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               {selectedMedia.media_type === 'image' ? (
                 <img
                   src={getMediaViewUrl(selectedMedia)}
                   alt={selectedMedia.filename}
-                  style={{ 
-                    maxWidth: '100%', 
-                    maxHeight: '70vh', 
+                  style={{
+                    maxWidth: '100%',
+                    maxHeight: '70vh',
                     objectFit: 'contain',
                     borderRadius: '12px'
                   }}
@@ -1551,23 +1553,23 @@ const MediaFilesDialog = ({ open, onClose, application, mediaFiles }) => {
 // 💳 ENHANCED STRIPE PAYMENT FORM
 // =============================================
 
-const StripePaymentForm = ({ 
-  clientSecret, 
-  application, 
-  onSuccess, 
+const StripePaymentForm = ({
+  clientSecret,
+  application,
+  onSuccess,
   onError,
-  onCancel 
+  onCancel
 }) => {
   const stripe = useStripe();
   const elements = useElements();
   const navigate = useNavigate();
-  
+
   const [isLoading, setIsLoading] = useState(false);
   const [paymentError, setPaymentError] = useState('');
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    
+
     if (!stripe || !elements) {
       setPaymentError('Payment system not ready. Please try again.');
       return;
@@ -1624,22 +1626,22 @@ const StripePaymentForm = ({
   return (
     <Box component="form" onSubmit={handleSubmit}>
       {paymentError && (
-        <Alert 
-          severity="error" 
+        <Alert
+          severity="error"
           sx={{ mb: 2, borderRadius: '12px' }}
           onClose={() => setPaymentError('')}
         >
           {paymentError}
         </Alert>
       )}
-      
+
       {/* Campaign Summary */}
       <PaymentCard sx={{ mb: 3, p: 3 }}>
         <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <Receipt />
           Payment Summary
         </Typography>
-        
+
         <Grid container spacing={3}>
           <Grid item xs={12} md={6}>
             <Typography variant="subtitle2" color="text.secondary">
@@ -1651,13 +1653,13 @@ const StripePaymentForm = ({
             <Typography variant="body2" color="text.secondary">
               {application?.category || 'General Category'}
             </Typography>
-            
+
             {/* Campaign Details */}
             <Box sx={{ mt: 2 }}>
               <CampaignDetails campaign={application} expanded={false} />
             </Box>
           </Grid>
-          
+
           <Grid item xs={12} md={6}>
             <Typography variant="subtitle2" color="text.secondary">
               Influencer
@@ -1672,10 +1674,10 @@ const StripePaymentForm = ({
               onViewProfile={handleViewProfile}
               onChat={handleChat}
             />
-            
+
             {/* Quick Actions */}
             <Box sx={{ mt: 2, display: 'flex', gap: 1 }}>
-              <ChatLaunch 
+              <ChatLaunch
                 userId={application.influencer_id}
                 userName={application.influencer_name}
                 size="small"
@@ -1691,7 +1693,7 @@ const StripePaymentForm = ({
               </Button>
             </Box>
           </Grid>
-          
+
           <Grid item xs={12} md={6}>
             <Typography variant="subtitle2" color="text.secondary">
               Amount
@@ -1700,13 +1702,13 @@ const StripePaymentForm = ({
               {formatCurrency(application?.budget || application?.campaign_budget, application?.currency)}
             </Typography>
           </Grid>
-          
+
           <Grid item xs={12} md={6}>
             <Typography variant="subtitle2" color="text.secondary">
               Status
             </Typography>
-            <StatusChip 
-              label="Ready for Payment" 
+            <StatusChip
+              label="Ready for Payment"
               status="pending"
             />
           </Grid>
@@ -1751,7 +1753,7 @@ const StripePaymentForm = ({
           )}
         </Grid>
       </PaymentCard>
-      
+
       {/* Stripe Payment Element */}
       <PaymentCard sx={{ mb: 2 }}>
         <CardContent>
@@ -1759,33 +1761,33 @@ const StripePaymentForm = ({
             <Payment />
             Payment Details
           </Typography>
-          
+
           <Box sx={{ py: 2 }}>
-            <PaymentElement 
+            <PaymentElement
               options={{
                 layout: 'tabs'
-              }} 
+              }}
             />
           </Box>
         </CardContent>
       </PaymentCard>
 
       {/* Security Notice */}
-      <Alert 
-        severity="info" 
+      <Alert
+        severity="info"
         sx={{ mb: 2, borderRadius: '12px' }}
         icon={<Security />}
       >
         <Typography variant="body2">
-          <strong>Secure Payment:</strong> Your payment information is encrypted and processed securely by Stripe. 
+          <strong>Secure Payment:</strong> Your payment information is encrypted and processed securely by Stripe.
           We never store your credit card details.
         </Typography>
       </Alert>
 
       {/* Action Buttons */}
       <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
-        <Button 
-          variant="outlined" 
+        <Button
+          variant="outlined"
           onClick={onCancel}
           disabled={isLoading}
           startIcon={<Close />}
@@ -1793,13 +1795,13 @@ const StripePaymentForm = ({
         >
           Cancel
         </Button>
-        <Button 
-          variant="contained" 
-          type="submit" 
+        <Button
+          variant="contained"
+          type="submit"
           disabled={!stripe || isLoading}
           startIcon={isLoading ? <CircularProgress size={20} /> : <Payment />}
-          sx={{ 
-            borderRadius: '12px', 
+          sx={{
+            borderRadius: '12px',
             px: 4,
             background: '#2563eb',
             '&:hover': {
@@ -1826,7 +1828,7 @@ const useRealTimeStatus = () => {
   const markAsUpdated = (itemId) => {
     setUpdatedItems(prev => new Set([...prev, itemId]));
     setLastUpdate(Date.now());
-    
+
     setTimeout(() => {
       setUpdatedItems(prev => {
         const newSet = new Set(prev);
@@ -1849,7 +1851,7 @@ const useRealTimeStatus = () => {
 
   const removeApplication = (campaignId, influencerId) => {
     setApplications(prev => {
-      const filtered = prev.filter(app => 
+      const filtered = prev.filter(app =>
         !(app.campaign_id === campaignId && app.influencer_id === influencerId)
       );
       markAsUpdated(`${campaignId}-${influencerId}`);
@@ -1884,7 +1886,7 @@ const StripePayment = () => {
   const { currency, changeCurrency, rates } = useContext(CurrencyContext); // Add this line
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  
+
   // Real-time status management
   const {
     applications,
@@ -1957,7 +1959,7 @@ const StripePayment = () => {
   // Auto-open payment dialog when URL parameters are present
   useEffect(() => {
     if (campaignId && influencerId && applications.length > 0 && !paymentDialogOpen) {
-      const targetApp = applications.find(app => 
+      const targetApp = applications.find(app =>
         app.campaign_id === campaignId && app.influencer_id === influencerId
       );
       if (targetApp) {
@@ -1969,21 +1971,21 @@ const StripePayment = () => {
   const checkForUpdates = async () => {
     try {
       const appsResponse = await campaignAPI.getBrandApplications();
-      const appsData = Array.isArray(appsResponse) ? appsResponse : 
-                     appsResponse?.data || appsResponse?.applications || [];
-      
+      const appsData = Array.isArray(appsResponse) ? appsResponse :
+        appsResponse?.data || appsResponse?.applications || [];
+
       // Check for status changes
       appsData.forEach(newApp => {
-        const existingApp = applications.find(app => 
-          app.campaign_id === newApp.campaign_id && 
+        const existingApp = applications.find(app =>
+          app.campaign_id === newApp.campaign_id &&
           app.influencer_id === newApp.influencer_id
         );
-        
+
         if (existingApp && existingApp.status !== newApp.status) {
           console.log(`🔄 Status changed: ${existingApp.status} → ${newApp.status}`);
           updateApplicationStatus(
-            newApp.campaign_id, 
-            newApp.influencer_id, 
+            newApp.campaign_id,
+            newApp.influencer_id,
             newApp.status
           );
         }
@@ -2001,22 +2003,22 @@ const StripePayment = () => {
       } else {
         setIsLoading(true);
       }
-      
+
       setError('');
-      
+
       // Load applications with media submitted using campaignAPI
       const appsResponse = await campaignAPI.getBrandApplications();
       console.log('🔄 Loading applications:', appsResponse);
-      
-      const appsData = Array.isArray(appsResponse) ? appsResponse : 
-                     appsResponse?.data || appsResponse?.applications || [];
-      
+
+      const appsData = Array.isArray(appsResponse) ? appsResponse :
+        appsResponse?.data || appsResponse?.applications || [];
+
       // Filter applications with media submitted and not completed
-      const filteredApps = appsData.filter(app => 
-        (app.status === 'media_submitted' || app.submitted_media?.length > 0) && 
+      const filteredApps = appsData.filter(app =>
+        (app.status === 'media_submitted' || app.submitted_media?.length > 0) &&
         app.status !== 'completed'
       );
-      
+
       console.log('✅ Filtered applications:', filteredApps);
       setApplications(filteredApps);
 
@@ -2025,7 +2027,7 @@ const StripePayment = () => {
         const paymentsResponse = await stripeAPI.getPaymentHistory();
         console.log('💰 Payments response:', paymentsResponse);
         const paymentsData = paymentsResponse?.payments || paymentsResponse?.data || [];
-        
+
         setPaymentHistory(paymentsData);
       } catch (paymentError) {
         console.error('Error loading payment history:', paymentError);
@@ -2045,14 +2047,14 @@ const StripePayment = () => {
 
   const loadMediaFiles = async (application) => {
     if (!application) return;
-    
+
     try {
       let mediaData = [];
-      
+
       try {
         const response = await campaignAPI.getCampaignMediaFiles(application.campaign_id);
         if (response && Array.isArray(response)) {
-          mediaData = response.filter(media => 
+          mediaData = response.filter(media =>
             media.influencer_id === application.influencer_id
           );
         }
@@ -2091,14 +2093,14 @@ const StripePayment = () => {
 
       const response = await stripeAPI.createPaymentIntent(paymentData);
       console.log('✅ Payment intent response:', response);
-      
+
       if (!response.client_secret) {
         throw new Error('No client secret received from server');
       }
 
       setClientSecret(response.client_secret);
       setActiveStep(1);
-      
+
     } catch (err) {
       console.error('❌ Payment initialization failed:', err);
       const errorMessage = err.response?.data?.detail || err.message || 'Failed to initialize payment system';
@@ -2127,7 +2129,7 @@ const StripePayment = () => {
       setPaymentIntent(null);
       setMediaFiles([]);
       setError('');
-      
+
       // Clear URL parameters
       navigate('/brand/stripepay', { replace: true });
     }
@@ -2150,7 +2152,7 @@ const StripePayment = () => {
 
   const handlePaymentSuccess = async (paymentIntent) => {
     console.log('🎉 Payment success:', paymentIntent);
-    
+
     try {
       // Confirm payment with backend
       const confirmData = {
@@ -2165,12 +2167,12 @@ const StripePayment = () => {
       setActiveStep(3);
       setSuccess('Payment completed successfully!');
       setShowSuccessToast(true);
-      
+
       // Immediately update the UI
       if (selectedApplication) {
         // Remove from pending applications
         removeApplication(selectedApplication.campaign_id, selectedApplication.influencer_id);
-        
+
         // Add to payment history
         const newPayment = {
           _id: `payment-${Date.now()}`,
@@ -2182,7 +2184,7 @@ const StripePayment = () => {
           created_at: new Date().toISOString(),
           transaction_id: paymentIntent.id
         };
-        
+
         setPaymentHistory(prev => [newPayment, ...prev]);
         setCompletedPayment(newPayment);
         addToPaymentHistory(newPayment);
@@ -2210,30 +2212,30 @@ const StripePayment = () => {
     handleClosePaymentDialog();
   };
 
- // Add this helper function near other helper functions
-const formatCurrency = (amount, currencyCode = 'USD') => {
-  const symbol = CURRENCY_SYMBOLS[currencyCode] || currencyCode;
-  const formattedAmount = new Intl.NumberFormat('en-US', {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2
-  }).format(amount);
-  
-  return `${symbol}${formattedAmount}`;
-};
+  // Add this helper function near other helper functions
+  const formatCurrency = (amount, currencyCode = 'USD') => {
+    const symbol = CURRENCY_SYMBOLS[currencyCode] || currencyCode;
+    const formattedAmount = new Intl.NumberFormat('en-US', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2
+    }).format(amount);
 
-// Update the existing formatCurrency function to use the context
-const formatCurrencyWithContext = (amount, originalCurrency = 'USD') => {
-  if (!amount) return 'N/A';
-  
-  // If rates are available, convert to selected currency
-  if (rates && rates[originalCurrency] && rates[currency]) {
-    const amountInGBP = amount / rates[originalCurrency];
-    const convertedAmount = amountInGBP * rates[currency];
-    return formatCurrency(convertedAmount, currency);
-  }
-  
-  return formatCurrency(amount, originalCurrency);
-};
+    return `${symbol}${formattedAmount}`;
+  };
+
+  // Update the existing formatCurrency function to use the context
+  const formatCurrencyWithContext = (amount, originalCurrency = 'USD') => {
+    if (!amount) return 'N/A';
+
+    // If rates are available, convert to selected currency
+    if (rates && rates[originalCurrency] && rates[currency]) {
+      const amountInGBP = amount / rates[originalCurrency];
+      const convertedAmount = amountInGBP * rates[currency];
+      return formatCurrency(convertedAmount, currency);
+    }
+
+    return formatCurrency(amount, originalCurrency);
+  };
 
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
@@ -2250,36 +2252,36 @@ const formatCurrencyWithContext = (amount, originalCurrency = 'USD') => {
 
   // Enhanced stats calculation with real-time updates
   // Replace the stats calculation with currency-converted version
-const stats = {
-  pendingPayments: applications.length,
-  totalPayments: paymentHistory.length,
-  completedPayments: paymentHistory.filter(p => p.status === 'completed').length,
-  totalAmount: paymentHistory.reduce((sum, payment) => {
-    // Convert each payment to selected currency
-    const paymentAmount = payment.amount || 0;
-    const paymentCurrency = payment.currency || 'USD';
-    
-    if (rates && rates[paymentCurrency] && rates[currency]) {
-      // Convert payment amount to selected currency
-      const amountInGBP = paymentAmount / rates[paymentCurrency];
-      const convertedAmount = amountInGBP * rates[currency];
-      return sum + convertedAmount;
-    }
-    
-    return sum + paymentAmount;
-  }, 0),
-  // Keep original amounts for display
-  originalAmounts: paymentHistory.reduce((acc, payment) => {
-    const paymentCurrency = payment.currency || 'USD';
-    const paymentAmount = payment.amount || 0;
-    
-    if (!acc[paymentCurrency]) {
-      acc[paymentCurrency] = 0;
-    }
-    acc[paymentCurrency] += paymentAmount;
-    return acc;
-  }, {})
-};
+  const stats = {
+    pendingPayments: applications.length,
+    totalPayments: paymentHistory.length,
+    completedPayments: paymentHistory.filter(p => p.status === 'completed').length,
+    totalAmount: paymentHistory.reduce((sum, payment) => {
+      // Convert each payment to selected currency
+      const paymentAmount = payment.amount || 0;
+      const paymentCurrency = payment.currency || 'USD';
+
+      if (rates && rates[paymentCurrency] && rates[currency]) {
+        // Convert payment amount to selected currency
+        const amountInGBP = paymentAmount / rates[paymentCurrency];
+        const convertedAmount = amountInGBP * rates[currency];
+        return sum + convertedAmount;
+      }
+
+      return sum + paymentAmount;
+    }, 0),
+    // Keep original amounts for display
+    originalAmounts: paymentHistory.reduce((acc, payment) => {
+      const paymentCurrency = payment.currency || 'USD';
+      const paymentAmount = payment.amount || 0;
+
+      if (!acc[paymentCurrency]) {
+        acc[paymentCurrency] = 0;
+      }
+      acc[paymentCurrency] += paymentAmount;
+      return acc;
+    }, {})
+  };
 
 
 
@@ -2327,9 +2329,9 @@ const stats = {
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
         TransitionComponent={Slide}
       >
-        <Alert 
-          severity="success" 
-          sx={{ 
+        <Alert
+          severity="success"
+          sx={{
             borderRadius: '12px',
             background: 'linear-gradient(135deg, #4CAF50, #66BB6A)',
             color: 'white',
@@ -2353,7 +2355,7 @@ const stats = {
       </Snackbar>
 
       {/* Header Section with Breadcrumbs */}
-       <Box sx={{ 
+      <Box sx={{
         background: 'linear-gradient(135deg, #0066CC 0%, #004499 100%)',
         p: 4,
         borderRadius: '16px',
@@ -2381,7 +2383,7 @@ const stats = {
           borderRadius: '50%',
           background: 'rgba(255, 255, 255, 0.05)',
         }} />
-        
+
         <Box sx={{ position: 'relative', zIndex: 1 }}>
           <Box display="flex" justifyContent="space-between" alignItems="flex-start" flexWrap="wrap" gap={2}>
             <Box>
@@ -2397,9 +2399,9 @@ const stats = {
               startIcon={<Refresh />}
               onClick={() => loadData(true)}
               disabled={isRefreshing}
-              sx={{ 
-                borderRadius: '25px', 
-                px: 3, 
+              sx={{
+                borderRadius: '25px',
+                px: 3,
                 fontWeight: 600,
                 background: 'rgba(255, 255, 255, 0.2)',
                 '&:hover': {
@@ -2412,9 +2414,9 @@ const stats = {
           </Box>
 
           {/* Currency Converter Section */}
-          <Box sx={{ 
-            mt: 3, 
-            p: 3, 
+          <Box sx={{
+            mt: 3,
+            p: 3,
             background: 'rgba(255, 255, 255, 0.1)',
             borderRadius: '12px',
             backdropFilter: 'blur(10px)',
@@ -2429,7 +2431,7 @@ const stats = {
                   All amounts will be displayed in your selected currency
                 </Typography>
               </Box>
-              
+
               {/* Custom Material-UI Currency Selector */}
               <Box sx={{ minWidth: 200 }}>
                 <FormControl fullWidth size="small">
@@ -2487,7 +2489,7 @@ const stats = {
                   </Select>
                 </FormControl>
               </Box>
-              
+
               {/* Converted Total Display */}
               <Box sx={{ textAlign: 'right' }}>
                 <Typography variant="body2" sx={{ opacity: 0.8 }}>
@@ -2505,8 +2507,8 @@ const stats = {
             {/* Currency Stats */}
             <Grid container spacing={2} sx={{ mt: 2 }}>
               <Grid item xs={12} sm={6} md={3}>
-                <Box sx={{ 
-                  p: 2, 
+                <Box sx={{
+                  p: 2,
                   background: 'rgba(255, 255, 255, 0.1)',
                   borderRadius: '8px',
                   border: '1px solid rgba(255, 255, 255, 0.2)'
@@ -2528,8 +2530,8 @@ const stats = {
                 </Box>
               </Grid>
               <Grid item xs={12} sm={6} md={3}>
-                <Box sx={{ 
-                  p: 2, 
+                <Box sx={{
+                  p: 2,
                   background: 'rgba(255, 255, 255, 0.1)',
                   borderRadius: '8px',
                   border: '1px solid rgba(255, 255, 255, 0.2)'
@@ -2546,8 +2548,8 @@ const stats = {
                 </Box>
               </Grid>
               <Grid item xs={12} sm={6} md={3}>
-                <Box sx={{ 
-                  p: 2, 
+                <Box sx={{
+                  p: 2,
                   background: 'rgba(255, 255, 255, 0.1)',
                   borderRadius: '8px',
                   border: '1px solid rgba(255, 255, 255, 0.2)'
@@ -2564,8 +2566,8 @@ const stats = {
                 </Box>
               </Grid>
               <Grid item xs={12} sm={6} md={3}>
-                <Box sx={{ 
-                  p: 2, 
+                <Box sx={{
+                  p: 2,
                   background: 'rgba(255, 255, 255, 0.1)',
                   borderRadius: '8px',
                   border: '1px solid rgba(255, 255, 255, 0.2)'
@@ -2603,7 +2605,7 @@ const stats = {
           <Tabs
             value={activeTab}
             onChange={(e, newValue) => setActiveTab(newValue)}
-            sx={{ 
+            sx={{
               '& .MuiTab-root': {
                 fontWeight: 600,
                 fontSize: '0.9rem',
@@ -2612,23 +2614,23 @@ const stats = {
               }
             }}
           >
-            <Tab 
-              icon={<AccountBalanceWallet />} 
+            <Tab
+              icon={<AccountBalanceWallet />}
               label={
                 <Badge badgeContent={applications.length} color="primary" showZero>
                   Pending Payments
                 </Badge>
-              } 
-              value="pending" 
+              }
+              value="pending"
             />
-            <Tab 
-              icon={<Receipt />} 
+            <Tab
+              icon={<Receipt />}
               label={
                 <Badge badgeContent={paymentHistory.length} color="primary" showZero>
                   Payment History
                 </Badge>
-              } 
-              value="history" 
+              }
+              value="history"
             />
           </Tabs>
         </Box>
@@ -2642,9 +2644,9 @@ const stats = {
                   <Typography variant="h5" gutterBottom sx={{ fontWeight: '700', mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
                     <AccountBalanceWallet color="primary" />
                     Ready for Payment
-                    <Chip 
-                      label={applications.length} 
-                      color="primary" 
+                    <Chip
+                      label={applications.length}
+                      color="primary"
                       size="small"
                       sx={{ animation: applications.length === 0 ? `${pulseAnimation} 2s ease infinite` : 'none' }}
                     />
@@ -2665,11 +2667,11 @@ const stats = {
                       {applications.map((application) => {
                         const itemId = `${application.campaign_id}-${application.influencer_id}`;
                         const isUpdated = isRecentlyUpdated(itemId);
-                        
+
                         return (
                           <Grid item key={itemId} sx={{ display: "flex", justifyContent: "center" }}>
                             <Zoom in={true} style={{ transitionDelay: isUpdated ? '0ms' : '100ms' }}>
-                              <ProfessionalCard 
+                              <ProfessionalCard
                                 updated={isUpdated}
                               >
                                 {/* Campaign Image */}
@@ -2678,7 +2680,7 @@ const stats = {
                                   alt={application.title}
                                   campaignData={application}
                                 />
-                                
+
                                 <CardContent sx={{ flexGrow: 1, p: 3, pb: 2 }}>
                                   {/* Header with Influencer Info and Status */}
                                   <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={2}>
@@ -2694,8 +2696,8 @@ const stats = {
                                         onChat={handleChat}
                                       />
                                     </Box>
-                                    <StatusChip 
-                                      label={application.status === 'media_submitted' ? 'Ready for Payment' : application.status} 
+                                    <StatusChip
+                                      label={application.status === 'media_submitted' ? 'Ready for Payment' : application.status}
                                       status={application.status === 'media_submitted' ? 'media_submitted' : application.status}
                                       size="small"
                                     />
@@ -2709,19 +2711,19 @@ const stats = {
                                   {/* Budget and Media Info */}
                                   <Box display="flex" justifyContent="space-between" alignItems="center" mb={1.5}>
                                     <Box display="flex" alignItems="center" gap={0.5}>
-  <AttachMoney sx={{ fontSize: 18, color: 'success' }} />
-  <Box>
-    <Typography variant="body1" fontWeight="700" color="success">
-      {formatCurrencyWithContext(application.budget || application.campaign_budget, application.currency)}
-    </Typography>
-    {application.currency !== currency && (
-      <Typography variant="caption" color="text.secondary">
-        {application.currency} {application.budget?.toLocaleString()}
-      </Typography>
-    )}
-  </Box>
-</Box>
-                                    
+                                      <AttachMoney sx={{ fontSize: 18, color: 'success' }} />
+                                      <Box>
+                                        <Typography variant="body1" fontWeight="700" color="success">
+                                          {formatCurrencyWithContext(application.budget || application.campaign_budget, application.currency)}
+                                        </Typography>
+                                        {application.currency !== currency && (
+                                          <Typography variant="caption" color="text.secondary">
+                                            {application.currency} {application.budget?.toLocaleString()}
+                                          </Typography>
+                                        )}
+                                      </Box>
+                                    </Box>
+
                                     {/* Media File Count */}
                                     <Box display="flex" alignItems="center" gap={0.5}>
                                       <Badge badgeContent={getMediaFileCount(application)} color="primary" overlap="circular">
@@ -2739,8 +2741,8 @@ const stats = {
                                       <Typography variant="caption" color="text.secondary" fontWeight="600">
                                         INFLUENCER MESSAGE:
                                       </Typography>
-                                      <Typography 
-                                        variant="body2" 
+                                      <Typography
+                                        variant="body2"
                                         sx={{
                                           p: 1,
                                           background: 'rgba(102, 126, 234, 0.05)',
@@ -2769,9 +2771,9 @@ const stats = {
                                         size="small"
                                         startIcon={<Payment />}
                                         onClick={() => handleOpenPaymentDialog(application)}
-                                        sx={{ 
-                                          borderRadius: '8px', 
-                                          fontSize: '0.75rem', 
+                                        sx={{
+                                          borderRadius: '8px',
+                                          fontSize: '0.75rem',
                                           flex: 2,
                                           animation: isUpdated ? `${pulseAnimation} 1s ease infinite` : 'none'
                                         }}
@@ -2793,7 +2795,7 @@ const stats = {
 
                                     {/* Secondary Actions Row */}
                                     <Box sx={{ display: 'flex', gap: 1, width: '100%' }}>
-                                      <ChatLaunch 
+                                      <ChatLaunch
                                         userId={application.influencer_id}
                                         userName={application.influencer_name}
                                         size="small"
@@ -2839,8 +2841,8 @@ const stats = {
                       <ListItemIcon>
                         <AutoAwesome color="primary" />
                       </ListItemIcon>
-                      <ListItemText 
-                        primary="Live Status" 
+                      <ListItemText
+                        primary="Live Status"
                         secondary="Automatic status updates every 5 seconds"
                       />
                     </ListItem>
@@ -2848,8 +2850,8 @@ const stats = {
                       <ListItemIcon>
                         <CheckCircle color="success" />
                       </ListItemIcon>
-                      <ListItemText 
-                        primary="Instant Completion" 
+                      <ListItemText
+                        primary="Instant Completion"
                         secondary="Payments disappear immediately after completion"
                       />
                     </ListItem>
@@ -2857,8 +2859,8 @@ const stats = {
                       <ListItemIcon>
                         <TrendingUp color="info" />
                       </ListItemIcon>
-                      <ListItemText 
-                        primary="Live Counter" 
+                      <ListItemText
+                        primary="Live Counter"
                         secondary="Stats update in real-time"
                       />
                     </ListItem>
@@ -2866,8 +2868,8 @@ const stats = {
                       <ListItemIcon>
                         <ChatIcon color="secondary" />
                       </ListItemIcon>
-                      <ListItemText 
-                        primary="Chat Integration" 
+                      <ListItemText
+                        primary="Chat Integration"
                         secondary="Direct messaging with influencers"
                       />
                     </ListItem>
@@ -2908,27 +2910,27 @@ const stats = {
                   </Box>
 
                   <Box sx={{ mt: 3, p: 2, background: 'linear-gradient(135deg, #f5f7ff, #f0f4ff)', borderRadius: 2 }}>
-  <Typography variant="subtitle2" fontWeight="600" gutterBottom>
-    Currency Summary
-  </Typography>
-  
-  <StripeCurrencyConverter
-    selectedCurrency={currency}
-    onCurrencyChange={changeCurrency}
-    totalAmount={{
-      amount: stats.totalAmount,
-      originalCurrency: 'USD'
-    }}
-    rates={rates}
-    showLabel={false}
-  />
-  
-  <Box sx={{ mt: 2, pt: 2, borderTop: '1px dashed', borderColor: 'divider' }}>
-    <Typography variant="caption" color="text.secondary">
-      Exchange rates updated: {rates ? 'Today' : 'Loading...'}
-    </Typography>
-  </Box>
-</Box>
+                    <Typography variant="subtitle2" fontWeight="600" gutterBottom>
+                      Currency Summary
+                    </Typography>
+
+                    <StripeCurrencyConverter
+                      selectedCurrency={currency}
+                      onCurrencyChange={changeCurrency}
+                      totalAmount={{
+                        amount: stats.totalAmount,
+                        originalCurrency: 'USD'
+                      }}
+                      rates={rates}
+                      showLabel={false}
+                    />
+
+                    <Box sx={{ mt: 2, pt: 2, borderTop: '1px dashed', borderColor: 'divider' }}>
+                      <Typography variant="caption" color="text.secondary">
+                        Exchange rates updated: {rates ? 'Today' : 'Loading...'}
+                      </Typography>
+                    </Box>
+                  </Box>
                 </CardContent>
               </PaymentCard>
             </Grid>
@@ -2972,10 +2974,10 @@ const stats = {
                       {paymentHistory.map((payment, index) => {
                         const isNew = index === 0 && isRecentlyUpdated(`payment-${payment._id}`);
                         return (
-                          <TableRow 
-                            key={payment._id || payment.payment_id} 
+                          <TableRow
+                            key={payment._id || payment.payment_id}
                             hover
-                            sx={{ 
+                            sx={{
                               '&:last-child td, &:last-child th': { border: 0 },
                               animation: isNew ? `${slideInUp} 0.5s ease` : 'none',
                               background: isNew ? 'rgba(76, 175, 80, 0.05)' : 'inherit'
@@ -2997,18 +2999,18 @@ const stats = {
                                 onChat={handleChat}
                               />
                             </TableCell>
-<TableCell>
-  <Box>
-    <Typography fontWeight="700" color="primary">
-      {formatCurrencyWithContext(payment.amount, payment.currency)}
-    </Typography>
-    {payment.currency !== currency && rates && (
-      <Typography variant="caption" color="text.secondary">
-        Original: {formatCurrency(payment.amount, payment.currency)}
-      </Typography>
-    )}
-  </Box>
-</TableCell>
+                            <TableCell>
+                              <Box>
+                                <Typography fontWeight="700" color="primary">
+                                  {formatCurrencyWithContext(payment.amount, payment.currency)}
+                                </Typography>
+                                {payment.currency !== currency && rates && (
+                                  <Typography variant="caption" color="text.secondary">
+                                    Original: {formatCurrency(payment.amount, payment.currency)}
+                                  </Typography>
+                                )}
+                              </Box>
+                            </TableCell>
                             <TableCell>
                               <Typography variant="body2">
                                 {formatDate(payment.created_at || payment.payment_date)}
@@ -3059,12 +3061,12 @@ const stats = {
         onClose={handleClosePaymentDialog}
         maxWidth="md"
         fullWidth
-        scroll="paper"  
+        scroll="paper"
         PaperProps={{
-          sx: { borderRadius: '16px', maxHeight: '90vh',  }
+          sx: { borderRadius: '16px', maxHeight: '90vh', }
         }}
       >
-        <DialogTitle sx={{ 
+        <DialogTitle sx={{
           background: '#2563eb',
           color: 'white',
           fontWeight: 700
@@ -3146,7 +3148,7 @@ const stats = {
                   <Typography variant="body1" color="text.secondary" paragraph>
                     Your payment of {formatCurrency(selectedApplication.budget || selectedApplication.campaign_budget, selectedApplication.currency)} has been processed successfully.
                   </Typography>
-                  
+
                   <PaymentCard sx={{ mt: 3, p: 3, maxWidth: 400, mx: 'auto' }}>
                     <Typography variant="subtitle2" gutterBottom>
                       Transaction Details
@@ -3181,15 +3183,15 @@ const stats = {
                     <Button
                       variant="contained"
                       onClick={() => navigate('/brand/campaigns')}
-                      sx={{ 
-                        borderRadius: '12px', 
+                      sx={{
+                        borderRadius: '12px',
                         px: 4,
                         background: '#2563eb'
                       }}
                     >
                       View Campaigns
                     </Button>
-                    <ChatLaunch 
+                    <ChatLaunch
                       userId={selectedApplication.influencer_id}
                       userName={selectedApplication.influencer_name}
                     />
@@ -3219,7 +3221,7 @@ const stats = {
       >
         {selectedProfile && (
           <>
-            <DialogTitle sx={{ 
+            <DialogTitle sx={{
               background: '#2563eb',
               color: 'white',
               fontWeight: 700
@@ -3254,7 +3256,7 @@ const stats = {
               </Box>
 
               <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', mt: 2 }}>
-                <ChatLaunch 
+                <ChatLaunch
                   userId={selectedProfile._id}
                   userName={selectedProfile.username}
                 />

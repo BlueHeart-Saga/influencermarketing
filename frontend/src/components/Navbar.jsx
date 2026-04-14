@@ -10,64 +10,60 @@ import "../style/Navbar.css";
 import API_BASE_URL from "../config/api";
 
 export default function Navbar({ toggleSidebar, isSidebarOpen, isMobile }) {
-  const { user, logout, subscription, profileImageVersion  } = useContext(AuthContext);
+  const { user, logout, subscription, profileImageVersion, profileStatus } = useContext(AuthContext);
   const location = useLocation();
   const navigate = useNavigate();
   const [runTour, setRunTour] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
-  
+
   const [navItems, setNavItems] = useState([]);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
-  
+
   const [logoUrl, setLogoUrl] = useState("");
   const [brandName, setBrandName] = useState("Brio"); // Default fallback
   const [loading, setLoading] = useState({ logo: true, name: true });
   const [remainingTime, setRemainingTime] = useState({ days: 0, hours: 0, minutes: 0 });
 
-  const [profileImage, setProfileImage] = useState(
-    user?.role === "influencer"
-      ? `${API_BASE_URL}/static/defaults/influencer-avatar.png`
-      : `${API_BASE_URL}/static/defaults/brand-logo.png`
-  );
+  const [profileImage, setProfileImage] = useState("");
 
 
- 
+
 
 
   const tourSteps = [
-  {
-    target: ".qb-sidebar-toggle",
-    content: "Click here to open the main navigation menu.",
-    disableBeacon: true
-  },
-  {
-    target: ".qb-nav-links",
-    content: "These are your primary navigation controls."
-  },
-  {
-    target: ".qb-subscription-batch",
-    content: "This shows your current subscription status."
-  },
-  {
-    target: ".qb-user-dropdown",
-    content: "Access your profile and account controls here."
-  }
-];
+    {
+      target: ".qb-sidebar-toggle",
+      content: "Click here to open the main navigation menu.",
+      disableBeacon: true
+    },
+    {
+      target: ".qb-nav-links",
+      content: "These are your primary navigation controls."
+    },
+    {
+      target: ".qb-subscription-batch",
+      content: "This shows your current subscription status."
+    },
+    {
+      target: ".qb-user-dropdown",
+      content: "Access your profile and account controls here."
+    }
+  ];
 
-useEffect(() => {
-  if (!user?.token) return;
+  useEffect(() => {
+    if (!user?.token) return;
 
-  const userKey = user.id || user.email; // MUST be stable & unique
-  const storageKey = `seenNavbarTour_${userKey}`;
+    const userKey = user.id || user.email; // MUST be stable & unique
+    const storageKey = `seenNavbarTour_${userKey}`;
 
-  if (localStorage.getItem(storageKey)) return;
+    if (localStorage.getItem(storageKey)) return;
 
-  setRunTour(true);
-  setStepIndex(0);
-  localStorage.setItem(storageKey, "true");
+    setRunTour(true);
+    setStepIndex(0);
+    localStorage.setItem(storageKey, "true");
 
-}, [user?.token]);
+  }, [user?.token]);
 
 
 
@@ -98,17 +94,17 @@ useEffect(() => {
             return <IconComponent className="qb-nav-icon-component" />;
           }
         }
-        
+
         if (value.includes('fa-')) {
           return <i className={value} />;
         }
-        
+
         return <FaIcons.FaPalette className="qb-nav-icon-component" />;
 
       case "emoji":
         return (
-          <span 
-            className="qb-emoji-icon" 
+          <span
+            className="qb-emoji-icon"
             title={alt_text}
             role="img"
             aria-label={alt_text || "icon"}
@@ -119,9 +115,9 @@ useEffect(() => {
 
       case "url":
         return (
-          <img 
-            src={value} 
-            alt={alt_text || "icon"} 
+          <img
+            src={value}
+            alt={alt_text || "icon"}
             className="qb-url-icon"
             onError={(e) => {
               e.target.style.display = 'none';
@@ -133,9 +129,9 @@ useEffect(() => {
       case "upload":
         const iconUrl = `${API_BASE_URL}/icon/${value}`;
         return (
-          <img 
-            src={iconUrl} 
-            alt={alt_text || "icon"} 
+          <img
+            src={iconUrl}
+            alt={alt_text || "icon"}
             className="qb-uploaded-icon"
             onError={(e) => {
               e.target.style.display = 'none';
@@ -152,7 +148,7 @@ useEffect(() => {
           }
           if (value.length <= 3) {
             return (
-              <span 
+              <span
                 className="qb-emoji-icon"
                 role="img"
                 aria-label="icon"
@@ -275,7 +271,7 @@ useEffect(() => {
           : DEFAULT_BRAND_LOGO
       );
     }
-  }, [user]);
+  }, [user?.token, user?.role, DEFAULT_INFLUENCER_AVATAR, DEFAULT_BRAND_LOGO]);
 
   const fetchNavbar = useCallback(async () => {
     if (!user?.role || !user?.token) {
@@ -287,9 +283,9 @@ useEffect(() => {
       const res = await fetch(`${API_BASE_URL}/navbar/${user.role}`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
-      
+
       if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
-      
+
       const data = await res.json();
       const items = data?.items || data?.navbar || [];
       setNavItems(Array.isArray(items) ? items : []);
@@ -327,9 +323,9 @@ useEffect(() => {
     fetchBrandName();
     fetchNavbar();
     fetchProfileImage();
-    
+
     const cleanup = pollBrandName();
-    
+
     return () => {
       cleanup();
       if (logoUrl) {
@@ -344,6 +340,31 @@ useEffect(() => {
     return () => clearInterval(interval);
   }, [calculateRemainingTime]);
 
+  // Sync profile image with AuthContext profile data if available
+  useEffect(() => {
+    if (profileStatus?.profile) {
+      const profile = profileStatus.profile;
+      const imageValue = profile.profile_picture || profile.logo;
+
+      if (!imageValue || imageValue.trim?.() === "") {
+        setProfileImage(
+          user?.role === "influencer"
+            ? DEFAULT_INFLUENCER_AVATAR
+            : DEFAULT_BRAND_LOGO
+        );
+        return;
+      }
+
+      if (typeof imageValue === "string" && imageValue.startsWith("/static/")) {
+        setProfileImage(`${API_BASE_URL}${imageValue}`);
+      } else {
+        setProfileImage(
+          `${API_BASE_URL}/profiles/image/${imageValue}?t=${profileImageVersion}`
+        );
+      }
+    }
+  }, [profileStatus, profileImageVersion, user?.role, DEFAULT_INFLUENCER_AVATAR, DEFAULT_BRAND_LOGO]);
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (userDropdownOpen && !event.target.closest(".qb-user-dropdown")) {
@@ -353,7 +374,7 @@ useEffect(() => {
         setIsMenuOpen(false);
       }
     };
-    
+
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [userDropdownOpen, isMenuOpen]);
@@ -421,14 +442,14 @@ useEffect(() => {
     };
 
     let planKey = 'free';
-    
+
     if (subscription.plan) {
       planKey = subscription.plan.split('_')[0];
     } else if (subscription.type === 'trial') {
       planKey = 'free_trial';
     } else if (subscription.type === 'paid') {
-      planKey = subscription.plan_name?.toLowerCase().includes('pro') ? 'pro' : 
-                subscription.plan_name?.toLowerCase().includes('enterprise') ? 'enterprise' : 'starter';
+      planKey = subscription.plan_name?.toLowerCase().includes('pro') ? 'pro' :
+        subscription.plan_name?.toLowerCase().includes('enterprise') ? 'enterprise' : 'starter';
     }
 
     return plans[planKey] || plans.free;
@@ -436,13 +457,13 @@ useEffect(() => {
 
   const renderSubscriptionBatch = () => {
     const batchConfig = getBatchConfig();
-    const shouldShowCountdown = batchConfig.showCountdown && 
-                               subscription?.current_period_end && 
-                               remainingTime.days >= 0;
+    const shouldShowCountdown = batchConfig.showCountdown &&
+      subscription?.current_period_end &&
+      remainingTime.days >= 0;
 
     return (
       <div className="qb-subscription-batch-wrapper">
-        <div 
+        <div
           className="qb-subscription-batch"
           style={{
             background: batchConfig.gradient,
@@ -452,7 +473,7 @@ useEffect(() => {
         >
           <span className="qb-batch-icon-container">{batchConfig.icon}</span>
           <span className="qb-batch-label">{batchConfig.label}</span>
-          
+
           {shouldShowCountdown && (
             <div className="qb-countdown-timer">
               <div className="qb-countdown-item">
@@ -478,13 +499,13 @@ useEffect(() => {
 
   const renderMobileSubscriptionBatch = () => {
     const batchConfig = getBatchConfig();
-    const shouldShowCountdown = batchConfig.showCountdown && 
-                               subscription?.current_period_end && 
-                               remainingTime.days >= 0;
+    const shouldShowCountdown = batchConfig.showCountdown &&
+      subscription?.current_period_end &&
+      remainingTime.days >= 0;
 
     return (
       <div className="qb-mobile-subscription-container">
-        <div 
+        <div
           className="qb-mobile-subscription-batch"
           style={{
             background: batchConfig.gradient,
@@ -510,16 +531,15 @@ useEffect(() => {
 
   const renderNavItems = (items, isMobile = false, depth = 0) => {
     return items.map((item) => {
-      const isActive = location.pathname === item.path || 
-                      location.pathname.startsWith(`${item.path}/`);
+      const isActive = location.pathname === item.path ||
+        location.pathname.startsWith(`${item.path}/`);
       const hasChildren = item.children && item.children.length > 0;
 
       return (
         <div
           key={item.path}
-          className={`qb-nav-group ${isMobile ? "qb-mobile-nav-group" : ""} ${
-            hasChildren ? "qb-has-children" : ""
-          } depth-${depth}`}
+          className={`qb-nav-group ${isMobile ? "qb-mobile-nav-group" : ""} ${hasChildren ? "qb-has-children" : ""
+            } depth-${depth}`}
         >
           <Link
             to={item.path}
@@ -532,7 +552,7 @@ useEffect(() => {
             <span className="qb-nav-text">{item.title}</span>
             {hasChildren && <FaIcons.FaChevronDown className="qb-nav-chevron" />}
           </Link>
-          
+
           {hasChildren && (
             <div className={`qb-nav-children ${isMobile ? "qb-mobile-nav-children" : ""}`}>
               {renderNavItems(item.children, isMobile, depth + 1)}
@@ -607,55 +627,55 @@ useEffect(() => {
 }
 
       `}</style>
-      
+
       <nav className="qb-navbar">
         <Joyride
-        key={runTour ? "tour-running" : "tour-idle"}
-  steps={tourSteps}
-  run={runTour}
-  stepIndex={stepIndex}
-  continuous
-  showSkipButton
-  showProgress
-  scrollToFirstStep
-  disableOverlayClose
-  spotlightClicks={true} 
-  styles={{
-    options: {
-      primaryColor: "#00A3A3",
-      zIndex: 10000
-    }
-  }}
- callback={(data) => {
-  const { action, index, status, type } = data;
+          key={runTour ? "tour-running" : "tour-idle"}
+          steps={tourSteps}
+          run={runTour}
+          stepIndex={stepIndex}
+          continuous
+          showSkipButton
+          showProgress
+          scrollToFirstStep
+          disableOverlayClose
+          spotlightClicks={true}
+          styles={{
+            options: {
+              primaryColor: "#00A3A3",
+              zIndex: 10000
+            }
+          }}
+          callback={(data) => {
+            const { action, index, status, type } = data;
 
-  if (status === "finished" || status === "skipped") {
-    setRunTour(false);
-    setStepIndex(0);
-    return;
-  }
+            if (status === "finished" || status === "skipped") {
+              setRunTour(false);
+              setStepIndex(0);
+              return;
+            }
 
-  if (type === "step:after") {
-    if (action === "next") setStepIndex(index + 1);
-    if (action === "prev") setStepIndex(index - 1);
-  }
-}}
+            if (type === "step:after") {
+              if (action === "next") setStepIndex(index + 1);
+              if (action === "prev") setStepIndex(index - 1);
+            }
+          }}
 
 
 
-/>
+        />
 
 
         {/* LEFT: Logo + Sidebar Toggle */}
         <div className="qb-navbar-left">
-          <button 
+          <button
             className={`qb-sidebar-toggle ${runTour && stepIndex === 0 ? "qb-tour-pulse" : ""}`}
             onClick={() => {
-    toggleSidebar();
-    if (runTour && stepIndex === 0) {
-      setStepIndex(1); // move tour forward after click
-    }
-  }}
+              toggleSidebar();
+              if (runTour && stepIndex === 0) {
+                setStepIndex(1); // move tour forward after click
+              }
+            }}
             aria-label={isSidebarOpen ? "Close sidebar" : "Open sidebar"}
           >
             {isSidebarOpen ? <FaIcons.FaTimes /> : <FaIcons.FaBars />}
@@ -665,16 +685,16 @@ useEffect(() => {
             <Link to="/" onClick={() => setIsMenuOpen(false)} className="qb-brand-link">
               {loading.logo ? (
                 // <div className="logo-skeleton"></div>
-                 <div className="qb-logo-placeholder">
-      <span className="qb-brand-name">
-  {loading.name ? "Brio" : (brandName || "Brio")}
-</span>
-  </div>
+                <div className="qb-logo-placeholder">
+                  <span className="qb-brand-name">
+                    {loading.name ? "Brio" : (brandName || "Brio")}
+                  </span>
+                </div>
               ) : logoUrl ? (
                 <>
-                  <img 
-                    src={logoUrl} 
-                    alt={`${brandName} Logo`} 
+                  <img
+                    src={logoUrl}
+                    alt={`${brandName} Logo`}
                     className="qb-navbar-logo"
                     onError={(e) => {
                       console.error("Logo failed to load");
@@ -689,8 +709,8 @@ useEffect(() => {
                     )}
                   </span> */}
                   <span className="qb-brand-name">
-  {loading.name ? "Brio" : (brandName || "Brio")}
-</span>
+                    {loading.name ? "Brio" : (brandName || "Brio")}
+                  </span>
                 </>
               ) : (
                 <div className="qb-logo-placeholder">
@@ -731,6 +751,13 @@ useEffect(() => {
                     <img
                       src={profileImage}
                       alt="Profile"
+                      className="qb-avatar-img"
+                      onError={(e) => {
+                        e.currentTarget.src =
+                          user.role === "influencer"
+                            ? DEFAULT_INFLUENCER_AVATAR
+                            : DEFAULT_BRAND_LOGO;
+                      }}
                     />
                   ) : (
                     <FaIcons.FaUserCircle className="qb-avatar-icon" />
@@ -810,9 +837,9 @@ useEffect(() => {
               {loading.logo ? (
                 <div className="logo-skeleton" style={{ width: '32px', height: '32px' }}></div>
               ) : logoUrl ? (
-                <img 
-                  src={logoUrl} 
-                  alt={`${brandName} Logo`} 
+                <img
+                  src={logoUrl}
+                  alt={`${brandName} Logo`}
                   className="qb-mobile-logo-img"
                   onError={(e) => {
                     e.target.style.display = 'none';
@@ -825,8 +852,8 @@ useEffect(() => {
                 </div>
               )}
             </div>
-            <button 
-              className="qb-mobile-close" 
+            <button
+              className="qb-mobile-close"
               onClick={() => setIsMenuOpen(false)}
               aria-label="Close mobile menu"
             >

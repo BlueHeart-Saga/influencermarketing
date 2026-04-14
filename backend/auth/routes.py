@@ -1624,11 +1624,11 @@ async def list_users(
     token: str = Depends(oauth2_scheme)
 ):
     """
-    List users filtered by role (brand or influencer)
+    List users filtered by role (brand, influencer, or all)
     Used for chat user picker
     """
     try:
-        if role not in ["brand", "influencer"]:
+        if role not in ["brand", "influencer", "all"]:
             raise HTTPException(
                 status_code=400,
                 detail="Invalid role filter"
@@ -1644,44 +1644,53 @@ async def list_users(
 
         current_user_id = payload["sub"]
 
+        # Build query
+        query = {"_id": {"$ne": ObjectId(current_user_id)}}
+        if role != "all":
+            query["role"] = role
+        else:
+            # When role is "all", we typically only want participants who can chat
+            query["role"] = {"$in": ["brand", "influencer"]}
+
         # query users with profile data
         cursor = users_collection.find(
-            {"role": role, "_id": {"$ne": ObjectId(current_user_id)}},
+            query,
             {
                 "password": 0,
                 "reset_otp": 0,
                 "reset_otp_expires": 0
             }
-        )
+        ).limit(100) # Added a sensible limit
 
         users = []
         for user in cursor:
+            user_role = user.get("role")
             user_data = {
                 "id": str(user["_id"]),
                 "username": user.get("username"),
                 "email": user.get("email"),
-                "role": user.get("role"),
+                "role": user_role,
                 "name": user.get("name"),
-                "profile_picture": user.get("profile_picture"),
             }
             
             # Add profile-specific data
-            if role == "brand" and user.get("brand_profile"):
+            if user_role == "brand" and user.get("brand_profile"):
                 profile = user["brand_profile"]
                 user_data.update({
-                    "display_name": profile.get("company_name"),
+                    "display_name": profile.get("company_name") or user.get("username"),
                     "company_name": profile.get("company_name"),
                     "contact_person": profile.get("contact_person_name"),
                     "industry": profile.get("industry"),
                     "categories": profile.get("categories", []),
                     "location": profile.get("location"),
                     "profile_picture": profile.get("logo"),
+                    "logo": profile.get("logo"),
                     "website": profile.get("website")
                 })
-            elif role == "influencer" and user.get("influencer_profile"):
+            elif user_role == "influencer" and user.get("influencer_profile"):
                 profile = user["influencer_profile"]
                 user_data.update({
-                    "display_name": profile.get("nickname") or profile.get("full_name"),
+                    "display_name": profile.get("nickname") or profile.get("full_name") or user.get("username"),
                     "full_name": profile.get("full_name"),
                     "nickname": profile.get("nickname"),
                     "niche": profile.get("niche"),
@@ -1691,6 +1700,10 @@ async def list_users(
                     "bio": profile.get("bio")
                 })
             
+            # Ensure we have a profile_picture field for the frontend
+            if not user_data.get("profile_picture"):
+                user_data["profile_picture"] = user.get("profile_picture")
+                
             users.append(user_data)
 
         return {

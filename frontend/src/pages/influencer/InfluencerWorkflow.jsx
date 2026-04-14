@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  FaCheckCircle, FaUser, FaSearch, FaHandshake, 
+import {
+  FaCheckCircle, FaUser, FaSearch, FaHandshake,
   FaFileContract, FaFileVideo, FaDollarSign, FaRocket,
   FaChartLine, FaUsers, FaFileAlt, FaStar, FaArrowRight,
   FaInstagram, FaYoutube, FaTiktok, FaTwitter
 } from "react-icons/fa";
-import { 
+import {
   Box, Typography, Paper, Chip, Button, LinearProgress,
   Card, CardContent, Avatar, Tooltip, IconButton
 } from "@mui/material";
@@ -35,11 +35,11 @@ const GlassCard = styled(Paper)(({ theme }) => ({
 }));
 
 const StepCard = styled(motion.div)(({ theme, completed, active }) => ({
-  background: completed 
+  background: completed
     ? 'linear-gradient(135deg, #4CAF50, #66BB6A)'
     : active
-    ? 'linear-gradient(135deg, #FF6B6B, #FF8E53)'
-    : 'rgba(255, 255, 255, 0.9)',
+      ? 'linear-gradient(135deg, #FF6B6B, #FF8E53)'
+      : 'rgba(255, 255, 255, 0.9)',
   color: completed || active ? 'white' : theme.palette.text.primary,
   padding: theme.spacing(3),
   borderRadius: '20px',
@@ -89,55 +89,55 @@ const PlatformIcon = ({ platform }) => {
     tiktok: <FaTiktok style={{ color: '#000000' }} />,
     twitter: <FaTwitter style={{ color: '#1DA1F2' }} />,
   };
-  
+
   return icons[platform] || <FaUser />;
 };
 
 // Influencer workflow steps
 const influencerSteps = [
-  { 
-    icon: <FaUser />, 
-    title: "Complete Influencer Profile", 
+  {
+    icon: <FaUser />,
+    title: "Complete Influencer Profile",
     key: "register",
     route: "/influencer/profile",
     description: "Build your influencer profile with portfolio, social media links, engagement metrics, and content niches.",
     stats: ['Profile Completion', 'Portfolio Items', 'Social Verification']
   },
-  { 
-    icon: <FaSearch />, 
-    title: "Discover Campaigns", 
+  {
+    icon: <FaSearch />,
+    title: "Discover Campaigns",
     key: "discoverCampaigns",
     route: "/influencer/campaigns",
     description: "Browse available campaigns that match your niche, audience, and collaboration preferences.",
     stats: ['Available Campaigns', 'Matches Found', 'Recommended']
   },
-  { 
-    icon: <FaHandshake />, 
-    title: "Apply to Campaigns", 
+  {
+    icon: <FaHandshake />,
+    title: "Apply to Campaigns",
     key: "applyCampaigns",
     route: "/influencer/campaigns",
     description: "Submit compelling applications showcasing your value proposition and content ideas to brands.",
     stats: ['Applications Sent', 'Success Rate', 'Pending Reviews']
   },
-  { 
-    icon: <FaFileContract />, 
-    title: "Review Contracts", 
+  {
+    icon: <FaFileContract />,
+    title: "Review Contracts",
     key: "reviewContracts",
     route: "/influencer/applications",
     description: "Review and accept collaboration contracts outlining deliverables, timelines, and compensation.",
     stats: ['Contracts Received', 'Signed Contracts', 'Active Collaborations']
   },
-  { 
-    icon: <FaFileVideo />, 
-    title: "Create & Submit Content", 
+  {
+    icon: <FaFileVideo />,
+    title: "Create & Submit Content",
     key: "createContent",
     route: "/influencer/applications",
     description: "Produce high-quality content according to campaign requirements and submit for brand approval.",
     stats: ['Content Submitted', 'Approval Rate', 'Revision Requests']
   },
-  { 
-    icon: <FaDollarSign />, 
-    title: "Receive Payments", 
+  {
+    icon: <FaDollarSign />,
+    title: "Receive Payments",
     key: "receivePayments",
     route: "/influencer/payments",
     description: "Get compensated for your work with secure payments and track your earnings across campaigns.",
@@ -235,10 +235,10 @@ const InfluencerWorkflow = () => {
 
   useEffect(() => {
     fetchWorkflowData();
-    
+
     // Set up real-time updates (WebSocket or polling)
     const interval = setInterval(fetchWorkflowData, 30000); // Update every 30 seconds
-    
+
     return () => clearInterval(interval);
   }, []);
 
@@ -265,7 +265,7 @@ const InfluencerWorkflow = () => {
 
   // Get step-specific statistics
   const getStepStats = (stepKey) => {
-    switch(stepKey) {
+    switch (stepKey) {
       case 'register':
         return { value: influencerProfile.profileCompletion || 0, label: '% Complete' };
       case 'discoverCampaigns':
@@ -308,9 +308,9 @@ const InfluencerWorkflow = () => {
           >
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mb: 2 }}>
               <FaRocket style={{ fontSize: '2.5rem', color: '#FF6B6B', marginRight: '1rem' }} />
-              <Typography 
-                variant="h3" 
-                component="h1" 
+              <Typography
+                variant="h3"
+                component="h1"
                 fontWeight="800"
                 sx={{
                   background: 'linear-gradient(135deg, #FF6B6B 0%, #4ECDC4 100%)',
@@ -359,9 +359,9 @@ const InfluencerWorkflow = () => {
                     <Typography variant="body2">
                       {influencerProfile.followers?.toLocaleString() || '0'} followers
                     </Typography>
-                    <Chip 
-                      label={`${influencerProfile.engagementRate || 0}% engagement`} 
-                      size="small" 
+                    <Chip
+                      label={`${influencerProfile.engagementRate || 0}% engagement`}
+                      size="small"
                       color="success"
                     />
                   </Box>
@@ -379,7 +379,7 @@ const InfluencerWorkflow = () => {
                   </Typography>
                 </Box>
               </ProgressRing>
-              
+
               <Box sx={{ textAlign: 'left' }}>
                 <Typography variant="h6" gutterBottom fontWeight="600">
                   Your Progress
@@ -387,11 +387,11 @@ const InfluencerWorkflow = () => {
                 <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                   {completedCount} of {influencerSteps.length} steps completed
                 </Typography>
-                <LinearProgress 
-                  variant="determinate" 
-                  value={completionPercent} 
-                  sx={{ 
-                    height: 8, 
+                <LinearProgress
+                  variant="determinate"
+                  value={completionPercent}
+                  sx={{
+                    height: 8,
                     borderRadius: 4,
                     backgroundColor: '#f0f0f0',
                     '& .MuiLinearProgress-bar': {
@@ -421,7 +421,7 @@ const InfluencerWorkflow = () => {
                 Total Applications
               </Typography>
             </StatsCard>
-            
+
             <StatsCard>
               <FaCheckCircle style={{ fontSize: '2rem', color: '#4CAF50', marginBottom: '0.5rem' }} />
               <Typography variant="h4" fontWeight="700" color="success.main">
@@ -431,7 +431,7 @@ const InfluencerWorkflow = () => {
                 Approved Applications
               </Typography>
             </StatsCard>
-            
+
             <StatsCard>
               <FaFileAlt style={{ fontSize: '2rem', color: '#FF9800', marginBottom: '0.5rem' }} />
               <Typography variant="h4" fontWeight="700" color="warning.main">
@@ -441,7 +441,7 @@ const InfluencerWorkflow = () => {
                 Active Collaborations
               </Typography>
             </StatsCard>
-            
+
             <StatsCard>
               <FaDollarSign style={{ fontSize: '2rem', color: '#4ECDC4', marginBottom: '0.5rem' }} />
               <Typography variant="h4" fontWeight="700" color="secondary.main">
@@ -460,7 +460,7 @@ const InfluencerWorkflow = () => {
             const isCompleted = completedSteps[step.key];
             const isActive = activeStep === step.key;
             const stepStats = getStepStats(step.key);
-            
+
             return (
               <motion.div
                 key={step.key}
@@ -483,11 +483,11 @@ const InfluencerWorkflow = () => {
                           width: 60,
                           height: 60,
                           borderRadius: '50%',
-                          background: isCompleted 
-                            ? 'rgba(255, 255, 255, 0.2)' 
+                          background: isCompleted
+                            ? 'rgba(255, 255, 255, 0.2)'
                             : isActive
-                            ? 'rgba(255, 255, 255, 0.3)'
-                            : 'rgba(255, 107, 107, 0.1)',
+                              ? 'rgba(255, 255, 255, 0.3)'
+                              : 'rgba(255, 107, 107, 0.1)',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
@@ -530,7 +530,7 @@ const InfluencerWorkflow = () => {
                           {step.title}
                         </Typography>
                         {stepStats.value > 0 && (
-                          <Chip 
+                          <Chip
                             label={`${stepStats.value} ${stepStats.label}`}
                             size="small"
                             color={isCompleted ? "success" : isActive ? "primary" : "default"}
@@ -538,10 +538,10 @@ const InfluencerWorkflow = () => {
                           />
                         )}
                       </Box>
-                      
-                      <Typography variant="body2" sx={{ 
+
+                      <Typography variant="body2" sx={{
                         opacity: isCompleted ? 0.9 : 0.7,
-                        mb: 2 
+                        mb: 2
                       }}>
                         {step.description}
                       </Typography>
@@ -554,7 +554,7 @@ const InfluencerWorkflow = () => {
                             label={stat}
                             size="small"
                             variant="outlined"
-                            sx={{ 
+                            sx={{
                               background: isCompleted ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.05)',
                               color: isCompleted || isActive ? 'white' : 'text.secondary',
                               borderColor: isCompleted || isActive ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.1)',
@@ -569,8 +569,8 @@ const InfluencerWorkflow = () => {
                       animate={{ x: isActive ? [0, 5, 0] : 0 }}
                       transition={{ duration: 1, repeat: isActive ? Infinity : 0 }}
                     >
-                      <FaArrowRight style={{ 
-                        fontSize: '1.2rem', 
+                      <FaArrowRight style={{
+                        fontSize: '1.2rem',
                         color: isCompleted || isActive ? 'white' : 'text.secondary',
                         opacity: isActive ? 1 : 0.5
                       }} />
@@ -587,7 +587,7 @@ const InfluencerWorkflow = () => {
                         transform: 'translateX(-50%)',
                         width: '2px',
                         height: '20px',
-                        background: completedSteps[influencerSteps[index + 1].key] 
+                        background: completedSteps[influencerSteps[index + 1].key]
                           ? 'linear-gradient(to bottom, #4CAF50, #4CAF50)'
                           : 'linear-gradient(to bottom, #E0E0E0, transparent)',
                       }}
@@ -618,11 +618,10 @@ const InfluencerWorkflow = () => {
                     sx={{
                       p: 2,
                       background: 'rgba(255, 255, 255, 0.7)',
-                      borderLeft: `4px solid ${
-                        activity.type === 'campaign' ? '#4ECDC4' :
-                        activity.type === 'application' ? '#4CAF50' :
-                        activity.type === 'contract' ? '#FF6B6B' : '#FF9800'
-                      }`,
+                      borderLeft: `4px solid ${activity.type === 'campaign' ? '#4ECDC4' :
+                          activity.type === 'application' ? '#4CAF50' :
+                            activity.type === 'contract' ? '#FF6B6B' : '#FF9800'
+                        }`,
                     }}
                   >
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -636,6 +635,18 @@ const InfluencerWorkflow = () => {
                   </Paper>
                 ))}
               </Box>
+              {realTimeData.recentActivity && realTimeData.recentActivity.length > 0 && (
+                <Box sx={{ mt: 2, textAlign: 'center' }}>
+                  <Button
+                    variant="text"
+                    color="primary"
+                    onClick={() => navigate('/influencer/activity')}
+                    sx={{ textTransform: 'none', fontWeight: 600 }}
+                  >
+                    View All Activity History
+                  </Button>
+                </Box>
+              )}
             </Box>
           </motion.div>
         )}

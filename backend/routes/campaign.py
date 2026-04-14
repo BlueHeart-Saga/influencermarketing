@@ -3733,18 +3733,22 @@ async def get_brand_applications_endpoint(current_user: dict = Depends(get_curre
                 "applied_at": app.get("applied_at", datetime.utcnow()),
                 "contract_signed": app.get("contract_signed", False),
                 "contract_signed_at": app.get("contract_signed_at"),
+                "contract_sent": app.get("contract_sent", False),
+                "contract_sent_at": app.get("contract_sent_at"),
+                "contract_sent_by": app.get("contract_sent_by"),
                 "submitted_media": app.get("submitted_media", []),
                 "media_submitted_at": app.get("media_submitted_at"),
                 
-                # Campaign details WITHOUT campaign_ prefix
+                # Campaign details
                 "campaign_id": campaign_id,
-                "title": campaign.get("title", "Untitled Campaign"),
+                "campaign_title": campaign.get("title", "Untitled Campaign"),
+                "title": campaign.get("title", "Untitled Campaign"), # Keep both for compatibility
                 "description": campaign.get("description", ""),
                 "requirements": campaign.get("requirements", ""),
                 "budget": campaign.get("budget", 0),
                 "category": campaign.get("category", "Uncategorized"),
                 "deadline": campaign.get("deadline", datetime.utcnow()),
-                "campaign_status": campaign.get("status", "active"),  # Keep this with prefix to avoid conflict
+                "campaign_status": campaign.get("status", "active"),
                 "currency": campaign.get("currency", "USD"),
                 "campaign_image_id": campaign.get("campaign_image_id"),
                 "campaign_video_id": campaign.get("campaign_video_id"),
@@ -3758,14 +3762,24 @@ async def get_brand_applications_endpoint(current_user: dict = Depends(get_curre
             
             # Get influencer details
             try:
-                influencer = users_collection.find_one({"_id": ObjectId(app["influencer_id"])})
+                influencer_id = app["influencer_id"]
+                influencer = users_collection.find_one({"_id": ObjectId(influencer_id)})
                 if influencer:
                     application_data["influencer_email"] = influencer.get("email", "No email")
                     application_data["influencer_phone"] = influencer.get("phone", "No phone")
                     application_data["influencer_bio"] = influencer.get("bio", "No bio")
+                    
+                    # Fetch profile name from nested field
+                    profile = influencer.get("influencer_profile", {})
+                    if profile:
+                        application_data["influencer_profile_name"] = profile.get("nickname") or profile.get("full_name") or application_data["influencer_name"]
+                    else:
+                        application_data["influencer_profile_name"] = application_data["influencer_name"]
             except Exception as e:
-                logger.error(f"Error fetching influencer details: {e}")
+                import logging
+                logging.error(f"Error fetching influencer details: {e}")
                 application_data["influencer_email"] = "Error fetching details"
+                application_data["influencer_profile_name"] = application_data["influencer_name"]
             
             applications.append(application_data)
     
@@ -3792,15 +3806,21 @@ async def get_influencer_applications_endpoint(current_user: dict = Depends(get_
                 application = app
                 break
         
-        if not application:
+        if application is None:
             continue
             
         # Get brand details
-        brand = users_collection.find_one({"_id": ObjectId(campaign["brand_id"])})
+        brand_id = campaign["brand_id"]
+        brand = users_collection.find_one({"_id": ObjectId(brand_id)})
         brand_name = brand.get("username", "Unknown Brand") if brand else "Unknown Brand"
         brand_email = brand.get("email", "No email") if brand else "No email"
         
+        # Fetch brand profile name from nested field
+        brand_profile = brand.get("brand_profile") if brand else None
+        brand_profile_name = brand_profile.get("company_name") or brand_name if brand_profile else brand_name
+        
         # Create application data with ALL campaign details
+        assert application is not None
         application_data = {
             # Application-specific fields
             "application_id": f"{campaign_id}_{application['influencer_id']}",
@@ -3811,13 +3831,18 @@ async def get_influencer_applications_endpoint(current_user: dict = Depends(get_
             "applied_at": application.get("applied_at", datetime.utcnow()),
             "contract_signed": application.get("contract_signed", False),
             "contract_signed_at": application.get("contract_signed_at"),
+            "contract_sent": application.get("contract_sent", False),
+            "contract_sent_at": application.get("contract_sent_at"),
             "submitted_media": application.get("submitted_media", []),
             "media_submitted_at": application.get("media_submitted_at"),
             
             # Complete campaign details
             "campaign_id": campaign_id,
             "campaign_title": campaign.get("title", "Untitled Campaign"),
-            "campaign_description": campaign.get("description", ""),
+            "brand_profile_name": brand_profile_name,
+            "brand_name": brand_name,
+            "brand_email": brand_email,
+            "brand_id": campaign.get("brand_id"),
             "campaign_requirements": campaign.get("requirements", ""),
             "campaign_budget": campaign.get("budget", 0),
             "campaign_category": campaign.get("category", "Uncategorized"),
@@ -4727,28 +4752,52 @@ async def get_campaign_video(campaign_id: str):
         headers={"Content-Disposition": f"inline; filename={campaign_id}.mp4"}
     )
 
-@router.get("/campaigns/image/{file_id}")
+@router.get("/campaigns/image/{file_id:path}")
 async def get_campaign_image_by_id(file_id: str):
     """Get campaign image by file ID"""
     try:
-        content = get_file_from_storage(file_id)
+        # Strip any legacy prefixes
+        clean_id = file_id.replace("\\", "/")
+        base_name = clean_id.split("/")[-1]
+        
+        # Try finding in specific campaigns/ directory
+        try:
+            content = get_file_from_storage(f"campaigns/{base_name}")
+        except Exception:
+            # Fallback to the raw file_id
+            content = get_file_from_storage(file_id)
+
+        # Detect typical image types
+        content_type = "image/jpeg"
+        if base_name.lower().endswith(".png"):
+            content_type = "image/png"
+        elif base_name.lower().endswith((".gif", ".webp")):
+            content_type = f"image/{base_name.split('.')[-1]}"
+
         return StreamingResponse(
             BytesIO(content),
-            media_type="image/jpeg",  # Simplified detect if needed
-            headers={"Content-Disposition": f"inline; filename={file_id}"}
+            media_type=content_type,
+            headers={"Content-Disposition": f"inline; filename={base_name}"}
         )
     except Exception as e:
         raise HTTPException(status_code=404, detail="Image not found")
 
-@router.get("/campaigns/video/{file_id}")
+@router.get("/campaigns/video/{file_id:path}")
 async def get_campaign_video_by_id(file_id: str):
     """Get campaign video by file ID"""
     try:
-        content = get_file_from_storage(file_id)
+        clean_id = file_id.replace("\\", "/")
+        base_name = clean_id.split("/")[-1]
+        
+        try:
+            content = get_file_from_storage(f"campaigns/{base_name}")
+        except Exception:
+            content = get_file_from_storage(file_id)
+
         return StreamingResponse(
             BytesIO(content),
             media_type="video/mp4",
-            headers={"Content-Disposition": f"inline; filename={file_id}"}
+            headers={"Content-Disposition": f"inline; filename={base_name}"}
         )
     except Exception as e:
         raise HTTPException(status_code=404, detail="Video not found")

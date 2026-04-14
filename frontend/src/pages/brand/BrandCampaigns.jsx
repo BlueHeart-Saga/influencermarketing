@@ -97,7 +97,7 @@ import {
   MonetizationOn,
   Send,
   Refresh
- 
+
 
 } from "@mui/icons-material";
 import { campaignAPI } from "../../services/api";
@@ -135,14 +135,14 @@ const glow = keyframes`
 
 // Styled components with premium design
 const PremiumCard = ({ children, sx, ...props }) => (
-  <Card 
-    sx={{ 
+  <Card
+    sx={{
       height: '100%',
-      borderRadius: '16px', 
+      borderRadius: '16px',
       boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)',
       overflow: 'hidden',
       transition: 'all 0.3s ease',
-      background: 'linear-gradient(145deg, #ffffff, #f8f9fa)',
+      backgroundColor: '#ffffff',
       border: '1px solid rgba(255, 255, 255, 0.6)',
       backdropFilter: 'blur(10px)',
       '&:hover': {
@@ -150,18 +150,18 @@ const PremiumCard = ({ children, sx, ...props }) => (
         boxShadow: '0 12px 48px rgba(0, 0, 0, 0.15)',
         borderColor: 'primary.light'
       },
-      ...sx 
-    }} 
+      ...sx
+    }}
     {...props}
   >
     {children}
   </Card>
 );
 
-const GradientButton = ({ children, sx, ...props }) => (
+const PrimaryButton = ({ children, sx, ...props }) => (
   <Button
     sx={{
-      background: 'linear-gradient(45deg, #667eea 0%, #3b82f6 100%)',
+      backgroundColor: 'primary.main',
       color: 'white',
       borderRadius: '12px',
       fontWeight: 600,
@@ -171,7 +171,7 @@ const GradientButton = ({ children, sx, ...props }) => (
       '&:hover': {
         boxShadow: '0 6px 20px rgba(102, 126, 234, 0.6)',
         transform: 'translateY(-2px)',
-        background: 'linear-gradient(45deg, #5a6fd8 0%, #3b82f6 100%)'
+        backgroundColor: 'primary.dark'
       },
       ...sx
     }}
@@ -185,32 +185,32 @@ const StatusChip = styled(Chip)(({ theme, status }) => ({
   fontWeight: 600,
   fontSize: '0.75rem',
   ...(status === 'approved' && {
-    background: 'linear-gradient(45deg, #4CAF50 30%, #66BB6A 90%)',
+    backgroundColor: '#4CAF50',
     color: 'white',
     boxShadow: '0 3px 5px 2px rgba(76, 175, 80, 0.3)',
   }),
   ...(status === 'pending' && {
-    background: 'linear-gradient(45deg, #FF9800 30%, #FFB74D 90%)',
+    backgroundColor: '#FF9800',
     color: 'white',
     boxShadow: '0 3px 5px 2px rgba(255, 152, 0, 0.3)',
   }),
   ...(status === 'rejected' && {
-    background: 'linear-gradient(45deg, #F44336 30%, #EF5350 90%)',
+    backgroundColor: '#F44336',
     color: 'white',
     boxShadow: '0 3px 5px 2px rgba(244, 67, 54, 0.3)',
   }),
   ...(status === 'contracted' && {
-    background: 'linear-gradient(45deg, #9C27B0 30%, #BA68C8 90%)',
+    backgroundColor: '#9C27B0',
     color: 'white',
     boxShadow: '0 3px 5px 2px rgba(156, 39, 176, 0.3)',
   }),
   ...(status === 'media_submitted' && {
-    background: 'linear-gradient(45deg, #2196F3 30%, #42A5F5 90%)',
+    backgroundColor: '#2196F3',
     color: 'white',
     boxShadow: '0 3px 5px 2px rgba(33, 150, 243, 0.3)',
   }),
   ...(status === 'completed' && {
-    background: 'linear-gradient(45deg, #607D8B 30%, #78909C 90%)',
+    backgroundColor: '#607D8B',
     color: 'white',
     boxShadow: '0 3px 5px 2px rgba(96, 125, 139, 0.3)',
   })
@@ -228,11 +228,11 @@ const ProfileImage = ({ userId, profileType, alt, onClick, size = 32 }) => {
       try {
         setLoading(true);
         const response = await profileAPI.getProfileById(userId);
-        
+
         if (response && response.profile) {
           const profileData = response.profile;
           setUserData(profileData);
-          
+
           let imageId = null;
           if (profileType === 'influencer' && profileData.profile_picture) {
             imageId = profileData.profile_picture;
@@ -279,9 +279,9 @@ const ProfileImage = ({ userId, profileType, alt, onClick, size = 32 }) => {
 
   if (error || !imageUrl) {
     return (
-      <Avatar 
-        sx={{ 
-          width: size, 
+      <Avatar
+        sx={{
+          width: size,
           height: size,
           bgcolor: 'primary.light',
           color: 'primary.main',
@@ -319,11 +319,11 @@ const ProfileImage = ({ userId, profileType, alt, onClick, size = 32 }) => {
           <CircularProgress size={size * 0.5} />
         </Box>
       )}
-      <Avatar 
+      <Avatar
         src={imageUrl}
         alt={getDisplayName()}
-        sx={{ 
-          width: size, 
+        sx={{
+          width: size,
           height: size,
           cursor: onClick ? 'pointer' : 'default',
           boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)'
@@ -372,7 +372,7 @@ const UserInfo = ({ userId, profileType, showEmail = true, size = 32, showStats 
 
   const getDisplayName = () => {
     if (!userData) return 'Loading...';
-    
+
     if (profileType === 'influencer') {
       return userData.nickname || userData.full_name || 'Unknown Influencer';
     } else {
@@ -412,10 +412,10 @@ const UserInfo = ({ userId, profileType, showEmail = true, size = 32, showStats 
         size={size}
       />
       <Box>
-        <Typography 
-          variant="subtitle2" 
+        <Typography
+          variant="subtitle2"
           fontWeight="600"
-          sx={{ 
+          sx={{
             cursor: 'pointer',
             '&:hover': { color: 'primary.main', textDecoration: 'underline' }
           }}
@@ -466,11 +466,11 @@ const ApplicationWorkflow = ({ application }) => {
     {
       label: 'Approval Decision',
       status: ['approved', 'rejected', 'contracted', 'media_submitted', 'completed'].includes(application.status) ? 'completed' : 'pending',
-      description: application.status === 'approved' ? 'Application approved' : 
-                   application.status === 'rejected' ? 'Application rejected' : 'Pending decision',
+      description: application.status === 'approved' ? 'Application approved' :
+        application.status === 'rejected' ? 'Application rejected' : 'Pending decision',
       date: application.status !== 'pending' ? application.applied_at : null,
-      icon: application.status === 'approved' ? <ThumbUp /> : 
-            application.status === 'rejected' ? <ThumbDown /> : <WorkOutline />
+      icon: application.status === 'approved' ? <ThumbUp /> :
+        application.status === 'rejected' ? <ThumbDown /> : <WorkOutline />
     },
     {
       label: 'Contract Sent',
@@ -604,11 +604,11 @@ const ApplicationDetailDialog = ({ open, onClose, application, campaign, onStatu
       fullWidth
       PaperProps={{ sx: { borderRadius: '16px', minHeight: '80vh' } }}
     >
-      <DialogTitle sx={{ 
-        bgcolor: 'primary.main', 
-        color: 'white', 
+      <DialogTitle sx={{
+        bgcolor: 'primary.main',
+        color: 'white',
         fontWeight: 700,
-        background: 'linear-gradient(135deg, #667eea 0%, #3b82f6 100%)'
+        backgroundColor: 'primary.main'
       }}>
         <Box display="flex" alignItems="center" justifyContent="space-between">
           <Box display="flex" alignItems="center" gap={1}>
@@ -620,7 +620,7 @@ const ApplicationDetailDialog = ({ open, onClose, application, campaign, onStatu
           </IconButton>
         </Box>
       </DialogTitle>
-      
+
       <DialogContent dividers sx={{ p: 0 }}>
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
           <Tabs
@@ -637,139 +637,127 @@ const ApplicationDetailDialog = ({ open, onClose, application, campaign, onStatu
 
         <Box sx={{ p: 3 }}>
           {activeTab === 'overview' && (
-            <Grid container spacing={3}>
-              <Grid item xs={12} md={6}>
-                <Typography variant="h6" gutterBottom color="primary" fontWeight="700">
-                  Application Information
-                </Typography>
-                
-                <Box sx={{ mb: 3 }}>
-                  <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
-                    <StatusChip 
-                      label={application.status === 'approved' ? 'Approved - Send Contract' : 
-                             application.status === 'rejected' ? 'Rejected' : 
-                             application.status === 'pending' ? 'Under Review' : application.status} 
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+              {/* Application Status Section */}
+              <PremiumCard>
+                <CardContent>
+                  <Typography variant="h6" gutterBottom color="primary" fontWeight="700">
+                    Application Status
+                  </Typography>
+                  <Box display="flex" alignItems="center" justifyContent="space-between" flexWrap="wrap" gap={2}>
+                    <StatusChip
+                      label={application.status === 'approved' ? 'Approved - Send Contract' :
+                        application.status === 'rejected' ? 'Rejected' :
+                          application.status === 'pending' ? 'Under Review' : application.status}
                       status={application.status}
+                      sx={{ py: 2, px: 2, fontSize: '0.9rem' }}
                     />
-                    <Typography variant="caption" color="text.secondary">
-                      Applied: {new Date(application.applied_at).toLocaleDateString()}
-                    </Typography>
+                    <Box display="flex" alignItems="center" gap={1}>
+                      <CalendarToday fontSize="small" color="action" />
+                      <Typography variant="body2" color="text.secondary">
+                        Applied on {new Date(application.applied_at).toLocaleDateString()}
+                      </Typography>
+                    </Box>
                   </Box>
 
                   {application.message && (
-                    <Box sx={{ mb: 3, p: 2, bgcolor: 'grey.50', borderRadius: 2 }}>
-                      <Typography variant="subtitle2" gutterBottom color="text.secondary">
-                        MESSAGE FROM INFLUENCER
+                    <Box sx={{ mt: 3, p: 3, bgcolor: 'primary.50', borderRadius: 2, borderLeft: '4px solid', borderColor: 'primary.main' }}>
+                      <Typography variant="subtitle2" gutterBottom color="primary.main" fontWeight="700" sx={{ textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '0.5px' }}>
+                        Message from Influencer
                       </Typography>
-                      <Typography variant="body1" sx={{ fontStyle: 'italic' }}>
+                      <Typography variant="body1" sx={{ fontStyle: 'italic', color: 'text.primary', mt: 1 }}>
                         "{application.message}"
                       </Typography>
                     </Box>
                   )}
-                </Box>
+                </CardContent>
+              </PremiumCard>
 
-                <Typography variant="h6" gutterBottom color="primary" fontWeight="700">
-                  Quick Actions
-                </Typography>
-                <Box display="flex" gap={1} flexWrap="wrap" mb={3}>
-                  <Button
-                    variant="contained"
-                    startIcon={<Chat />}
-                    onClick={handleSendMessage}
-                    sx={{ borderRadius: '8px' }}
-                  >
-                    Send Message
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    startIcon={<Person />}
-                    onClick={handleViewProfile}
-                    sx={{ borderRadius: '8px' }}
-                  >
-                    View Profile
-                  </Button>
-                  {application.status === 'pending' && (
-                    <>
-                      <Button
-                        variant="contained"
-                        color="success"
-                        startIcon={<CheckCircle />}
-                        onClick={() => onStatusChange(campaign._id, application.influencer_id, 'approved')}
-                        sx={{ borderRadius: '8px' }}
-                      >
-                        Approve
-                      </Button>
-                      <Button
-                        variant="outlined"
-                        color="error"
-                        startIcon={<Cancel />}
-                        onClick={() => onStatusChange(campaign._id, application.influencer_id, 'rejected')}
-                        sx={{ borderRadius: '8px' }}
-                      >
-                        Reject
-                      </Button>
-                    </>
-                  )}
-                </Box>
-              </Grid>
-
-              <Grid item xs={12} md={6}>
-                <Typography variant="h6" gutterBottom color="primary" fontWeight="700">
-                  Campaign Details
-                </Typography>
-                
-                <PremiumCard variant="outlined" sx={{ mb: 2 }}>
-                  <CardContent>
-                    <Typography variant="h6" gutterBottom>
-                      {campaign.title}
-                    </Typography>
-                    <Box display="flex" alignItems="center" gap={1} mb={1}>
-                      <AttachMoney sx={{ color: 'success.main' }} />
-                      <Typography variant="body1" fontWeight="600" color="success.main">
-                        {campaign.currency || 'USD'} {campaign.budget}
-                      </Typography>
-                    </Box>
-                    <Box display="flex" alignItems="center" gap={1} mb={1}>
-                      <Category sx={{ color: 'primary.main' }} />
-                      <Typography variant="body2">
-                        {campaign.category}
-                      </Typography>
-                    </Box>
-                    <Box display="flex" alignItems="center" gap={1}>
-                      <CalendarToday sx={{ color: 'warning.main' }} />
-                      <Typography variant="body2">
-                        Deadline: {new Date(campaign.deadline).toLocaleDateString()}
-                      </Typography>
-                    </Box>
-                  </CardContent>
-                  
-                </PremiumCard>
-              </Grid>
-
-
-
-                <Grid item xs={12} md={6}>
+              {/* Quick Actions Section */}
+              <PremiumCard>
+                <CardContent>
                   <Typography variant="h6" gutterBottom color="primary" fontWeight="700">
-                  Campaign requirements
-                </Typography>
-                  <PremiumCard variant="outlined" sx={{ mb: 2 }}>
-
-                {campaign.requirements && (
-                  <Box alignItems="center" gap={1} mb={1} padding={2}>
-                    <Typography variant="subtitle2" gutterBottom color="text.secondary">
-                      CAMPAIGN REQUIREMENTS
-                    </Typography>
-                    <Typography variant="body2">
-                      {campaign.requirements}
-                    </Typography>
+                    Professional Actions
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                    Manage this collaboration efficiently using the tools below.
+                  </Typography>
+                  <Box display="flex" gap={2} flexWrap="wrap">
+                    <PrimaryButton
+                      variant="contained"
+                      startIcon={<Chat />}
+                      onClick={handleSendMessage}
+                      sx={{ px: 4 }}
+                    >
+                      Open Chat Channel
+                    </PrimaryButton>
+                    <Button
+                      variant="outlined"
+                      startIcon={<Person />}
+                      onClick={handleViewProfile}
+                      sx={{ borderRadius: '12px', px: 3 }}
+                    >
+                      View Full Bio
+                    </Button>
+                    {application.status === 'pending' && (
+                      <Box display="flex" gap={2}>
+                        <Button
+                          variant="contained"
+                          color="success"
+                          startIcon={<CheckCircle />}
+                          onClick={() => onStatusChange(campaign._id, application.influencer_id, 'approved')}
+                          sx={{ borderRadius: '12px', px: 3, boxShadow: '0 4px 12px rgba(76, 175, 80, 0.2)' }}
+                        >
+                          Approve Application
+                        </Button>
+                        <Button
+                          variant="outlined"
+                          color="error"
+                          startIcon={<Cancel />}
+                          onClick={() => onStatusChange(campaign._id, application.influencer_id, 'rejected')}
+                          sx={{ borderRadius: '12px', px: 3 }}
+                        >
+                          Decline
+                        </Button>
+                      </Box>
+                    )}
                   </Box>
-                )}
-                </PremiumCard>
-              </Grid>
+                </CardContent>
+              </PremiumCard>
 
-                
-              
-            </Grid>
+              {/* Campaign Reference Section */}
+              <PremiumCard>
+                <CardContent>
+                  <Typography variant="h6" gutterBottom color="primary" fontWeight="700">
+                    Linked Campaign
+                  </Typography>
+                  <Box display="flex" alignItems="center" gap={2}>
+                    <Box sx={{ p: 2, bgcolor: 'primary.main', borderRadius: 2, color: 'white' }}>
+                      <Campaign fontSize="large" />
+                    </Box>
+                    <Box>
+                      <Typography variant="h6" fontWeight="600">
+                        {campaign.title}
+                      </Typography>
+                      <Box display="flex" gap={3} mt={0.5}>
+                        <Box display="flex" alignItems="center" gap={0.5}>
+                          <AttachMoney fontSize="small" sx={{ color: 'success.main' }} />
+                          <Typography variant="body2" fontWeight="600" color="success.main">
+                            {campaign.currency || 'USD'} {campaign.budget}
+                          </Typography>
+                        </Box>
+                        <Box display="flex" alignItems="center" gap={0.5}>
+                          <Category fontSize="small" sx={{ color: 'primary.main' }} />
+                          <Typography variant="body2">
+                            {campaign.category}
+                          </Typography>
+                        </Box>
+                      </Box>
+                    </Box>
+                  </Box>
+                </CardContent>
+              </PremiumCard>
+            </Box>
           )}
 
           {activeTab === 'profile' && (
@@ -779,52 +767,63 @@ const ApplicationDetailDialog = ({ open, onClose, application, campaign, onStatu
                   <CircularProgress />
                 </Box>
               ) : influencerData ? (
-                <Grid >
-                  <Grid item xs={12} md={4}>
-                    <Box display="flex" flexDirection="column" alignItems="center" mb={3}>
-                      <ProfileImage
-                        userId={application.influencer_id}
-                        profileType="influencer"
-                        size={120}
-                      />
-                      <Typography variant="h5" gutterBottom mt={2} fontWeight="700">
-                        {influencerData.nickname || influencerData.full_name}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary" gutterBottom>
-                        {influencerData.email}
-                      </Typography>
-                      <Rating
-                        value={4.5}
-                        readOnly
-                        precision={0.5}
-                        sx={{ mt: 1 }}
-                      />
-                    </Box>
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                  <PremiumCard>
+                    <CardContent>
+                      <Box display="flex" alignItems="center" gap={3} flexDirection={isMobile ? 'column' : 'row'}>
+                        <ProfileImage
+                          userId={application.influencer_id}
+                          profileType="influencer"
+                          size={100}
+                        />
+                        <Box sx={{ flex: 1, textAlign: isMobile ? 'center' : 'left' }}>
+                          <Typography variant="h5" fontWeight="800">
+                            {influencerData.nickname || influencerData.full_name}
+                          </Typography>
+                          <Typography variant="body1" color="text.secondary" gutterBottom>
+                            {influencerData.email}
+                          </Typography>
+                          <Box display="flex" alignItems="center" justifyContent={isMobile ? 'center' : 'flex-start'} gap={1} mt={1}>
+                            <Rating value={4.5} readOnly precision={0.5} size="small" />
+                            <Typography variant="body2" color="text.secondary">(4.5/5.0)</Typography>
+                          </Box>
+                        </Box>
+                        <Box display="flex" flexDirection="column" gap={1.5} sx={{ minWidth: 200 }}>
+                          <PrimaryButton
+                            variant="contained"
+                            fullWidth
+                            startIcon={<Chat />}
+                            onClick={handleSendMessage}
+                          >
+                            Send Message
+                          </PrimaryButton>
+                          <Button
+                            variant="outlined"
+                            fullWidth
+                            startIcon={<Person />}
+                            onClick={handleViewProfile}
+                            sx={{ borderRadius: '12px' }}
+                          >
+                            View Full Profile
+                          </Button>
+                        </Box>
+                      </Box>
+                    </CardContent>
+                  </PremiumCard>
 
-                    <Box display="flex" gap={1} flexDirection="column">
-                      <Button
-                        variant="contained"
-                        fullWidth
-                        startIcon={<Chat />}
-                        onClick={handleSendMessage}
-                        sx={{ borderRadius: '8px' }}
-                      >
-                        Send Message
-                      </Button>
-                      <Button
-                        variant="outlined"
-                        fullWidth
-                        startIcon={<Person />}
-                        onClick={handleViewProfile}
-                        sx={{ borderRadius: '8px' }}
-                      >
-                        View Full Profile
-                      </Button>
-                    </Box>
-                  </Grid>
-
-                  
-                </Grid>
+                  {/* Additional section for social links can go here if data exists */}
+                  <PremiumCard>
+                    <CardContent>
+                      <Typography variant="h6" gutterBottom color="primary" fontWeight="700">
+                        Influencer Overview
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary" paragraph>
+                        A dedicated content creator specialized in {influencerData.category || 'diverse niches'}. Known for high engagement and quality production.
+                      </Typography>
+                      {/* You can add more stats here */}
+                    </CardContent>
+                  </PremiumCard>
+                </Box>
               ) : (
                 <Box textAlign="center" py={4}>
                   <Person sx={{ fontSize: 64, color: 'text.secondary', mb: 2, opacity: 0.5 }} />
@@ -844,109 +843,77 @@ const ApplicationDetailDialog = ({ open, onClose, application, campaign, onStatu
           )}
 
           {activeTab === 'campaign' && (
-            <Box>
-              <Typography variant="h6" gutterBottom fontWeight="700" color="primary">
-                Campaign Overview
-              </Typography>
-              
-              <Grid container spacing={3}>
-                <Grid item xs={12} md={6}>
-                  <PremiumCard>
-                    <CardContent>
-                      <Typography variant="h5" gutterBottom fontWeight="700">
-                        {campaign.title}
-                      </Typography>
-                      <Typography variant="body1" paragraph>
-                        {campaign.description}
-                      </Typography>
-                      
-                      <Box display="flex" alignItems="center" gap={2} mb={2}>
-                        <Chip 
-                          label={campaign.category} 
-                          color="primary" 
-                          variant="outlined" 
-                        />
-                        <Chip 
-                          label={campaign.status} 
-                          color={campaign.status === 'active' ? 'success' : 'default'}
-                        />
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+              {/* Campaign Basic Info */}
+              <PremiumCard>
+                <CardContent>
+                  <Typography variant="h6" gutterBottom color="primary" fontWeight="700">
+                    Campaign Summary
+                  </Typography>
+                  <Typography variant="h5" gutterBottom fontWeight="800">
+                    {campaign.title}
+                  </Typography>
+                  <Typography variant="body1" paragraph color="text.secondary" sx={{ lineHeight: 1.7 }}>
+                    {campaign.description}
+                  </Typography>
+                  <Box display="flex" gap={2} mt={2}>
+                    <Chip label={campaign.category} color="primary" variant="outlined" sx={{ fontWeight: 600 }} />
+                    <Chip label={campaign.status} color={campaign.status === 'active' ? 'success' : 'default'} sx={{ fontWeight: 600 }} />
+                  </Box>
+                </CardContent>
+              </PremiumCard>
+
+              {/* Requirements List */}
+              <PremiumCard>
+                <CardContent>
+                  <Typography variant="h6" gutterBottom color="primary" fontWeight="700">
+                    Standard Requirements
+                  </Typography>
+                  <Box sx={{ p: 2, bgcolor: 'grey.50', borderRadius: 2 }}>
+                    <Typography variant="body1" sx={{ whiteSpace: 'pre-wrap' }}>
+                      {campaign.requirements || "No specific requirements detailed for this campaign."}
+                    </Typography>
+                  </Box>
+                </CardContent>
+              </PremiumCard>
+
+              {/* Budget & Statistics */}
+              <PremiumCard>
+                <CardContent>
+                  <Typography variant="h6" gutterBottom color="primary" fontWeight="700">
+                    Financials & Performance
+                  </Typography>
+                  <Box display="flex" justifyContent="space-between" flexWrap="wrap" gap={3} py={1}>
+                    <Box display="flex" alignItems="center" gap={2}>
+                      <Box sx={{ p: 1.5, bgcolor: 'success.50', borderRadius: '50%' }}>
+                        <AttachMoney color="success" />
                       </Box>
-
-                      <Grid container spacing={3}>
-                        <Grid item xs={6}>
-                          <Box display="flex" alignItems="center" gap={1}>
-                            <AttachMoney color="success" />
-                            <Box>
-                              <Typography variant="caption" color="text.secondary">
-                                Budget
-                              </Typography>
-                              <Typography variant="body2" fontWeight="600">
-                                {campaign.currency || 'USD'} {campaign.budget}
-                              </Typography>
-                            </Box>
-                          </Box>
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Box display="flex" alignItems="center" gap={1}>
-                            <CalendarToday color="warning" />
-                            <Box>
-                              <Typography variant="caption" color="text.secondary">
-                                Deadline
-                              </Typography>
-                              <Typography variant="body2" fontWeight="600">
-                                {new Date(campaign.deadline).toLocaleDateString()}
-                              </Typography>
-                            </Box>
-                          </Box>
-                        </Grid>
-                      </Grid>
-                    </CardContent>
-                  </PremiumCard>
-                </Grid>
-
-                <Grid item xs={12} md={6}>
-                  <PremiumCard>
-                    <CardContent>
-                      <Typography variant="h6" gutterBottom fontWeight="700">
-                        Campaign Requirements
-                      </Typography>
-                      <Typography variant="body2">
-                        {campaign.requirements}
-                      </Typography>
-                    </CardContent>
-                  </PremiumCard>
-                  </Grid>
-
-
-                  <Grid item xs={12} md={6}>
-
-                  <PremiumCard>
-                    <CardContent>
-                      <Typography variant="h6" gutterBottom fontWeight="700">
-                        Application Statistics
-                      </Typography>
-                      <Grid container spacing={2}>
-                        <Grid item xs={6}>
-                          <Typography variant="body2" color="text.secondary">
-                            Total Applications
-                          </Typography>
-                          <Typography variant="h6" fontWeight="700">
-                            {campaign.applications?.length || 0}
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Typography variant="body2" color="text.secondary">
-                            Approved
-                          </Typography>
-                          <Typography variant="h6" fontWeight="700" color="success.main">
-                            {campaign.applications?.filter(app => app.status === 'approved').length || 0}
-                          </Typography>
-                        </Grid>
-                      </Grid>
-                    </CardContent>
-                  </PremiumCard>
-                </Grid>
-              </Grid>
+                      <Box>
+                        <Typography variant="caption" color="text.secondary" fontWeight="700">BUDGET</Typography>
+                        <Typography variant="h6" fontWeight="700">{campaign.currency || 'USD'} {campaign.budget}</Typography>
+                      </Box>
+                    </Box>
+                    <Box display="flex" alignItems="center" gap={2}>
+                      <Box sx={{ p: 1.5, bgcolor: 'warning.50', borderRadius: '50%' }}>
+                        <CalendarToday color="warning" />
+                      </Box>
+                      <Box>
+                        <Typography variant="caption" color="text.secondary" fontWeight="700">DEADLINE</Typography>
+                        <Typography variant="h6" fontWeight="700">{new Date(campaign.deadline).toLocaleDateString()}</Typography>
+                      </Box>
+                    </Box>
+                    <Box display="flex" alignItems="center" gap={2}>
+                      <Box sx={{ p: 1.5, bgcolor: 'info.50', borderRadius: '50%' }}>
+                        <People color="info" />
+                      </Box>
+                      <Box>
+                        <Typography variant="caption" color="text.secondary" fontWeight="700">PARTICIPANTS</Typography>
+                        <Typography variant="h6" fontWeight="700">{campaign.applications?.length || 0} Applied</Typography>
+                      </Box>
+                    </Box>
+                  </Box>
+                </CardContent>
+              </PremiumCard>
             </Box>
           )}
         </Box>
@@ -968,8 +935,8 @@ const CampaignStatistics = ({ campaign }) => {
     approvedApplications: campaign.applications?.filter(app => app.status === 'approved').length || 0,
     pendingApplications: campaign.applications?.filter(app => app.status === 'pending').length || 0,
     rejectedApplications: campaign.applications?.filter(app => app.status === 'rejected').length || 0,
-    completionRate: campaign.applications?.length > 0 ? 
-      Math.round((campaign.applications.filter(app => 
+    completionRate: campaign.applications?.length > 0 ?
+      Math.round((campaign.applications.filter(app =>
         ['completed', 'media_submitted', 'contracted'].includes(app.status)
       ).length / campaign.applications.length) * 100) : 0,
     // Add engagement metrics
@@ -1051,7 +1018,7 @@ function BrandCampaign() {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
   const { user } = useContext(AuthContext);
-  
+
   const [campaigns, setCampaigns] = useState([]);
   const [selectedCampaign, setSelectedCampaign] = useState(null);
   const [error, setError] = useState("");
@@ -1077,6 +1044,10 @@ function BrandCampaign() {
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectedStatuses, setSelectedStatuses] = useState([]);
   const [budgetRange, setBudgetRange] = useState([0, 100000]);
+  const [minViews, setMinViews] = useState(0);
+  const [minLikes, setMinLikes] = useState(0);
+  const [minBookmarks, setMinBookmarks] = useState(0);
+  const [minApplications, setMinApplications] = useState(0);
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
   const [timelineFilter, setTimelineFilter] = useState('all');
   const [sortBy, setSortBy] = useState('newest');
@@ -1181,12 +1152,12 @@ function BrandCampaign() {
     try {
       setLoading(true);
       const res = await campaignAPI.getBrandCampaigns();
-      
+
       const sortedCampaigns = (res.data || []).sort((a, b) => {
-        return new Date(b.created_at || b.createdAt || b.date_created) - 
-               new Date(a.created_at || a.createdAt || a.date_created);
+        return new Date(b.created_at || b.createdAt || b.date_created) -
+          new Date(a.created_at || a.createdAt || a.date_created);
       });
-      
+
       setCampaigns(sortedCampaigns);
     } catch (err) {
       setError("Failed to load campaigns");
@@ -1198,23 +1169,28 @@ function BrandCampaign() {
 
   // Filter campaigns based on search and filter criteria
   const filteredCampaigns = campaigns.filter(campaign => {
-    const matchesSearch = searchQuery === '' || 
+    const matchesSearch = searchQuery === '' ||
       campaign.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      campaign.description.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    const matchesCategory = selectedCategories.length === 0 || 
+      campaign.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (campaign.requirements && campaign.requirements.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      campaign.budget.toString().includes(searchQuery) ||
+      (campaign.category && campaign.category.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (campaign.status && campaign.status.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      new Date(campaign.deadline).toLocaleDateString().includes(searchQuery);
+
+    const matchesCategory = selectedCategories.length === 0 ||
       selectedCategories.includes(campaign.category);
-    
-    const matchesStatus = selectedStatuses.length === 0 || 
+
+    const matchesStatus = selectedStatuses.length === 0 ||
       selectedStatuses.includes(campaign.status);
-    
+
     const campaignBudget = parseFloat(campaign.budget) || 0;
     const matchesBudget = campaignBudget >= budgetRange[0] && campaignBudget <= budgetRange[1];
-    
+
     const campaignDate = new Date(campaign.created_at || campaign.createdAt || campaign.date_created);
     const now = new Date();
     let matchesTimeline = true;
-    
+
     switch (timelineFilter) {
       case 'today':
         matchesTimeline = campaignDate.toDateString() === now.toDateString();
@@ -1226,14 +1202,14 @@ function BrandCampaign() {
         matchesTimeline = campaignDate >= startOfWeek;
         break;
       case 'month':
-        matchesTimeline = campaignDate.getMonth() === now.getMonth() && 
-                         campaignDate.getFullYear() === now.getFullYear();
+        matchesTimeline = campaignDate.getMonth() === now.getMonth() &&
+          campaignDate.getFullYear() === now.getFullYear();
         break;
       case 'quarter':
         const currentQuarter = Math.floor(now.getMonth() / 3) + 1;
         const campaignQuarter = Math.floor(campaignDate.getMonth() / 3) + 1;
-        matchesTimeline = campaignQuarter === currentQuarter && 
-                         campaignDate.getFullYear() === now.getFullYear();
+        matchesTimeline = campaignQuarter === currentQuarter &&
+          campaignDate.getFullYear() === now.getFullYear();
         break;
       case 'year':
         matchesTimeline = campaignDate.getFullYear() === now.getFullYear();
@@ -1241,19 +1217,25 @@ function BrandCampaign() {
       default:
         matchesTimeline = true;
     }
-    
-    return matchesSearch && matchesCategory && matchesStatus && matchesBudget && matchesTimeline;
+
+    const matchesViews = (campaign.total_views || 0) >= minViews;
+    const matchesLikes = (campaign.likes_count || 0) >= minLikes;
+    const matchesBookmarks = (campaign.bookmarked_by?.length || 0) >= minBookmarks;
+    const matchesApplicationCount = (campaign.applications?.length || 0) >= minApplications;
+
+    return matchesSearch && matchesCategory && matchesStatus && matchesBudget && matchesTimeline &&
+      matchesViews && matchesLikes && matchesBookmarks && matchesApplicationCount;
   });
 
   // Sort the filtered campaigns
   const sortedCampaigns = [...filteredCampaigns].sort((a, b) => {
     switch (sortBy) {
       case 'newest':
-        return new Date(b.created_at || b.createdAt || b.date_created) - 
-               new Date(a.created_at || a.createdAt || a.date_created);
+        return new Date(b.created_at || b.createdAt || b.date_created) -
+          new Date(a.created_at || a.createdAt || a.date_created);
       case 'oldest':
-        return new Date(a.created_at || a.createdAt || a.date_created) - 
-               new Date(b.created_at || b.createdAt || b.date_created);
+        return new Date(a.created_at || a.createdAt || a.date_created) -
+          new Date(b.created_at || b.createdAt || b.date_created);
       case 'budget-high':
         return (parseFloat(b.budget) || 0) - (parseFloat(a.budget) || 0);
       case 'budget-low':
@@ -1274,18 +1256,62 @@ function BrandCampaign() {
   }) || [];
 
   // Calculate max budget for slider
-  const maxBudget = campaigns.length > 0 
-    ? Math.max(...campaigns.map(c => parseFloat(c.budget) || 0)) 
+  const maxBudget = campaigns.length > 0
+    ? Math.max(...campaigns.map(c => parseFloat(c.budget) || 0))
     : 10000;
+
+  // Common slider styles to prevent tooltip clipping and ensure professional look
+  const sliderStyle = {
+    mt: 4,
+
+    '& .MuiSlider-valueLabel': {
+      fontSize: '0.8rem',
+      fontWeight: 700,
+      top: -10,
+
+      backgroundColor: '#1976d2',
+      color: '#fff',
+
+      borderRadius: '8px',
+      padding: '4px 10px',
+
+      minWidth: 'max-content',   // ✅ IMPORTANT
+      width: 'auto',
+
+      whiteSpace: 'nowrap',
+      overflow: 'visible',       // ✅ IMPORTANT
+
+      transform: 'translateY(-120%) scale(1) !important',
+      '&:before': { display: 'none' },
+      '& .MuiSlider-valueLabelLabel': {
+        transform: 'none !important',
+        whiteSpace: 'nowrap',
+        display: 'block'
+      }
+    },
+    '& .MuiSlider-thumb': {
+      width: 20,
+      height: 20,
+      backgroundColor: '#fff',
+      border: '3px solid currentColor',
+      '&:hover, &.Mui-focusVisible': {
+        boxShadow: '0 0 0 8px rgba(25, 118, 210, 0.16)'
+      }
+    }
+  };
 
   // Clear all filters
   const clearFilters = () => {
     setSearchQuery("");
     setSelectedCategories([]);
     setSelectedStatuses([]);
+    setBudgetRange([0, maxBudget]);
+    setMinViews(0);
+    setMinLikes(0);
+    setMinBookmarks(0);
+    setMinApplications(0);
     setTimelineFilter('all');
     setSortBy('newest');
-    setBudgetRange([0, maxBudget]);
     setFilterDrawerOpen(false);
   };
 
@@ -1305,7 +1331,7 @@ function BrandCampaign() {
       AUD: 'A$',
       INR: '₹'
     };
-    
+
     const symbol = currencySymbols[currency] || '$';
     return `${symbol}${parseFloat(amount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   };
@@ -1317,7 +1343,7 @@ function BrandCampaign() {
         ...campaignForm,
         campaignImage: file
       });
-      
+
       // Create preview
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -1334,7 +1360,7 @@ function BrandCampaign() {
         ...campaignForm,
         campaignVideo: file
       });
-      
+
       // Create preview
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -1347,12 +1373,12 @@ function BrandCampaign() {
   const handleStatusChange = async (campaignId, influencerId, newStatus) => {
     const key = `${campaignId}-${influencerId}`;
     setUpdatingStatus(prev => ({ ...prev, [key]: true }));
-    
+
     try {
       await campaignAPI.updateApplicationStatus(campaignId, influencerId, { status: newStatus });
       setSuccess(`Application ${newStatus} successfully!`);
       fetchCampaigns();
-      
+
       if (selectedCampaign && selectedCampaign._id === campaignId) {
         const updatedCampaigns = await campaignAPI.getBrandCampaigns();
         const updatedCampaign = updatedCampaigns.data.find(c => c._id === campaignId);
@@ -1397,7 +1423,7 @@ function BrandCampaign() {
   const handleCreateCampaign = async () => {
     try {
       const user = JSON.parse(localStorage.getItem('user'));
-      
+
       const formDataToSend = new FormData();
       formDataToSend.append('title', campaignForm.title);
       formDataToSend.append('description', campaignForm.description);
@@ -1408,11 +1434,11 @@ function BrandCampaign() {
       formDataToSend.append('status', campaignForm.status);
       formDataToSend.append('currency', campaignForm.currency);
       formDataToSend.append('brand_id', user.id || user._id);
-      
+
       if (campaignForm.campaignImage) {
         formDataToSend.append('campaign_image', campaignForm.campaignImage);
       }
-      
+
       if (campaignForm.campaignVideo) {
         formDataToSend.append('campaign_video', campaignForm.campaignVideo);
       }
@@ -1422,32 +1448,32 @@ function BrandCampaign() {
       setSuccess('Campaign created successfully!');
       // Auto-close the modal after successful creation
       setTimeout(() => {
-      setCreateModalOpen(false);
-      setShowReview(false);
-      setCreatedCampaign(null);
-      // Reset form
-      setCampaignForm({
-        title: '',
-        description: '',
-        requirements: '',
-        budget: '',
-        category: '',
-        deadline: '',
-        status: 'active',
-        currency: 'USD',
-        campaignImage: null,
-        campaignVideo: null
-      });
-      setImagePreview(null);
-      setVideoPreview(null);
-      setActiveStep(0);
-    }, 2000); // Close after 2 seconds
-    
-    fetchCampaigns();
-  } catch (err) {
-    setError(err.response?.data?.detail || 'Failed to create campaign');
-  }
-};
+        setCreateModalOpen(false);
+        setShowReview(false);
+        setCreatedCampaign(null);
+        // Reset form
+        setCampaignForm({
+          title: '',
+          description: '',
+          requirements: '',
+          budget: '',
+          category: '',
+          deadline: '',
+          status: 'active',
+          currency: 'USD',
+          campaignImage: null,
+          campaignVideo: null
+        });
+        setImagePreview(null);
+        setVideoPreview(null);
+        setActiveStep(0);
+      }, 2000); // Close after 2 seconds
+
+      fetchCampaigns();
+    } catch (err) {
+      setError(err.response?.data?.detail || 'Failed to create campaign');
+    }
+  };
 
   const handleCreateNew = () => {
     setShowReview(false);
@@ -1481,11 +1507,11 @@ function BrandCampaign() {
       formDataToSend.append('deadline', campaignForm.deadline);
       formDataToSend.append('status', campaignForm.status);
       formDataToSend.append('currency', campaignForm.currency);
-      
+
       if (campaignForm.campaignImage) {
         formDataToSend.append('campaign_image', campaignForm.campaignImage);
       }
-      
+
       if (campaignForm.campaignVideo) {
         formDataToSend.append('campaign_video', campaignForm.campaignVideo);
       }
@@ -1697,29 +1723,29 @@ function BrandCampaign() {
             </TextField>
 
             <TextField
-  fullWidth
-  label="Application Deadline"
-  name="deadline"
-  type="datetime-local"
-  value={campaignForm.deadline}
-  onChange={handleFormChange}
-  required
-  InputProps={{
-    startAdornment: (
-      <InputAdornment position="start">
-        <CalendarToday color="primary" />
-      </InputAdornment>
-    ),
-  }}
-  InputLabelProps={{
-    shrink: true,
-  }}
-  inputProps={{
-  min: new Date(new Date().setHours(0,0,0,0)).toISOString().slice(0, 16)
-}}
-// helperText="Deadline can be today or any future date"
+              fullWidth
+              label="Application Deadline"
+              name="deadline"
+              type="datetime-local"
+              value={campaignForm.deadline}
+              onChange={handleFormChange}
+              required
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <CalendarToday color="primary" />
+                  </InputAdornment>
+                ),
+              }}
+              InputLabelProps={{
+                shrink: true,
+              }}
+              inputProps={{
+                min: new Date(new Date().setHours(0, 0, 0, 0)).toISOString().slice(0, 16)
+              }}
+            // helperText="Deadline can be today or any future date"
 
-/>
+            />
 
 
             <TextField
@@ -1745,50 +1771,50 @@ function BrandCampaign() {
             <Typography variant="h6" gutterBottom sx={{ mb: 2 }}>
               Campaign Media
             </Typography>
-            
+
             {/* Image Upload */}
             <Box sx={{ mb: 3 }}>
-  <Typography variant="subtitle1" gutterBottom>
-    Campaign Image (Required)
-  </Typography>
+              <Typography variant="subtitle1" gutterBottom>
+                Campaign Image (Required)
+              </Typography>
 
-  {/* Image Preview FIRST */}
-  {imagePreview && (
-    <Box sx={{ 
-      mb: 2, 
-      display: "flex", 
-      justifyContent: "flex-start" 
-    }}>
-      <img
-        src={imagePreview}
-        alt="Campaign preview"
-        style={{
-          maxWidth: "100%",
-          maxHeight: "220px",
-          borderRadius: "10px"
-        }}
-      />
-    </Box>
-  )}
+              {/* Image Preview FIRST */}
+              {imagePreview && (
+                <Box sx={{
+                  mb: 2,
+                  display: "flex",
+                  justifyContent: "flex-start"
+                }}>
+                  <img
+                    src={imagePreview}
+                    alt="Campaign preview"
+                    style={{
+                      maxWidth: "100%",
+                      maxHeight: "220px",
+                      borderRadius: "10px"
+                    }}
+                  />
+                </Box>
+              )}
 
-  {/* Upload Button BELOW */}
-  <Button
-    variant="outlined"
-    component="label"
-    startIcon={<Image />}
-    sx={{ mt: 1 }}
-  >
-    Upload Image
-    <input
-      type="file"
-      hidden
-      accept="image/*"
-      onChange={handleImageChange}
-    />
-  </Button>
-</Box>
+              {/* Upload Button BELOW */}
+              <Button
+                variant="outlined"
+                component="label"
+                startIcon={<Image />}
+                sx={{ mt: 1 }}
+              >
+                Upload Image
+                <input
+                  type="file"
+                  hidden
+                  accept="image/*"
+                  onChange={handleImageChange}
+                />
+              </Button>
+            </Box>
 
-            
+
             {/* Video Upload */}
             <Box sx={{ mb: 3 }}>
               <Typography variant="subtitle1" gutterBottom>
@@ -1811,7 +1837,7 @@ function BrandCampaign() {
               {videoPreview && (
                 <Box sx={{ mt: 2, position: 'relative', display: 'inline-block' }}>
                   <Box
-                    style={{ 
+                    style={{
                       position: 'relative',
                       maxWidth: '100%',
                       borderRadius: '8px',
@@ -1824,7 +1850,7 @@ function BrandCampaign() {
                       <source src={videoPreview} />
                       Your browser does not support the video tag.
                     </video>
-                    <Box 
+                    <Box
                       style={{
                         position: 'absolute',
                         top: 0,
@@ -1855,620 +1881,617 @@ function BrandCampaign() {
                   <Typography variant="h6" component="div">
                     {campaignForm.title || '[No Title]'}
                   </Typography>
-                  <Chip 
-                    label={campaignForm.category || 'No Category'} 
-                    size="small" 
-                    color="primary" 
-                    variant="outlined" 
+                  <Chip
+                    label={campaignForm.category || 'No Category'}
+                    size="small"
+                    color="primary"
+                    variant="outlined"
                   />
                 </Box>
                 <Typography variant="body2" color="text.secondary" paragraph>
-                    {campaignForm.description || '[No Description]'}
-                  </Typography>
-                  <Divider sx={{ my: 2 }} />
-                  <Grid container spacing={2}>
-                    <Grid item xs={6}>
-                      <Typography variant="body2" fontWeight="medium">
-                        Budget
-                      </Typography>
-                      <Typography variant="body2">
-                        {getCurrencySymbol()}{campaignForm.budget || '0'}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <Typography variant="body2" fontWeight="medium">
-                        Deadline
-                      </Typography>
-                      <Typography variant="body2">
-                        {campaignForm.deadline ? new Date(campaignForm.deadline).toLocaleString() : 'Not set'}
-                      </Typography>
-                    </Grid>
-                    
-                    <Grid item xs={6}>
-                      <Typography variant="body2" fontWeight="medium">
-                        Currency
-                      </Typography>
-                      <Typography variant="body2">
-                        {campaignForm.currency}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <Typography variant="body2" fontWeight="medium">
-                        Status
-                      </Typography>
-                      <Typography variant="body2">
-                        {campaignForm.status}
-                      </Typography>
-                    </Grid>
-                  </Grid>
-                  <Box sx={{ mt: 2 }}>
+                  {campaignForm.description || '[No Description]'}
+                </Typography>
+                <Divider sx={{ my: 2 }} />
+                <Grid container spacing={2}>
+                  <Grid item xs={6}>
                     <Typography variant="body2" fontWeight="medium">
-                      Requirements
+                      Budget
                     </Typography>
                     <Typography variant="body2">
-                      {campaignForm.requirements || '[No Requirements]'}
+                      {getCurrencySymbol()}{campaignForm.budget || '0'}
                     </Typography>
-                  </Box>
-                </CardContent>
-              </PremiumCard>
-            </Box>
-          );
-        default:
-          return 'Unknown step';
-      }
-    };
+                  </Grid>
+                  <Grid item xs={6}>
+                    <Typography variant="body2" fontWeight="medium">
+                      Deadline
+                    </Typography>
+                    <Typography variant="body2">
+                      {campaignForm.deadline ? new Date(campaignForm.deadline).toLocaleString() : 'Not set'}
+                    </Typography>
+                  </Grid>
 
-  // Helper function to determine badge color based on application count
-const getApplicationCountColor = (count) => {
-  if (count === 0) return 'default';
-  if (count <= 5) return 'info';
-  if (count <= 15) return 'primary';
-  if (count <= 30) return 'secondary';
-  return 'error'; // For very high numbers
-};
-
-  // ---------------- Render Campaign List ----------------
-const renderCampaignList = () => (
-  <Box>
-    <Box display="flex" justifyContent="space-between" alignItems="center" mb={4} flexDirection={isMobile ? "column" : "row"} gap={isMobile ? 2 : 0}>
-      <Box display="flex" alignItems="center" gap={2}>
-        <Typography variant={isMobile ? "h5" : "h4"} sx={{ 
-          fontWeight: 700, 
-          background: 'linear-gradient(45deg, #667eea 0%, #3b82f6 100%)',
-          backgroundClip: 'text',
-          textFillColor: 'transparent',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          pt: 1, pb: 2
-          
-        }}>
-          Our Campaigns
-        </Typography>
-        <Chip 
-          label={`${sortedCampaigns.length} campaigns`} 
-          size="small" 
-          variant="outlined" 
-          color="primary" 
-        />
-      </Box>
-      
-      <Box display="flex" gap={1} alignItems="center">
-        <IconButton 
-          onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
-          color={viewMode === 'grid' ? 'primary' : 'default'}
-        >
-          {viewMode === 'grid' ? <ViewList /> : <ViewModule />}
-        </IconButton>
-        
-        <GradientButton
-          startIcon={<Add />}
-          onClick={() => setCreateModalOpen(true)}
-          sx={{ 
-            borderRadius: '12px',
-            ...(isMobile && { width: '100%' })
-          }}
-        >
-          Create Campaign
-        </GradientButton>
-      </Box>
-    </Box>
-
-    {/* Search and Filter Section */}
-    <PremiumCard sx={{ mb: 3 }}>
-      <CardContent>
-        <Box display="flex" alignItems="center" gap={2} mb={2} flexDirection={isSmallScreen ? "column" : "row"}>
-          <TextField
-            fullWidth
-            variant="outlined"
-            placeholder="Search campaigns by title or description..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            sx={{
-              '& .MuiOutlinedInput-root': {
-                borderRadius: '12px',
-                background: 'rgba(255, 255, 255, 0.7)',
-                backdropFilter: 'blur(10px)'
-              }
-            }}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <Search color="primary" />
-                </InputAdornment>
-              ),
-              endAdornment: searchQuery && (
-                <InputAdornment position="end">
-                  <IconButton
-                    aria-label="clear search"
-                    onClick={() => setSearchQuery("")}
-                    edge="end"
-                    size="small"
-                  >
-                    <Close />
-                  </IconButton>
-                </InputAdornment>
-              ),
-            }}
-          />
-          
-          <Box display="flex" gap={1}>
-            <IconButton
-              onClick={() => setFilterDrawerOpen(true)}
-              sx={{ 
-                borderRadius: '12px',
-                background: 'linear-gradient(45deg, #667eea 0%, #3b82f6 100%)',
-                color: 'white',
-                '&:hover': {
-                  background: 'linear-gradient(45deg, #5a6fd8 0%, #3b82f6 100%)'
-                }
-              }}
-            >
-              <FilterList />
-            </IconButton>
-            
-            {(searchQuery || selectedCategories.length > 0 || selectedStatuses.length > 0 || 
-              timelineFilter !== 'all' || sortBy !== 'newest' || 
-              budgetRange[0] > 0 || budgetRange[1] < maxBudget) && (
-              <Button
-                variant="outlined"
-                startIcon={<Clear />}
-                onClick={clearFilters}
-                color="secondary"
-                sx={{ borderRadius: '12px' }}
-              >
-                Clear
-              </Button>
-            )}
-          </Box>
-        </Box>
-
-        {/* Results counter */}
-        <Box display="flex" justifyContent="space-between" alignItems="center" flexWrap="wrap" gap={1}>
-          <Typography variant="body2" color="text.secondary">
-            Showing {sortedCampaigns.length} of {campaigns.length} campaigns
-            {timelineFilter !== 'all' && ` (${timelineOptions.find(t => t.value === timelineFilter)?.label})`}
-            {sortBy !== 'newest' && `, sorted by ${sortOptions.find(s => s.value === sortBy)?.label}`}
-          </Typography>
-          {(searchQuery || selectedCategories.length > 0 || selectedStatuses.length > 0 || 
-            timelineFilter !== 'all' || sortBy !== 'newest' || 
-            budgetRange[0] > 0 || budgetRange[1] < maxBudget) && (
-            <Chip 
-              label="Filters Active" 
-              color="primary" 
-              variant="outlined" 
-              size="small" 
-              onDelete={clearFilters}
-            />
-          )}
-        </Box>
-      </CardContent>
-    </PremiumCard>
-
-    {loading ? (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
-        <LinearProgress sx={{ width: '100%', borderRadius: '8px' }} />
-      </Box>
-    ) : campaigns.length === 0 ? (
-      <PremiumCard sx={{ textAlign: 'center', p: 4 }}>
-        <CardContent>
-          <Box sx={{ 
-            display: 'flex', 
-            justifyContent: 'center', 
-            mb: 3,
-            animation: `${pulse} 2s infinite`
-          }}>
-            <Campaign sx={{ fontSize: 64, color: 'grey.300' }} />
-          </Box>
-          <Typography variant="h5" color="text.secondary" gutterBottom sx={{ mb: 2 }}>
-            No campaigns yet
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-            Create your first campaign to start collaborating with influencers and grow your brand
-          </Typography>
-          <GradientButton
-            startIcon={<Add />}
-            onClick={() => setCreateModalOpen(true)}
-          >
-            Create Your First Campaign
-          </GradientButton>
-        </CardContent>
-      </PremiumCard>
-    ) : sortedCampaigns.length === 0 ? (
-      <PremiumCard sx={{ textAlign: 'center', p: 4 }}>
-        <CardContent>
-          <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
-            <Search sx={{ fontSize: 64, color: 'grey.300' }} />
-          </Box>
-          <Typography variant="h5" color="text.secondary" gutterBottom sx={{ mb: 2 }}>
-            No campaigns match your filters
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-            Try adjusting your search criteria or clear all filters
-          </Typography>
-          <Button
-            variant="outlined"
-            startIcon={<Clear />}
-            onClick={clearFilters}
-            sx={{ borderRadius: '12px' }}
-          >
-            Clear Filters
-          </Button>
-        </CardContent>
-      </PremiumCard>
-    ) : (
-      <Grid 
-        container 
-        spacing={3}
-        sx={{
-          // Ensure consistent grid behavior
-          display: 'grid',
-          gridTemplateColumns: {
-            xs: '1fr',
-            sm: viewMode === 'list' ? '1fr' : 'repeat(2, 1fr)',
-            lg: viewMode === 'list' ? '1fr' : 'repeat(3, 1fr)'
-          },
-          gap: 3,
-          // Reset default Grid item spacing
-          '& .MuiGrid-item': {
-            padding: 0,
-            width: '100%'
-          }
-        }}
-      >
-        {sortedCampaigns.map((campaign, index) => (
-          <Grid 
-            item 
-            key={campaign._id}
-            sx={{ 
-              animation: `${fadeIn} 0.5s ease`,
-              animationDelay: `${index * 0.1}s`,
-              animationFillMode: 'both',
-              // Ensure consistent item sizing
-              display: 'flex',
-              minWidth: 0 // Prevent flex item overflow
-            }}
-          >
-            <PremiumCard 
-              sx={{ 
-                // Consistent dimensions for all cards
-                width: '100%',
-                minHeight: viewMode === 'list' ? '200px' : '480px',
-                display: 'flex',
-                flexDirection: viewMode === 'list' ? 'row' : 'column',
-                // Consistent spacing
-                p: 0,
-                overflow: 'hidden'
-              }}
-            >
-              {/* Campaign Image - Consistent sizing */}
-              {campaign.campaign_image_id && (
-                <Box
-                  sx={{
-                    position: 'relative',
-                    width: viewMode === 'list' ? '240px' : '100%',
-                    height: viewMode === 'list' ? '200px' : '200px',
-                    flexShrink: 0,
-                    overflow: 'hidden'
-                  }}
-                >
-                  <CardMedia
-                    component="img"
-                    image={getImageUrl(campaign.campaign_image_id)}
-                    alt={campaign.title}
-                    sx={{ 
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover',
-                      cursor: 'pointer',
-                      transition: 'transform 0.3s ease',
-                      '&:hover': {
-                        transform: 'scale(1.05)'
-                      }
-                    }}
-                    onClick={() => openMediaModal(getImageUrl(campaign.campaign_image_id), 'image')}
-                  />
-                </Box>
-              )}
-              
-              {/* Card Content - Consistent padding and layout */}
-              <CardContent 
-                sx={{ 
-                  flex: 1,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  p: 3,
-                  // Consistent content spacing
-                  '&:last-child': { pb: 3 }
-                }}
-              >
-                {/* Header Section - Consistent alignment */}
-                {/* Header Section with Color-Coded Application Badge */}
-{/* Header Section with Improved Layout */}
-<Box 
-  display="flex" 
-  justifyContent="space-between" 
-  alignItems="flex-start" 
-  mb={2}
-  sx={{ 
-    minHeight: '32px', 
-    position: 'relative',
-    gap: 1 // Add gap between title and status
-  }}
->
-  <Typography 
-    variant="h6" 
-    sx={{ 
-      fontWeight: 600,
-      flex: 1,
-      pr: 1,
-      display: '-webkit-box',
-      WebkitLineClamp: 2,
-      WebkitBoxOrient: 'vertical',
-      overflow: 'hidden',
-      lineHeight: 1.3,
-      minHeight: '2.6em'
-    }}
-  >
-    {campaign.title}
-  </Typography>
-  
-  {/* Application Count Badge */}
-  <Tooltip title={`${campaign.applications?.length || 0} applications received`} arrow>
-    <Box sx={{ position: 'absolute', top: -8, right: -8, zIndex: 1 }}>
-      <Chip
-        label={campaign.applications?.length || 0}
-        size="small"
-        color={getApplicationCountColor(campaign.applications?.length || 0)}
-        sx={{
-          fontWeight: 700,
-          fontSize: '0.7rem',
-          minWidth: '32px',
-          height: '24px',
-          color: 'white',
-          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)',
-          '& .MuiChip-label': {
-            px: 1,
-            py: 0.5
-          }
-        }}
-      />
-    </Box>
-  </Tooltip>
-
-  {/* Status Chip - Ensure it doesn't overlap */}
-  <Chip
-    label={campaign.status}
-    color={campaign.status === 'active' ? 'success' : 
-          campaign.status === 'completed' ? 'primary' : 
-          campaign.status === 'paused' ? 'warning' : 'default'}
-    size="small"
-    sx={{ 
-      fontWeight: 500,
-      flexShrink: 0,
-      mt: 0.5, // Adjust vertical alignment
-      zIndex: 0 // Ensure it stays behind the application badge
-    }}
-  />
-</Box>
-                {/* Description - Consistent text treatment */}
-                <Typography 
-                  variant="body2" 
-                  color="text.secondary" 
-                  sx={{ 
-                    flex: viewMode === 'list' ? 1 : 'none',
-                    mb: 2,
-                    // Consistent text truncation
-                    display: '-webkit-box',
-                    WebkitLineClamp: viewMode === 'list' ? 3 : 2,
-                    WebkitBoxOrient: 'vertical',
-                    overflow: 'hidden',
-                    lineHeight: 1.5,
-                    minHeight: viewMode === 'list' ? '4.5em' : '3em' // 3 lines for list, 2 for grid
-                  }}
-                >
-                  {campaign.description}
-                </Typography>
-
-                <Divider sx={{ my: 2 }} />
-
-                {/* Stats Grid - Consistent layout */}
-                <Box 
-                  sx={{ 
-                    display: 'grid',
-                    gridTemplateColumns: viewMode === 'list' ? 'repeat(4, 1fr)' : '1fr',
-                    gap: 2,
-                    mb: 3
-                  }}
-                >
-                  {/* Budget */}
-                  <Box display="flex" alignItems="center" sx={{ minHeight: '24px' }}>
-                    <AttachMoney sx={{ fontSize: 18, mr: 1.5, color: 'success.main', flexShrink: 0 }} />
-                    <Box sx={{ minWidth: 0 }}>
-                      <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.75rem' }}>
-                        Budget
-                      </Typography>
-                      <Typography variant="body2" sx={{ fontWeight: 600, color: 'success.main' }}>
-                        {formatCurrency(campaign.budget, campaign.currency)}
-                      </Typography>
-                    </Box>
-                  </Box>
-
-                  {/* Deadline */}
-                  <Box display="flex" alignItems="center" sx={{ minHeight: '24px' }}>
-                    <CalendarToday sx={{ fontSize: 18, mr: 1.5, color: 'warning.main', flexShrink: 0 }} />
-                    <Box sx={{ minWidth: 0 }}>
-                      <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.75rem' }}>
-                        Deadline
-                      </Typography>
-                      <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                        {new Date(campaign.deadline).toLocaleDateString()}
-                      </Typography>
-                    </Box>
-                  </Box>
-
-                  
-<Box display="flex" alignItems="center" justifyContent="space-between" sx={{ mt: 2, pt: 2, borderTop: '1px solid', borderColor: 'divider' }}>
-  <Box display="flex" alignItems="center" gap={2}>
-    <Tooltip title="Total Views">
-      <Box display="flex" alignItems="center" gap={0.5}>
-        <Visibility sx={{ fontSize: 16, color: 'text.secondary' }} />
-        <Typography variant="caption" color="text.secondary">
-          {campaign.total_views || 0}
-        </Typography>
-      </Box>
-    </Tooltip>
-    
-    <Tooltip title="Likes">
-      <Box display="flex" alignItems="center" gap={0.5}>
-        <ThumbUp sx={{ fontSize: 16, color: 'text.secondary' }} />
-        <Typography variant="caption" color="text.secondary">
-          {campaign.likes_count || 0}
-        </Typography>
-      </Box>
-    </Tooltip>
-    
-    <Tooltip title="Bookmarks">
-      <Box display="flex" alignItems="center" gap={0.5}>
-        <Bookmark sx={{ fontSize: 16, color: 'text.secondary' }} />
-        <Typography variant="caption" color="text.secondary">
-          {campaign.bookmarked_by?.length || 0}
-        </Typography>
-      </Box>
-    </Tooltip>
-  </Box>
-  
-  <Typography variant="caption" color="text.secondary">
-    {campaign.unique_views || 0} unique views
-  </Typography>
-</Box>
-
-                  {/* Category */}
-                  <Box display="flex" alignItems="center" sx={{ minHeight: '24px' }}>
-                    <Category sx={{ fontSize: 18, mr: 1.5, color: 'primary.main', flexShrink: 0 }} />
-                    <Box sx={{ minWidth: 0 }}>
-                      <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.75rem' }}>
-                        Category
-                      </Typography>
-                      <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                        {campaign.category}
-                      </Typography>
-                    </Box>
-                  </Box>
-
-                  {/* Applications Count - Only in list view */}
-                  {viewMode === 'list' && (
-                    <Box display="flex" alignItems="center" sx={{ minHeight: '24px' }}>
-                      <People sx={{ fontSize: 18, mr: 1.5, color: 'info.main', flexShrink: 0 }} />
-                      <Box sx={{ minWidth: 0 }}>
-                        <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.75rem' }}>
-                          Applications
-                        </Typography>
-                        <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                          {campaign.applications?.length || 0}
-                        </Typography>
-                      </Box>
-                    </Box>
-                  )}
-                </Box>
-
-                {/* Action Buttons - Consistent positioning */}
-                <Box 
-                  display="flex" 
-                  gap={1} 
-                  sx={{ 
-                    mt: 'auto',
-                    pt: 2,
-                    // Ensure consistent button sizing
-                    '& .MuiButton-root, & .MuiIconButton-root': {
-                      flex: viewMode === 'list' ? 'none' : 1,
-                      minHeight: '36px'
-                    }
-                  }}
-                >
-                  <GradientButton
-                    size="small"
-                    onClick={() => setSelectedCampaign(campaign)}
-                    startIcon={<TrendingUp />}
-                    sx={{ borderRadius: '8px' }}
-                  >
-                    View Details
-                  </GradientButton>
-                  <IconButton
-                    size="small"
-                    onClick={() => openEditModal(campaign)}
-                    color="primary"
-                    sx={{ 
-                      borderRadius: '8px',
-                      background: 'rgba(25, 118, 210, 0.1)',
-                      '&:hover': { background: 'rgba(25, 118, 210, 0.2)' }
-                    }}
-                  >
-                    <Edit />
-                  </IconButton>
-                  <IconButton
-                    size="small"
-                    onClick={() => openDeleteModal(campaign)}
-                    color="error"
-                    sx={{ 
-                      borderRadius: '8px',
-                      background: 'rgba(244, 67, 54, 0.1)',
-                      '&:hover': { background: 'rgba(244, 67, 54, 0.2)' }
-                    }}
-                  >
-                    <Delete />
-                  </IconButton>
+                  <Grid item xs={6}>
+                    <Typography variant="body2" fontWeight="medium">
+                      Currency
+                    </Typography>
+                    <Typography variant="body2">
+                      {campaignForm.currency}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <Typography variant="body2" fontWeight="medium">
+                      Status
+                    </Typography>
+                    <Typography variant="body2">
+                      {campaignForm.status}
+                    </Typography>
+                  </Grid>
+                </Grid>
+                <Box sx={{ mt: 2 }}>
+                  <Typography variant="body2" fontWeight="medium">
+                    Requirements
+                  </Typography>
+                  <Typography variant="body2">
+                    {campaignForm.requirements || '[No Requirements]'}
+                  </Typography>
                 </Box>
               </CardContent>
             </PremiumCard>
-          </Grid>
-        ))}
-      </Grid>
-    )}
-    
-    {/* Floating Action Button for Mobile */}
-    {isMobile && (
-      <Zoom in={!selectedCampaign}>
-        <Fab
-          color="primary"
-          aria-label="add campaign"
-          onClick={() => setCreateModalOpen(true)}
+          </Box>
+        );
+      default:
+        return 'Unknown step';
+    }
+  };
+
+  // Helper function to determine badge color based on application count
+  const getApplicationCountColor = (count) => {
+    if (count === 0) return 'default';
+    if (count <= 5) return 'info';
+    if (count <= 15) return 'primary';
+    if (count <= 30) return 'secondary';
+    return 'error'; // For very high numbers
+  };
+
+  // ---------------- Render Campaign List ----------------
+  const renderCampaignList = () => (
+    <Box>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={4} flexDirection={isMobile ? "column" : "row"} gap={isMobile ? 2 : 0}>
+        <Box display="flex" alignItems="center" gap={2}>
+          <Typography variant={isMobile ? "h5" : "h4"} sx={{
+            fontWeight: 700,
+            color: 'primary.main',
+            pt: 1, pb: 2
+
+          }}>
+            Our Campaigns
+          </Typography>
+          <Chip
+            label={`${sortedCampaigns.length} campaigns`}
+            size="small"
+            variant="outlined"
+            color="primary"
+          />
+        </Box>
+
+        <Box display="flex" gap={1} alignItems="center">
+          <IconButton
+            onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
+            color={viewMode === 'grid' ? 'primary' : 'default'}
+          >
+            {viewMode === 'grid' ? <ViewList /> : <ViewModule />}
+          </IconButton>
+
+          <PrimaryButton
+            startIcon={<Add />}
+            onClick={() => setCreateModalOpen(true)}
+            sx={{
+              borderRadius: '12px',
+              ...(isMobile && { width: '100%' })
+            }}
+          >
+            Create Campaign
+          </PrimaryButton>
+        </Box>
+      </Box>
+
+      {/* Search and Filter Section */}
+      <PremiumCard sx={{ mb: 3 }}>
+        <CardContent>
+          <Box display="flex" alignItems="center" gap={2} mb={2} flexDirection={isSmallScreen ? "column" : "row"}>
+            <TextField
+              fullWidth
+              variant="outlined"
+              placeholder="Search by title, description, requirements, budget or date..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: '12px',
+                  background: 'rgba(255, 255, 255, 0.7)',
+                  backdropFilter: 'blur(10px)'
+                }
+              }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Search color="primary" />
+                  </InputAdornment>
+                ),
+                endAdornment: searchQuery && (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="clear search"
+                      onClick={() => setSearchQuery("")}
+                      edge="end"
+                      size="small"
+                    >
+                      <Close />
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+
+            <Box display="flex" gap={1}>
+              <IconButton
+                onClick={() => setFilterDrawerOpen(true)}
+                sx={{
+                  borderRadius: '12px',
+                  backgroundColor: 'primary.main',
+                  color: 'white',
+                  '&:hover': {
+                    backgroundColor: 'primary.dark'
+                  }
+                }}
+              >
+                <FilterList />
+              </IconButton>
+
+              {(searchQuery || selectedCategories.length > 0 || selectedStatuses.length > 0 ||
+                timelineFilter !== 'all' || sortBy !== 'newest' ||
+                budgetRange[0] > 0 || budgetRange[1] < maxBudget) && (
+                  <Button
+                    variant="outlined"
+                    startIcon={<Clear />}
+                    onClick={clearFilters}
+                    color="secondary"
+                    sx={{ borderRadius: '12px' }}
+                  >
+                    Clear
+                  </Button>
+                )}
+            </Box>
+          </Box>
+
+          {/* Results counter */}
+          <Box display="flex" justifyContent="space-between" alignItems="center" flexWrap="wrap" gap={1}>
+            <Typography variant="body2" color="text.secondary">
+              Showing {sortedCampaigns.length} of {campaigns.length} campaigns
+              {timelineFilter !== 'all' && ` (${timelineOptions.find(t => t.value === timelineFilter)?.label})`}
+              {sortBy !== 'newest' && `, sorted by ${sortOptions.find(s => s.value === sortBy)?.label}`}
+            </Typography>
+            {(searchQuery || selectedCategories.length > 0 || selectedStatuses.length > 0 ||
+              timelineFilter !== 'all' || sortBy !== 'newest' ||
+              budgetRange[0] > 0 || budgetRange[1] < maxBudget ||
+              minViews > 0 || minLikes > 0 || minBookmarks > 0 || minApplications > 0) && (
+                <Chip
+                  label="Filters Active"
+                  color="primary"
+                  variant="outlined"
+                  size="small"
+                  onDelete={clearFilters}
+                />
+              )}
+          </Box>
+        </CardContent>
+      </PremiumCard>
+
+      {loading ? (
+        <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+          <LinearProgress sx={{ width: '100%', borderRadius: '8px' }} />
+        </Box>
+      ) : campaigns.length === 0 ? (
+        <PremiumCard sx={{ textAlign: 'center', p: 4 }}>
+          <CardContent>
+            <Box sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              mb: 3,
+              animation: `${pulse} 2s infinite`
+            }}>
+              <Campaign sx={{ fontSize: 64, color: 'grey.300' }} />
+            </Box>
+            <Typography variant="h5" color="text.secondary" gutterBottom sx={{ mb: 2 }}>
+              No campaigns yet
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+              Create your first campaign to start collaborating with influencers and grow your brand
+            </Typography>
+            <PrimaryButton
+              startIcon={<Add />}
+              onClick={() => setCreateModalOpen(true)}
+            >
+              Create Your First Campaign
+            </PrimaryButton>
+          </CardContent>
+        </PremiumCard>
+      ) : sortedCampaigns.length === 0 ? (
+        <PremiumCard sx={{ textAlign: 'center', p: 4 }}>
+          <CardContent>
+            <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
+              <Search sx={{ fontSize: 64, color: 'grey.300' }} />
+            </Box>
+            <Typography variant="h5" color="text.secondary" gutterBottom sx={{ mb: 2 }}>
+              No campaigns match your filters
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+              Try adjusting your search criteria or clear all filters
+            </Typography>
+            <Button
+              variant="outlined"
+              startIcon={<Clear />}
+              onClick={clearFilters}
+              sx={{ borderRadius: '12px' }}
+            >
+              Clear Filters
+            </Button>
+          </CardContent>
+        </PremiumCard>
+      ) : (
+        <Grid
+          container
+          spacing={3}
           sx={{
-            position: 'fixed',
-            bottom: 16,
-            right: 16,
-            background: 'linear-gradient(45deg, #667eea 0%, #3b82f6 100%)',
-            '&:hover': {
-              background: 'linear-gradient(45deg, #5a6fd8 0%, #3b82f6 100%)'
+            // Ensure consistent grid behavior
+            display: 'grid',
+            gridTemplateColumns: {
+              xs: '1fr',
+              sm: viewMode === 'list' ? '1fr' : 'repeat(2, 1fr)',
+              lg: viewMode === 'list' ? '1fr' : 'repeat(3, 1fr)'
+            },
+            gap: 3,
+            // Reset default Grid item spacing
+            '& .MuiGrid-item': {
+              padding: 0,
+              width: '100%'
             }
           }}
         >
-          <Add />
-        </Fab>
-      </Zoom>
-    )}
-  </Box>
-);
-    
+          {sortedCampaigns.map((campaign, index) => (
+            <Grid
+              item
+              key={campaign._id}
+              sx={{
+                animation: `${fadeIn} 0.5s ease`,
+                animationDelay: `${index * 0.1}s`,
+                animationFillMode: 'both',
+                // Ensure consistent item sizing
+                display: 'flex',
+                minWidth: 0 // Prevent flex item overflow
+              }}
+            >
+              <PremiumCard
+                sx={{
+                  // Consistent dimensions for all cards
+                  width: '100%',
+                  minHeight: viewMode === 'list' ? '200px' : '480px',
+                  display: 'flex',
+                  flexDirection: viewMode === 'list' ? 'row' : 'column',
+                  // Consistent spacing
+                  p: 0,
+                  overflow: 'hidden'
+                }}
+              >
+                {/* Campaign Image - Consistent sizing */}
+                {campaign.campaign_image_id && (
+                  <Box
+                    sx={{
+                      position: 'relative',
+                      width: viewMode === 'list' ? '240px' : '100%',
+                      height: viewMode === 'list' ? '200px' : '200px',
+                      flexShrink: 0,
+                      overflow: 'hidden'
+                    }}
+                  >
+                    <CardMedia
+                      component="img"
+                      image={getImageUrl(campaign.campaign_image_id)}
+                      alt={campaign.title}
+                      sx={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover',
+                        cursor: 'pointer',
+                        transition: 'transform 0.3s ease',
+                        '&:hover': {
+                          transform: 'scale(1.05)'
+                        }
+                      }}
+                      onClick={() => openMediaModal(getImageUrl(campaign.campaign_image_id), 'image')}
+                    />
+                  </Box>
+                )}
+
+                {/* Card Content - Consistent padding and layout */}
+                <CardContent
+                  sx={{
+                    flex: 1,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    p: 3,
+                    // Consistent content spacing
+                    '&:last-child': { pb: 3 }
+                  }}
+                >
+                  {/* Header Section - Consistent alignment */}
+                  {/* Header Section with Color-Coded Application Badge */}
+                  {/* Header Section with Improved Layout */}
+                  <Box
+                    display="flex"
+                    justifyContent="space-between"
+                    alignItems="flex-start"
+                    mb={2}
+                    sx={{
+                      minHeight: '32px',
+                      position: 'relative',
+                      gap: 1 // Add gap between title and status
+                    }}
+                  >
+                    <Typography
+                      variant="h6"
+                      sx={{
+                        fontWeight: 600,
+                        flex: 1,
+                        pr: 1,
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden',
+                        lineHeight: 1.3,
+                        minHeight: '2.6em'
+                      }}
+                    >
+                      {campaign.title}
+                    </Typography>
+
+                    {/* Application Count Badge */}
+                    <Tooltip title={`${campaign.applications?.length || 0} applications received`} arrow>
+                      <Box sx={{ position: 'absolute', top: -8, right: -8, zIndex: 1 }}>
+                        <Chip
+                          label={campaign.applications?.length || 0}
+                          size="small"
+                          color={getApplicationCountColor(campaign.applications?.length || 0)}
+                          sx={{
+                            fontWeight: 700,
+                            fontSize: '0.7rem',
+                            minWidth: '32px',
+                            height: '24px',
+                            color: 'white',
+                            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.2)',
+                            '& .MuiChip-label': {
+                              px: 1,
+                              py: 0.5
+                            }
+                          }}
+                        />
+                      </Box>
+                    </Tooltip>
+
+                    {/* Status Chip - Ensure it doesn't overlap */}
+                    <Chip
+                      label={campaign.status}
+                      color={campaign.status === 'active' ? 'success' :
+                        campaign.status === 'completed' ? 'primary' :
+                          campaign.status === 'paused' ? 'warning' : 'default'}
+                      size="small"
+                      sx={{
+                        fontWeight: 500,
+                        flexShrink: 0,
+                        mt: 0.5, // Adjust vertical alignment
+                        zIndex: 0 // Ensure it stays behind the application badge
+                      }}
+                    />
+                  </Box>
+                  {/* Description - Consistent text treatment */}
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{
+                      flex: viewMode === 'list' ? 1 : 'none',
+                      mb: 2,
+                      // Consistent text truncation
+                      display: '-webkit-box',
+                      WebkitLineClamp: viewMode === 'list' ? 3 : 2,
+                      WebkitBoxOrient: 'vertical',
+                      overflow: 'hidden',
+                      lineHeight: 1.5,
+                      minHeight: viewMode === 'list' ? '4.5em' : '3em' // 3 lines for list, 2 for grid
+                    }}
+                  >
+                    {campaign.description}
+                  </Typography>
+
+                  <Divider sx={{ my: 2 }} />
+
+                  {/* Stats Grid - Consistent layout */}
+                  <Box
+                    sx={{
+                      display: 'grid',
+                      gridTemplateColumns: viewMode === 'list' ? 'repeat(4, 1fr)' : '1fr',
+                      gap: 2,
+                      mb: 3
+                    }}
+                  >
+                    {/* Budget */}
+                    <Box display="flex" alignItems="center" sx={{ minHeight: '24px' }}>
+                      <AttachMoney sx={{ fontSize: 18, mr: 1.5, color: 'success.main', flexShrink: 0 }} />
+                      <Box sx={{ minWidth: 0 }}>
+                        <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.75rem' }}>
+                          Budget
+                        </Typography>
+                        <Typography variant="body2" sx={{ fontWeight: 600, color: 'success.main' }}>
+                          {formatCurrency(campaign.budget, campaign.currency)}
+                        </Typography>
+                      </Box>
+                    </Box>
+
+                    {/* Deadline */}
+                    <Box display="flex" alignItems="center" sx={{ minHeight: '24px' }}>
+                      <CalendarToday sx={{ fontSize: 18, mr: 1.5, color: 'warning.main', flexShrink: 0 }} />
+                      <Box sx={{ minWidth: 0 }}>
+                        <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.75rem' }}>
+                          Deadline
+                        </Typography>
+                        <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                          {new Date(campaign.deadline).toLocaleDateString()}
+                        </Typography>
+                      </Box>
+                    </Box>
+
+
+                    <Box display="flex" alignItems="center" justifyContent="space-between" sx={{ mt: 2, pt: 2, borderTop: '1px solid', borderColor: 'divider' }}>
+                      <Box display="flex" alignItems="center" gap={2}>
+                        <Tooltip title="Total Views">
+                          <Box display="flex" alignItems="center" gap={0.5}>
+                            <Visibility sx={{ fontSize: 16, color: 'text.secondary' }} />
+                            <Typography variant="caption" color="text.secondary">
+                              {campaign.total_views || 0}
+                            </Typography>
+                          </Box>
+                        </Tooltip>
+
+                        <Tooltip title="Likes">
+                          <Box display="flex" alignItems="center" gap={0.5}>
+                            <ThumbUp sx={{ fontSize: 16, color: 'text.secondary' }} />
+                            <Typography variant="caption" color="text.secondary">
+                              {campaign.likes_count || 0}
+                            </Typography>
+                          </Box>
+                        </Tooltip>
+
+                        <Tooltip title="Bookmarks">
+                          <Box display="flex" alignItems="center" gap={0.5}>
+                            <Bookmark sx={{ fontSize: 16, color: 'text.secondary' }} />
+                            <Typography variant="caption" color="text.secondary">
+                              {campaign.bookmarked_by?.length || 0}
+                            </Typography>
+                          </Box>
+                        </Tooltip>
+                      </Box>
+
+                      <Typography variant="caption" color="text.secondary">
+                        {campaign.unique_views || 0} unique views
+                      </Typography>
+                    </Box>
+
+                    {/* Category */}
+                    <Box display="flex" alignItems="center" sx={{ minHeight: '24px' }}>
+                      <Category sx={{ fontSize: 18, mr: 1.5, color: 'primary.main', flexShrink: 0 }} />
+                      <Box sx={{ minWidth: 0 }}>
+                        <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.75rem' }}>
+                          Category
+                        </Typography>
+                        <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                          {campaign.category}
+                        </Typography>
+                      </Box>
+                    </Box>
+
+                    {/* Applications Count - Only in list view */}
+                    {viewMode === 'list' && (
+                      <Box display="flex" alignItems="center" sx={{ minHeight: '24px' }}>
+                        <People sx={{ fontSize: 18, mr: 1.5, color: 'info.main', flexShrink: 0 }} />
+                        <Box sx={{ minWidth: 0 }}>
+                          <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.75rem' }}>
+                            Applications
+                          </Typography>
+                          <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                            {campaign.applications?.length || 0}
+                          </Typography>
+                        </Box>
+                      </Box>
+                    )}
+                  </Box>
+
+                  {/* Action Buttons - Consistent positioning */}
+                  <Box
+                    display="flex"
+                    gap={1}
+                    sx={{
+                      mt: 'auto',
+                      pt: 2,
+                      // Ensure consistent button sizing
+                      '& .MuiButton-root, & .MuiIconButton-root': {
+                        flex: viewMode === 'list' ? 'none' : 1,
+                        minHeight: '36px'
+                      }
+                    }}
+                  >
+                    <PrimaryButton
+                      size="small"
+                      onClick={() => setSelectedCampaign(campaign)}
+                      startIcon={<TrendingUp />}
+                      sx={{ borderRadius: '8px' }}
+                    >
+                      View Details
+                    </PrimaryButton>
+                    <IconButton
+                      size="small"
+                      onClick={() => openEditModal(campaign)}
+                      color="primary"
+                      sx={{
+                        borderRadius: '8px',
+                        background: 'rgba(25, 118, 210, 0.1)',
+                        '&:hover': { background: 'rgba(25, 118, 210, 0.2)' }
+                      }}
+                    >
+                      <Edit />
+                    </IconButton>
+                    <IconButton
+                      size="small"
+                      onClick={() => openDeleteModal(campaign)}
+                      color="error"
+                      sx={{
+                        borderRadius: '8px',
+                        background: 'rgba(244, 67, 54, 0.1)',
+                        '&:hover': { background: 'rgba(244, 67, 54, 0.2)' }
+                      }}
+                    >
+                      <Delete />
+                    </IconButton>
+                  </Box>
+                </CardContent>
+              </PremiumCard>
+            </Grid>
+          ))}
+        </Grid>
+      )}
+
+      {/* Floating Action Button for Mobile */}
+      {isMobile && (
+        <Zoom in={!selectedCampaign}>
+          <Fab
+            color="primary"
+            aria-label="add campaign"
+            onClick={() => setCreateModalOpen(true)}
+            sx={{
+              position: 'fixed',
+              bottom: 16,
+              right: 16,
+              backgroundColor: 'primary.main',
+              '&:hover': {
+                backgroundColor: 'primary.dark'
+              }
+            }}
+          >
+            <Add />
+          </Fab>
+        </Zoom>
+      )}
+    </Box>
+  );
+
 
 
   // ---------------- Render Campaign Detail (Enhanced Applications Focus) ----------------
@@ -2479,30 +2502,26 @@ const renderCampaignList = () => (
       <Box sx={{ animation: `${slideIn} 0.5s ease` }}>
         {/* Header with Back Button */}
         <Box display="flex" alignItems="center" mb={3} flexWrap="wrap" gap={2}>
-          <IconButton 
-            onClick={() => setSelectedCampaign(null)} 
-            sx={{ 
+          <IconButton
+            onClick={() => setSelectedCampaign(null)}
+            sx={{
               background: 'rgba(25, 118, 210, 0.1)',
               '&:hover': { background: 'rgba(25, 118, 210, 0.2)' }
             }}
           >
             <ArrowBack />
           </IconButton>
-          <Typography variant={isMobile ? "h5" : "h4"} sx={{ 
+          <Typography variant={isMobile ? "h5" : "h4"} sx={{
             fontWeight: 700,
-            background: 'linear-gradient(45deg, #667eea 0%, #3b82f6 100%)',
-            backgroundClip: 'text',
-            textFillColor: 'transparent',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent'
+            color: 'primary.main'
           }}>
             {selectedCampaign.title}
           </Typography>
           <Chip
             label={selectedCampaign.status}
-            color={selectedCampaign.status === 'active' ? 'success' : 
-                   selectedCampaign.status === 'completed' ? 'primary' : 
-                   selectedCampaign.status === 'paused' ? 'warning' : 'default'}
+            color={selectedCampaign.status === 'active' ? 'success' :
+              selectedCampaign.status === 'completed' ? 'primary' :
+                selectedCampaign.status === 'paused' ? 'warning' : 'default'}
             sx={{ fontWeight: 600 }}
           />
         </Box>
@@ -2520,8 +2539,8 @@ const renderCampaignList = () => (
             </Box>
             <Box sx={{ p: 2, pt: 0, display: 'flex', gap: 2, flexWrap: 'wrap' }}>
               {selectedCampaign.campaign_image_id && (
-                <Box 
-                  sx={{ 
+                <Box
+                  sx={{
                     position: 'relative',
                     flex: 1,
                     minWidth: 200,
@@ -2531,12 +2550,12 @@ const renderCampaignList = () => (
                   }}
                   onClick={() => openMediaModal(getImageUrl(selectedCampaign.campaign_image_id), 'image')}
                 >
-                  <img 
-                    src={getImageUrl(selectedCampaign.campaign_image_id)} 
-                    alt="Campaign" 
+                  <img
+                    src={getImageUrl(selectedCampaign.campaign_image_id)}
+                    alt="Campaign"
                     style={{ width: '100%', height: 200, objectFit: 'cover' }}
                   />
-                  <Box 
+                  <Box
                     sx={{
                       position: 'absolute',
                       top: 0,
@@ -2557,8 +2576,8 @@ const renderCampaignList = () => (
                 </Box>
               )}
               {selectedCampaign.campaign_video_id && (
-                <Box 
-                  sx={{ 
+                <Box
+                  sx={{
                     position: 'relative',
                     flex: 1,
                     minWidth: 200,
@@ -2568,10 +2587,10 @@ const renderCampaignList = () => (
                   }}
                   onClick={() => openMediaModal(getVideoUrl(selectedCampaign.campaign_video_id), 'video')}
                 >
-                  <Box 
-                    sx={{ 
-                      width: '100%', 
-                      height: 200, 
+                  <Box
+                    sx={{
+                      width: '100%',
+                      height: 200,
                       background: '#f0f0f0',
                       display: 'flex',
                       alignItems: 'center',
@@ -2580,7 +2599,7 @@ const renderCampaignList = () => (
                   >
                     <PlayArrow sx={{ fontSize: 48, color: '#666' }} />
                   </Box>
-                  <Box 
+                  <Box
                     sx={{
                       position: 'absolute',
                       top: 0,
@@ -2613,7 +2632,7 @@ const renderCampaignList = () => (
             <Typography variant="body1" paragraph sx={{ color: 'text.primary', lineHeight: 1.6 }}>
               {selectedCampaign.description}
             </Typography>
-            
+
             <Grid container spacing={2} sx={{ mb: 2 }}>
               <Grid item xs={12} sm={6} md={3}>
                 <Box display="flex" alignItems="center">
@@ -2675,7 +2694,7 @@ const renderCampaignList = () => (
         </PremiumCard>
 
         {/* Applications Section with Tabs */}
-        <Box sx={{ mb: 3 }}>
+        <Box sx={{ mb: 3, pt: 3.5 }}>
           <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
             <Typography variant="h5" sx={{ fontWeight: 700 }}>
               Applications ({selectedCampaign.applications?.length || 0})
@@ -2701,24 +2720,24 @@ const renderCampaignList = () => (
               scrollButtons="auto"
             >
               {applicationTabs.map((tab) => (
-                <Tab 
+                <Tab
                   key={tab.value}
                   label={
                     <Box display="flex" alignItems="center" gap={1}>
                       {tab.label}
-                      <Chip 
-                        label={tab.count} 
-                        size="small" 
+                      <Chip
+                        label={tab.count}
+                        size="small"
                         color={
                           tab.value === 'pending' ? 'warning' :
-                          tab.value === 'approved' ? 'success' :
-                          tab.value === 'rejected' ? 'error' : 'primary'
+                            tab.value === 'approved' ? 'success' :
+                              tab.value === 'rejected' ? 'error' : 'primary'
                         }
                         variant={tab.value === applicationsTab ? 'filled' : 'outlined'}
                       />
                     </Box>
-                  } 
-                  value={tab.value} 
+                  }
+                  value={tab.value}
                 />
               ))}
             </Tabs>
@@ -2726,122 +2745,131 @@ const renderCampaignList = () => (
 
           {/* Applications List */}
           {filteredApplications.length > 0 ? (
-            <Grid container spacing={2}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
               {filteredApplications.map((app, index) => (
-                <Grid item xs={12} key={index}>
-                  <PremiumCard variant="outlined">
-                    <CardContent>
-                      <Box display="flex" justifyContent="space-between" alignItems="start" mb={2} flexDirection={isSmallScreen ? "column" : "row"} gap={isSmallScreen ? 2 : 0}>
-                        <Box display="flex" alignItems="center" flex={1}>
-                          <UserInfo
-                            userId={app.influencer_id}
-                            profileType="influencer"
-                            showEmail={true}
-                            showStats={true}
-                            size={48}
-                          />
-                          <Box sx={{ ml: 2 }} gap={0.5 }>
-                            
-                            <Typography variant="body2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', mt: 0.5 }}>
-                              <CalendarToday sx={{ fontSize: 16, mr: 0.5 }} />
-                              Applied: {new Date(app.applied_at).toLocaleDateString()}
-                            </Typography>
+                <PremiumCard
+                  key={index}
+                  variant="outlined"
+                  sx={{
+                    width: '100%',
+                    transition: 'all 0.2s ease',
+                    '&:hover': {
+                      borderColor: 'primary.main',
+                      backgroundColor: 'rgba(25, 118, 210, 0.01)',
+                      transform: 'translateX(4px)'
+                    }
+                  }}
+                >
+                  <CardContent sx={{ p: '16px !important' }}>
+                    <Box display="flex" alignItems="center" gap={3} flexDirection={isSmallScreen ? 'column' : 'row'}>
+                      {/* Influencer Info Section */}
+                      <Box sx={{ minWidth: 260, flexShrink: 0 }}>
+                        <UserInfo
+                          userId={app.influencer_id}
+                          profileType="influencer"
+                          showEmail={true}
+                          showStats={true}
+                          size={40}
+                        />
+                      </Box>
+
+                      {/* Message Preview Section */}
+                      <Box sx={{
+                        flex: 1,
+                        px: 2,
+                        borderLeft: isSmallScreen ? 'none' : '1px solid',
+                        borderRight: isSmallScreen ? 'none' : '1px solid',
+                        borderColor: 'divider',
+                        minHeight: 40,
+                        display: 'flex',
+                        alignItems: 'center'
+                      }}>
+                        {app.message ? (
+                          <Typography variant="body2" sx={{
+                            color: 'text.secondary',
+                            fontStyle: 'italic',
+                            display: '-webkit-box',
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden',
+                            fontSize: '0.85rem'
+                          }}>
+                            "{app.message}"
+                          </Typography>
+                        ) : (
+                          <Typography variant="body2" color="text.disabled" sx={{ fontStyle: 'italic' }}>
+                            No message provided
+                          </Typography>
+                        )}
+                      </Box>
+
+                      {/* Status & Date Section */}
+                      <Box sx={{ minWidth: 150, textAlign: isSmallScreen ? 'center' : 'right', flexShrink: 0 }}>
+                        <StatusChip
+                          label={app.status === 'approved' ? 'Approved' :
+                            app.status === 'rejected' ? 'Rejected' :
+                              app.status === 'pending' ? 'Reviewing' : app.status}
+                          status={app.status}
+                          size="small"
+                        />
+                        <Typography variant="caption" sx={{ display: 'block', mt: 0.5, color: 'text.secondary', fontWeight: 500 }}>
+                          {new Date(app.applied_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                        </Typography>
+                      </Box>
+
+                      {/* Actions Section */}
+                      <Box sx={{ minWidth: 180, display: 'flex', justifyContent: 'flex-end', gap: 1, flexShrink: 0 }}>
+                        {(app.status === 'pending' || !app.status) && (
+                          <Box display="flex" gap={1}>
+                            <Tooltip title="Approve">
+                              <IconButton
+                                size="small"
+                                color="success"
+                                onClick={() => handleStatusChange(selectedCampaign._id, app.influencer_id, 'approved')}
+                                disabled={updatingStatus[`${selectedCampaign._id}-${app.influencer_id}`]}
+                                sx={{ border: '1px solid', borderColor: 'success.light' }}
+                              >
+                                <CheckCircle />
+                              </IconButton>
+                            </Tooltip>
+                            <Tooltip title="Reject">
+                              <IconButton
+                                size="small"
+                                color="error"
+                                onClick={() => handleStatusChange(selectedCampaign._id, app.influencer_id, 'rejected')}
+                                disabled={updatingStatus[`${selectedCampaign._id}-${app.influencer_id}`]}
+                                sx={{ border: '1px solid', borderColor: 'error.light' }}
+                              >
+                                <Cancel />
+                              </IconButton>
+                            </Tooltip>
                           </Box>
-                        </Box>
-                        <Box display="flex" alignItems="center" gap={1}>
-                          <StatusChip 
-                            label={app.status === 'approved' ? 'Approved - Send Contract' : 
-                                   app.status === 'rejected' ? 'Rejected' : 
-                                   app.status === 'pending' ? 'Under Review' : app.status} 
-                            status={app.status}
-                          />
+                        )}
+                        {app.status === 'approved' && (
+                          <PrimaryButton
+                            size="small"
+                            onClick={() => window.location.href = '/brand/agreements'}
+                            sx={{ py: 0.2, minWidth: 110 }}
+                          >
+                            Send Contract
+                          </PrimaryButton>
+                        )}
+                        <Tooltip title="View Details">
                           <IconButton
                             size="small"
-                            onClick={() => handleViewApplicationDetails(app)}
                             color="primary"
+                            onClick={() => handleViewApplicationDetails(app)}
+                            sx={{ border: '1px solid', borderColor: 'primary.light' }}
                           >
                             <Visibility />
                           </IconButton>
-                        </Box>
+                        </Tooltip>
                       </Box>
-
-                      {app.message && (
-                        <Box sx={{ mb: 2, p: 2, background: 'rgba(0, 0, 0, 0.02)', borderRadius: '8px' }}>
-                          <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 600 }}>
-                            Influencer Message:
-                          </Typography>
-                          <Typography variant="body2" sx={{ fontStyle: 'italic' }}>
-                            "{app.message}"
-                          </Typography>
-                        </Box>
-                      )}
-
-                      {(app.status === 'pending' || !app.status) && (
-                        <Box display="flex" gap={1} flexDirection={isSmallScreen ? "column" : "row"}>
-                          <GradientButton
-                            size="small"
-                            startIcon={<CheckCircle />}
-                            onClick={() => handleStatusChange(selectedCampaign._id, app.influencer_id, 'approved')}
-                            disabled={updatingStatus[`${selectedCampaign._id}-${app.influencer_id}`]}
-                            sx={{ borderRadius: '8px' }}
-                          >
-                            {updatingStatus[`${selectedCampaign._id}-${app.influencer_id}`] ? 'Updating...' : 'Approve'}
-                          </GradientButton>
-                          <Button
-                            variant="outlined"
-                            color="error"
-                            size="small"
-                            startIcon={<Cancel />}
-                            onClick={() => handleStatusChange(selectedCampaign._id, app.influencer_id, 'rejected')}
-                            disabled={updatingStatus[`${selectedCampaign._id}-${app.influencer_id}`]}
-                            sx={{ borderRadius: '8px' }}
-                          >
-                            {updatingStatus[`${selectedCampaign._id}-${app.influencer_id}`] ? 'Updating...' : 'Reject'}
-                          </Button>
-                          <Button
-                            variant="outlined"
-                            size="small"
-                            startIcon={<Visibility />}
-                            onClick={() => handleViewApplicationDetails(app)}
-                            sx={{ borderRadius: '8px' }}
-                          >
-                            View Details
-                          </Button>
-                        </Box>
-                      )}
-
-                      {app.status === 'approved' && (
-                        <Box display="flex" gap={1} flexWrap="wrap">
-                          <GradientButton
-                            size="small"
-                            startIcon={<Send />}
-                            onClick={() => {
-                              // Navigate to agreements page or send contract
-                              window.location.href = '/brand/agreements';
-                            }}
-                            sx={{ borderRadius: '8px' }}
-                          >
-                            Send Contract
-                          </GradientButton>
-                          <Button
-                            variant="outlined"
-                            size="small"
-                            startIcon={<Chat />}
-                            onClick={() => {
-                              // Navigate to chat
-                              window.location.href = `/brand/collaborations?user=${app.influencer_id}&campaign=${selectedCampaign._id}`;
-                            }}
-                            sx={{ borderRadius: '8px' }}
-                          >
-                            Message
-                          </Button>
-                        </Box>
-                      )}
-                    </CardContent>
-                  </PremiumCard>
-                </Grid>
+                    </Box>
+                  </CardContent>
+                </PremiumCard>
               ))}
-            </Grid>
+            </Box>
           ) : (
             <PremiumCard sx={{ textAlign: 'center', p: 4 }}>
               <CardContent>
@@ -2850,7 +2878,7 @@ const renderCampaignList = () => (
                   No {applicationsTab !== 'all' ? applicationsTab : ''} applications yet
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  {applicationsTab === 'all' 
+                  {applicationsTab === 'all'
                     ? "Influencers haven't applied to this campaign yet. Check back later!"
                     : `No ${applicationsTab} applications found.`
                   }
@@ -2870,9 +2898,9 @@ const renderCampaignList = () => (
       open={filterDrawerOpen}
       onClose={() => setFilterDrawerOpen(false)}
       PaperProps={{
-        sx: { 
+        sx: {
           width: isSmallScreen ? '100%' : 400,
-          background: 'linear-gradient(to bottom, #f8f9fa, #ffffff)'
+          backgroundColor: '#ffffff'
         }
       }}
     >
@@ -2894,7 +2922,7 @@ const renderCampaignList = () => (
           </Button>
         </Toolbar>
       </AppBar>
-      
+
       <Box sx={{ p: 3 }}>
         <FormControl fullWidth sx={{ mb: 3 }}>
           <InputLabel>Categories</InputLabel>
@@ -2913,7 +2941,7 @@ const renderCampaignList = () => (
             ))}
           </Select>
         </FormControl>
-        
+
         <FormControl fullWidth sx={{ mb: 3 }}>
           <InputLabel>Status</InputLabel>
           <Select
@@ -2961,254 +2989,302 @@ const renderCampaignList = () => (
             ))}
           </Select>
         </FormControl>
-        
+
         <Typography sx={{ mb: 1 }} fontWeight={600}>
-  Budget Range
-</Typography>
+          Budget Range
+        </Typography>
 
-<Box display="flex" gap={2} alignItems="center" sx={{ mb: 2 }}>
-  <TextField
-    label="Min"
-    size="small"
-    type="number"
-    value={budgetRange[0]}
-    onChange={(e) => {
-      const value = Number(e.target.value);
-      if (value <= budgetRange[1]) {
-        setBudgetRange([value, budgetRange[1]]);
-      }
-    }}
-    InputProps={{
-      startAdornment: <InputAdornment position="start">$</InputAdornment>
-    }}
-    sx={{ width: "50%" }}
-  />
+        <Box display="flex" gap={2} alignItems="center" sx={{ mb: 2 }}>
+          <TextField
+            label="Min"
+            size="small"
+            type="number"
+            value={budgetRange[0]}
+            onChange={(e) => {
+              const value = Number(e.target.value);
+              if (value <= budgetRange[1]) {
+                setBudgetRange([value, budgetRange[1]]);
+              }
+            }}
+            InputProps={{
+              startAdornment: <InputAdornment position="start">$</InputAdornment>
+            }}
+            sx={{ width: "50%" }}
+          />
 
-  <TextField
-    label="Max"
-    size="small"
-    type="number"
-    value={budgetRange[1]}
-    onChange={(e) => {
-      const value = Number(e.target.value);
-      if (value >= budgetRange[0]) {
-        setBudgetRange([budgetRange[0], value]);
-      }
-    }}
-    InputProps={{
-      startAdornment: <InputAdornment position="start">$</InputAdornment>
-    }}
-    sx={{ width: "50%" }}
-  />
-</Box>
-<Slider
-  value={budgetRange}
-  onChange={(e, newValue) => setBudgetRange(newValue)}
-  valueLabelDisplay="auto"
-  min={0}
-  max={maxBudget}
-  step={100}
-  sx={{
-    // VALUE LABEL CONTAINER
-    '& .MuiSlider-valueLabel': {
-      backgroundColor: '#111827',
-      color: '#fff',
-      fontSize: '0.75rem',
-      borderRadius: '8px',
-      padding: '4px 10px',
-      minWidth: 42,              // <<< fixed width baseline
-      textAlign: 'center',
-      transform: 'translateY(-110%) scale(1) !important', // remove zoom
-    },
-
-    // VALUE LABEL TEXT WRAPPER
-    '& .MuiSlider-valueLabel > *': {
-      transform: 'none',         // <<< kills default rotate+scale
-    },
-
-    // REMOVE POINTER TAIL (optional)
-    '& .MuiSlider-valueLabel:before': {
-      display: 'none',
-    },
-  }}
-/>
+          <TextField
+            label="Max"
+            size="small"
+            type="number"
+            value={budgetRange[1]}
+            onChange={(e) => {
+              const value = Number(e.target.value);
+              if (value >= budgetRange[0]) {
+                setBudgetRange([budgetRange[0], value]);
+              }
+            }}
+            InputProps={{
+              startAdornment: <InputAdornment position="start">$</InputAdornment>
+            }}
+            sx={{ width: "50%" }}
+          />
+        </Box>
+        <Slider
+          value={budgetRange}
+          onChange={(e, newValue) => setBudgetRange(newValue)}
+          valueLabelDisplay="auto"
+          min={0}
+          max={maxBudget}
+          step={100}
+          sx={sliderStyle}
+        />
 
 
 
-<Typography sx={{ mt: 1 }}>
-  ${budgetRange[0].toLocaleString()} – ${budgetRange[1].toLocaleString()}
-</Typography>
+        <Typography sx={{ mt: 1 }}>
+          ${budgetRange[0].toLocaleString()} – ${budgetRange[1].toLocaleString()}
+        </Typography>
 
-        
-        <GradientButton
+        <Divider sx={{ my: 3 }} />
+
+        <Typography variant="h6" sx={{ mb: 2 }} fontWeight={600}>
+          Performance Filters
+        </Typography>
+
+        <Box sx={{ mb: 3, pt: 3.5 }}>
+          <Box display="flex" justifyContent="space-between" mb={1}>
+            <Typography variant="body2" fontWeight={500}>Min Views</Typography>
+            <Typography variant="body2" color="primary" fontWeight={600}>{minViews}+</Typography>
+          </Box>
+          <Slider
+            value={minViews}
+            onChange={(e, v) => setMinViews(v)}
+            min={0}
+            max={5000}
+            step={100}
+            valueLabelDisplay="auto"
+            sx={sliderStyle}
+          />
+        </Box>
+
+        <Box sx={{ mb: 3, pt: 3.5 }}>
+          <Box display="flex" justifyContent="space-between" mb={1}>
+            <Typography variant="body2" fontWeight={500}>Min Likes</Typography>
+            <Typography variant="body2" color="primary" fontWeight={600}>{minLikes}+</Typography>
+          </Box>
+          <Slider
+            value={minLikes}
+            onChange={(e, v) => setMinLikes(v)}
+            min={0}
+            max={1000}
+            step={10}
+            valueLabelDisplay="auto"
+            sx={sliderStyle}
+          />
+        </Box>
+
+        <Box sx={{ mb: 3, pt: 3.5 }}>
+          <Box display="flex" justifyContent="space-between" mb={1}>
+            <Typography variant="body2" fontWeight={500}>Min Bookmarks</Typography>
+            <Typography variant="body2" color="primary" fontWeight={600}>{minBookmarks}+</Typography>
+          </Box>
+          <Slider
+            value={minBookmarks}
+            onChange={(e, v) => setMinBookmarks(v)}
+            min={0}
+            max={500}
+            step={5}
+            valueLabelDisplay="auto"
+            sx={sliderStyle}
+          />
+        </Box>
+
+        <Box sx={{ mb: 3, pt: 3.5 }}>
+          <Box display="flex" justifyContent="space-between" mb={1}>
+            <Typography variant="body2" fontWeight={500}>Min Applications</Typography>
+            <Typography variant="body2" color="primary" fontWeight={600}>{minApplications}+</Typography>
+          </Box>
+          <Slider
+            value={minApplications}
+            onChange={(e, v) => setMinApplications(v)}
+            min={0}
+            max={100}
+            step={1}
+            valueLabelDisplay="auto"
+            sx={sliderStyle}
+          />
+        </Box>
+
+
+        <PrimaryButton
           fullWidth
           onClick={() => setFilterDrawerOpen(false)}
           startIcon={<CheckCircle />}
         >
           Apply Filters
-        </GradientButton>
+        </PrimaryButton>
       </Box>
     </Drawer>
   );
 
   // ---------------- Render Create Campaign Modal ----------------
   // ---------------- Render Create Campaign Modal ----------------
-const renderCreateModal = () => {
-  if (showReview && createdCampaign) {
+  const renderCreateModal = () => {
+    if (showReview && createdCampaign) {
+      return (
+        <Dialog
+          open={createModalOpen}
+          onClose={() => {
+            setCreateModalOpen(false);
+            setShowReview(false);
+            setCreatedCampaign(null);
+          }}
+          maxWidth="md"
+          fullWidth
+          PaperProps={{ sx: { borderRadius: '16px' } }}
+        >
+          <DialogTitle sx={{
+            backgroundColor: 'success.main',
+            color: 'white',
+            display: 'flex',
+            alignItems: 'center'
+          }}>
+            <CheckCircle sx={{ mr: 1 }} />
+            Campaign Created Successfully!
+          </DialogTitle>
+          <DialogContent sx={{ p: 3 }}>
+            <Box sx={{ textAlign: 'center', my: 2 }}>
+              <TrendingUp sx={{ fontSize: 64, color: 'success.main', mb: 2 }} />
+              <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
+                Your campaign is now live!
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                Influencers can now discover and apply to your campaign.
+              </Typography>
+
+              <PremiumCard variant="outlined" sx={{ textAlign: 'left', mb: 2 }}>
+                <CardContent>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+                    <Typography variant="h6" component="div" sx={{ fontWeight: 600 }}>
+                      {createdCampaign.title}
+                    </Typography>
+                    <Chip
+                      label={createdCampaign.category}
+                      size="small"
+                      color="primary"
+                      variant="outlined"
+                    />
+                  </Box>
+                  <Grid container spacing={2}>
+                    <Grid item xs={6}>
+                      <Typography variant="body2" fontWeight="medium">
+                        Budget
+                      </Typography>
+                      <Typography variant="body2">
+                        {formatCurrency(createdCampaign.budget, createdCampaign.currency)}
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={6}>
+                      <Typography variant="body2" fontWeight="medium">
+                        Deadline
+                      </Typography>
+                      <Typography variant="body2">
+                        {new Date(createdCampaign.deadline).toLocaleString()}
+                      </Typography>
+                    </Grid>
+                  </Grid>
+                </CardContent>
+              </PremiumCard>
+
+              {/* Auto-close notification */}
+              <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mt: 2 }}>
+                <CircularProgress size={20} sx={{ mr: 1 }} />
+                <Typography variant="body2" color="text.secondary">
+                  Closing automatically...
+                </Typography>
+              </Box>
+            </Box>
+          </DialogContent>
+          <DialogActions sx={{ p: 3, pt: 0 }}>
+            <PrimaryButton
+              onClick={() => {
+                setCreateModalOpen(false);
+                setShowReview(false);
+                setCreatedCampaign(null);
+              }}
+            >
+              Close Now
+            </PrimaryButton>
+          </DialogActions>
+        </Dialog>
+      );
+    }
+
     return (
-      <Dialog 
-        open={createModalOpen} 
-        onClose={() => {
-          setCreateModalOpen(false);
-          setShowReview(false);
-          setCreatedCampaign(null);
-        }} 
-        maxWidth="md" 
+      <Dialog
+        open={createModalOpen}
+        onClose={() => setCreateModalOpen(false)}
+        maxWidth="md"
         fullWidth
         PaperProps={{ sx: { borderRadius: '16px' } }}
       >
-        <DialogTitle sx={{ 
-          background: 'linear-gradient(45deg, #4caf50 0%, #66bb6a 100%)',
+        <DialogTitle sx={{
+          backgroundColor: 'primary.main',
           color: 'white',
           display: 'flex',
           alignItems: 'center'
         }}>
-          <CheckCircle sx={{ mr: 1 }} />
-          Campaign Created Successfully!
+          <Campaign sx={{ mr: 1 }} />
+          Create New Campaign
         </DialogTitle>
         <DialogContent sx={{ p: 3 }}>
-          <Box sx={{ textAlign: 'center', my: 2 }}>
-            <TrendingUp sx={{ fontSize: 64, color: 'success.main', mb: 2 }} />
-            <Typography variant="h6" gutterBottom sx={{ fontWeight: 600 }}>
-              Your campaign is now live!
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-              Influencers can now discover and apply to your campaign.
-            </Typography>
-            
-            <PremiumCard variant="outlined" sx={{ textAlign: 'left', mb: 2 }}>
-              <CardContent>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-                  <Typography variant="h6" component="div" sx={{ fontWeight: 600 }}>
-                    {createdCampaign.title}
-                  </Typography>
-                  <Chip 
-                    label={createdCampaign.category} 
-                    size="small" 
-                    color="primary" 
-                    variant="outlined" 
-                  />
-                </Box>
-                <Grid container spacing={2}>
-                  <Grid item xs={6}>
-                    <Typography variant="body2" fontWeight="medium">
-                      Budget
-                    </Typography>
-                    <Typography variant="body2">
-                      {formatCurrency(createdCampaign.budget, createdCampaign.currency)}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Typography variant="body2" fontWeight="medium">
-                      Deadline
-                    </Typography>
-                    <Typography variant="body2">
-                      {new Date(createdCampaign.deadline).toLocaleString()}
-                    </Typography>
-                  </Grid>
-                </Grid>
-              </CardContent>
-            </PremiumCard>
-            
-            {/* Auto-close notification */}
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', mt: 2 }}>
-              <CircularProgress size={20} sx={{ mr: 1 }} />
-              <Typography variant="body2" color="text.secondary">
-                Closing automatically...
-              </Typography>
-            </Box>
-          </Box>
+          <Stepper activeStep={activeStep} sx={{ mb: 3 }}>
+            {steps.map((label) => (
+              <Step key={label}>
+                <StepLabel>{label}</StepLabel>
+              </Step>
+            ))}
+          </Stepper>
+
+          {error && (
+            <Alert severity="error" sx={{ mb: 2, borderRadius: '8px' }}>
+              {error}
+            </Alert>
+          )}
+
+          {getStepContent(activeStep)}
         </DialogContent>
         <DialogActions sx={{ p: 3, pt: 0 }}>
-          <GradientButton
-            onClick={() => {
-              setCreateModalOpen(false);
-              setShowReview(false);
-              setCreatedCampaign(null);
-            }}
+          <Button
+            onClick={activeStep === 0 ? () => setCreateModalOpen(false) : handleBack}
+            startIcon={activeStep > 0 ? <BackIcon /> : null}
+            sx={{ borderRadius: '8px' }}
           >
-            Close Now
-          </GradientButton>
+            {activeStep === 0 ? 'Cancel' : 'Back'}
+          </Button>
+          <PrimaryButton
+            onClick={activeStep === steps.length - 1 ? handleCreateCampaign : handleNext}
+            endIcon={activeStep < steps.length - 1 ? <ArrowForward /> : null}
+            disabled={activeStep === steps.length - 1 && !campaignForm.campaignImage && !imagePreview}
+          >
+            {activeStep === steps.length - 1 ? 'Create Campaign' : 'Next'}
+          </PrimaryButton>
         </DialogActions>
       </Dialog>
     );
-  }
-
-  return (
-    <Dialog 
-      open={createModalOpen} 
-      onClose={() => setCreateModalOpen(false)} 
-      maxWidth="md" 
-      fullWidth
-      PaperProps={{ sx: { borderRadius: '16px' } }}
-    >
-      <DialogTitle sx={{ 
-        background: 'linear-gradient(45deg, #667eea 0%, #3b82f6 100%)',
-        color: 'white',
-        display: 'flex',
-        alignItems: 'center'
-      }}>
-        <Campaign sx={{ mr: 1 }} />
-        Create New Campaign
-      </DialogTitle>
-      <DialogContent sx={{ p: 3 }}>
-        <Stepper activeStep={activeStep} sx={{ mb: 3 }}>
-          {steps.map((label) => (
-            <Step key={label}>
-              <StepLabel>{label}</StepLabel>
-            </Step>
-          ))}
-        </Stepper>
-
-        {error && (
-          <Alert severity="error" sx={{ mb: 2, borderRadius: '8px' }}>
-            {error}
-          </Alert>
-        )}
-
-        {getStepContent(activeStep)}
-      </DialogContent>
-      <DialogActions sx={{ p: 3, pt: 0 }}>
-        <Button 
-          onClick={activeStep === 0 ? () => setCreateModalOpen(false) : handleBack}
-          startIcon={activeStep > 0 ? <BackIcon /> : null}
-          sx={{ borderRadius: '8px' }}
-        >
-          {activeStep === 0 ? 'Cancel' : 'Back'}
-        </Button>
-        <GradientButton
-          onClick={activeStep === steps.length - 1 ? handleCreateCampaign : handleNext}
-          endIcon={activeStep < steps.length - 1 ? <ArrowForward /> : null}
-          disabled={activeStep === steps.length - 1 && !campaignForm.campaignImage && !imagePreview}
-        >
-          {activeStep === steps.length - 1 ? 'Create Campaign' : 'Next'}
-        </GradientButton>
-      </DialogActions>
-    </Dialog>
-  );
-};
+  };
 
   // ---------------- Render Edit Modal ----------------
   const renderEditModal = () => (
-    <Dialog 
-      open={editModalOpen} 
-      onClose={() => setEditModalOpen(false)} 
-      maxWidth="md" 
+    <Dialog
+      open={editModalOpen}
+      onClose={() => setEditModalOpen(false)}
+      maxWidth="md"
       fullWidth
       PaperProps={{ sx: { borderRadius: '16px' } }}
     >
-      <DialogTitle sx={{ 
-        background: 'linear-gradient(45deg, #667eea 0%, #3b82f6 100%)',
+      <DialogTitle sx={{
+        backgroundColor: 'primary.main',
         color: 'white',
         display: 'flex',
         alignItems: 'center'
@@ -3252,12 +3328,12 @@ const renderCreateModal = () => {
                 ),
               }}
             />
-            </Grid>
           </Grid>
+        </Grid>
 
 
 
-          <Grid container spacing={2} sx={{ p: 2, pt: 0 }}>
+        <Grid container spacing={2} sx={{ p: 2, pt: 0 }}>
 
           <TextField
             fullWidth
@@ -3267,9 +3343,9 @@ const renderCreateModal = () => {
             onChange={handleFormChange}
             required
           />
-          </Grid>
-          <Grid item xs={12} sm={6} sx={{ p: 2, pt: 0 }}>
-          
+        </Grid>
+        <Grid item xs={12} sm={6} sx={{ p: 2, pt: 0 }}>
+
           <TextField
             fullWidth
             label="Description"
@@ -3280,8 +3356,8 @@ const renderCreateModal = () => {
             multiline
             rows={1}
           />
-          </Grid>
-          <Grid item xs={12} sm={6} sx={{ p: 2, pt: 0 }}>
+        </Grid>
+        <Grid item xs={12} sm={6} sx={{ p: 2, pt: 0 }}>
           <TextField
             fullWidth
             label="Requirements"
@@ -3292,295 +3368,295 @@ const renderCreateModal = () => {
             multiline
             rows={1}
           />
-          </Grid>
-          <Grid container spacing={3} sx={{ mb: 2 }}>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                select
-                label="Category"
-                name="category"
-                value={campaignForm.category}
-                onChange={handleFormChange}
-                required
-              >
-                {categories.map((category) => (
-                  <MenuItem key={category.value} value={category.value}>
-                    {category.label}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                fullWidth
-                select
-                label="Status"
-                name="status"
-                value={campaignForm.status}
-                onChange={handleFormChange}
-              >
-                {statusOptions.map((status) => (
-                  <MenuItem key={status.value} value={status.value}>
-                    {status.label}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Grid>
-          </Grid>
-          <TextField
-  fullWidth
-  label="Deadline"
-  name="deadline"
-  type="date"
-  value={campaignForm.deadline}
-  onChange={handleFormChange}
-  required
-  InputLabelProps={{ shrink: true }}
-  sx={{ mb: 2 }}
-  inputProps={{
-    min: new Date().toISOString().split("T")[0], // 👈 restricts to today and future
-  }}
-/>
-
-
-          {/* Media Section in Edit Modal */}
-          <Typography variant="h6" gutterBottom sx={{ mt: 3, mb: 2, fontWeight: 600 }}>
-            Campaign Media
-          </Typography>
-          
-          {/* Image Upload */}
-          <Box sx={{ mb: 3 }}>
-            <Typography variant="subtitle1" gutterBottom>
-              Campaign Image
-            </Typography>
-            <Button
-              variant="outlined"
-              component="label"
-              startIcon={<Image />}
-              sx={{ borderRadius: '8px', mb: 2 }}
+        </Grid>
+        <Grid container spacing={3} sx={{ mb: 2 }}>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              select
+              label="Category"
+              name="category"
+              value={campaignForm.category}
+              onChange={handleFormChange}
+              required
             >
-              Upload Image
-              <input
-                type="file"
-                hidden
-                accept="image/*"
-                onChange={handleImageChange}
-              />
-            </Button>
-            {imagePreview && (
-              <Box sx={{ mt: 1 }}>
-                <img 
-                  src={imagePreview} 
-                  alt="Campaign preview" 
-                  style={{ 
-                    maxWidth: '100%', 
-                    maxHeight: '200px', 
-                    borderRadius: '8px',
-                    cursor: 'pointer'
-                  }}
-                  onClick={() => openMediaModal(imagePreview, 'image')}
-                />
-              </Box>
-            )}
-          </Box>
-          
-          {/* Video Upload */}
-          <Box sx={{ mb: 2 }}>
-            <Typography variant="subtitle1" gutterBottom>
-              Campaign Video
-            </Typography>
-            <Button
-              variant="outlined"
-              component="label"
-              startIcon={<Videocam />}
-              sx={{ borderRadius: '8px', mb: 2 }}
+              {categories.map((category) => (
+                <MenuItem key={category.value} value={category.value}>
+                  {category.label}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              fullWidth
+              select
+              label="Status"
+              name="status"
+              value={campaignForm.status}
+              onChange={handleFormChange}
             >
-              Upload Video
-              <input
-                type="file"
-                hidden
-                accept="video/*"
-                onChange={handleVideoChange}
-              />
-            </Button>
-            {videoPreview && (
-              <Box sx={{ mt: 1 }}>
-                <Box
-                  style={{ 
-                    position: 'relative',
-                    maxWidth: '100%',
-                    borderRadius: '8px',
-                    overflow: 'hidden',
-                    cursor: 'pointer'
-                  }}
-                  onClick={() => openMediaModal(videoPreview, 'video')}
-                >
-                  <video style={{ width: '100%', maxHeight: '200px' }}>
-                    <source src={videoPreview} />
-                    Your browser does not support the video tag.
-                  </video>
-                  <Box 
-                    style={{
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      background: 'rgba(0,0,0,0.3)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      opacity: 1,
-                      transition: 'opacity 0.2s ease'
-                    }}
-                  >
-                    <PlayArrow style={{ color: 'white', fontSize: '48px' }} />
-                  </Box>
-                </Box>
-              </Box>
-            )}
-          </Box>
-        </DialogContent>
-        <DialogActions sx={{ p: 3, pt: 0 }}>
-          <Button 
-            onClick={() => setEditModalOpen(false)} 
-            sx={{ borderRadius: '8px' }}
-          >
-            Cancel
-          </Button>
-          <GradientButton
-            onClick={handleUpdateCampaign}
-          >
-            Update Campaign
-          </GradientButton>
-        </DialogActions>
-      </Dialog>
-    );
+              {statusOptions.map((status) => (
+                <MenuItem key={status.value} value={status.value}>
+                  {status.label}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Grid>
+        </Grid>
+        <TextField
+          fullWidth
+          label="Deadline"
+          name="deadline"
+          type="date"
+          value={campaignForm.deadline}
+          onChange={handleFormChange}
+          required
+          InputLabelProps={{ shrink: true }}
+          sx={{ mb: 2 }}
+          inputProps={{
+            min: new Date().toISOString().split("T")[0], // 👈 restricts to today and future
+          }}
+        />
 
-    const renderDeleteModal = () => (
-      <Dialog 
-        open={deleteModalOpen} 
-        onClose={() => setDeleteModalOpen(false)}
-        PaperProps={{ sx: { borderRadius: '16px' } }}
-      >
-        <DialogTitle sx={{ fontWeight: 600 }}>Delete Campaign</DialogTitle>
-        <DialogContent>
-          <Typography>
-            Are you sure you want to delete the campaign "{campaignToDelete?.title}"?
-            This action cannot be undone and will remove all associated applications.
+
+        {/* Media Section in Edit Modal */}
+        <Typography variant="h6" gutterBottom sx={{ mt: 3, mb: 2, fontWeight: 600 }}>
+          Campaign Media
+        </Typography>
+
+        {/* Image Upload */}
+        <Box sx={{ mb: 3, pt: 3.5 }}>
+          <Typography variant="subtitle1" gutterBottom>
+            Campaign Image
           </Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button 
-            onClick={() => setDeleteModalOpen(false)} 
-            sx={{ borderRadius: '8px' }}
+          <Button
+            variant="outlined"
+            component="label"
+            startIcon={<Image />}
+            sx={{ borderRadius: '8px', mb: 2 }}
           >
-            Cancel
+            Upload Image
+            <input
+              type="file"
+              hidden
+              accept="image/*"
+              onChange={handleImageChange}
+            />
           </Button>
-          <Button 
-            onClick={handleDeleteCampaign} 
-            color="error" 
-            variant="contained"
-            sx={{ borderRadius: '8px' }}
-          >
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
-    );
+          {imagePreview && (
+            <Box sx={{ mt: 1 }}>
+              <img
+                src={imagePreview}
+                alt="Campaign preview"
+                style={{
+                  maxWidth: '100%',
+                  maxHeight: '200px',
+                  borderRadius: '8px',
+                  cursor: 'pointer'
+                }}
+                onClick={() => openMediaModal(imagePreview, 'image')}
+              />
+            </Box>
+          )}
+        </Box>
 
-    const renderMediaModal = () => (
-          <Dialog 
-            open={mediaModalOpen} 
-            onClose={() => setMediaModalOpen(false)}
-            maxWidth="md"
-            fullWidth
-            PaperProps={{ sx: { borderRadius: '16px' } }}
+        {/* Video Upload */}
+        <Box sx={{ mb: 2 }}>
+          <Typography variant="subtitle1" gutterBottom>
+            Campaign Video
+          </Typography>
+          <Button
+            variant="outlined"
+            component="label"
+            startIcon={<Videocam />}
+            sx={{ borderRadius: '8px', mb: 2 }}
           >
-            <DialogTitle sx={{ 
-              display: 'flex', 
-              justifyContent: 'space-between', 
-              alignItems: 'center',
-              fontWeight: 600
-            }}>
-              {selectedMedia?.type === 'image' ? 'Campaign Image' : 'Campaign Video'}
-              <IconButton onClick={() => setMediaModalOpen(false)}>
-                <Close />
-              </IconButton>
-            </DialogTitle>
-            <DialogContent>
-              {selectedMedia?.type === 'image' ? (
-                <img 
-                  src={selectedMedia.url} 
-                  alt="Campaign" 
-                  style={{ width: '100%', height: 'auto', borderRadius: '8px' }}
-                />
-              ) : (
-                <video 
-                  controls 
-                  autoPlay
-                  style={{ width: '100%', borderRadius: '8px' }}
-                >
-                  <source src={selectedMedia?.url} />
+            Upload Video
+            <input
+              type="file"
+              hidden
+              accept="video/*"
+              onChange={handleVideoChange}
+            />
+          </Button>
+          {videoPreview && (
+            <Box sx={{ mt: 1 }}>
+              <Box
+                style={{
+                  position: 'relative',
+                  maxWidth: '100%',
+                  borderRadius: '8px',
+                  overflow: 'hidden',
+                  cursor: 'pointer'
+                }}
+                onClick={() => openMediaModal(videoPreview, 'video')}
+              >
+                <video style={{ width: '100%', maxHeight: '200px' }}>
+                  <source src={videoPreview} />
                   Your browser does not support the video tag.
                 </video>
-              )}
-            </DialogContent>
-          </Dialog>
-    );
-
-    return (
-      <Container maxWidth="lg" sx={{ py: 3 }}>
-        <Fade in timeout={800}>
-          <Box>
-            {selectedCampaign ? renderCampaignDetail() : renderCampaignList()}
-
-            {/* Modals */}
-            {renderCreateModal()}
-            {renderEditModal()}
-            {renderDeleteModal()}
-            {renderMediaModal()}
-            {renderFilterDrawer()}
-
-            {/* Application Detail Dialog */}
-            <ApplicationDetailDialog
-              open={applicationDetailOpen}
-              onClose={() => setApplicationDetailOpen(false)}
-              application={selectedApplication}
-              campaign={selectedCampaign}
-              onStatusChange={handleStatusChange}
-            />
-
-            {/* Success/Error Snackbar */}
-            <Snackbar
-              open={!!error || !!success}
-              autoHideDuration={5000}
-              onClose={handleCloseSnackbar}
-              anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-            >
-              {error ? (
-                <Alert 
-                  onClose={handleCloseSnackbar} 
-                  severity="error"
-                  sx={{ borderRadius: '8px' }}
+                <Box
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background: 'rgba(0,0,0,0.3)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    opacity: 1,
+                    transition: 'opacity 0.2s ease'
+                  }}
                 >
-                  {error}
-                </Alert>
-              ) : success ? (
-                <Alert 
-                  onClose={handleCloseSnackbar} 
-                  severity="success"
-                  sx={{ borderRadius: '8px' }}
-                >
-                  {success}
-                </Alert>
-              ) : null}
-            </Snackbar>
-          </Box>
-        </Fade>
-      </Container>
-    );
-  }
+                  <PlayArrow style={{ color: 'white', fontSize: '48px' }} />
+                </Box>
+              </Box>
+            </Box>
+          )}
+        </Box>
+      </DialogContent>
+      <DialogActions sx={{ p: 3, pt: 0 }}>
+        <Button
+          onClick={() => setEditModalOpen(false)}
+          sx={{ borderRadius: '8px' }}
+        >
+          Cancel
+        </Button>
+        <PrimaryButton
+          onClick={handleUpdateCampaign}
+        >
+          Update Campaign
+        </PrimaryButton>
+      </DialogActions>
+    </Dialog>
+  );
+
+  const renderDeleteModal = () => (
+    <Dialog
+      open={deleteModalOpen}
+      onClose={() => setDeleteModalOpen(false)}
+      PaperProps={{ sx: { borderRadius: '16px' } }}
+    >
+      <DialogTitle sx={{ fontWeight: 600 }}>Delete Campaign</DialogTitle>
+      <DialogContent>
+        <Typography>
+          Are you sure you want to delete the campaign "{campaignToDelete?.title}"?
+          This action cannot be undone and will remove all associated applications.
+        </Typography>
+      </DialogContent>
+      <DialogActions>
+        <Button
+          onClick={() => setDeleteModalOpen(false)}
+          sx={{ borderRadius: '8px' }}
+        >
+          Cancel
+        </Button>
+        <Button
+          onClick={handleDeleteCampaign}
+          color="error"
+          variant="contained"
+          sx={{ borderRadius: '8px' }}
+        >
+          Delete
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+
+  const renderMediaModal = () => (
+    <Dialog
+      open={mediaModalOpen}
+      onClose={() => setMediaModalOpen(false)}
+      maxWidth="md"
+      fullWidth
+      PaperProps={{ sx: { borderRadius: '16px' } }}
+    >
+      <DialogTitle sx={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        fontWeight: 600
+      }}>
+        {selectedMedia?.type === 'image' ? 'Campaign Image' : 'Campaign Video'}
+        <IconButton onClick={() => setMediaModalOpen(false)}>
+          <Close />
+        </IconButton>
+      </DialogTitle>
+      <DialogContent>
+        {selectedMedia?.type === 'image' ? (
+          <img
+            src={selectedMedia.url}
+            alt="Campaign"
+            style={{ width: '100%', height: 'auto', borderRadius: '8px' }}
+          />
+        ) : (
+          <video
+            controls
+            autoPlay
+            style={{ width: '100%', borderRadius: '8px' }}
+          >
+            <source src={selectedMedia?.url} />
+            Your browser does not support the video tag.
+          </video>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+
+  return (
+    <Container maxWidth="lg" sx={{ py: 3 }}>
+      <Fade in timeout={800}>
+        <Box>
+          {selectedCampaign ? renderCampaignDetail() : renderCampaignList()}
+
+          {/* Modals */}
+          {renderCreateModal()}
+          {renderEditModal()}
+          {renderDeleteModal()}
+          {renderMediaModal()}
+          {renderFilterDrawer()}
+
+          {/* Application Detail Dialog */}
+          <ApplicationDetailDialog
+            open={applicationDetailOpen}
+            onClose={() => setApplicationDetailOpen(false)}
+            application={selectedApplication}
+            campaign={selectedCampaign}
+            onStatusChange={handleStatusChange}
+          />
+
+          {/* Success/Error Snackbar */}
+          <Snackbar
+            open={!!error || !!success}
+            autoHideDuration={5000}
+            onClose={handleCloseSnackbar}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+          >
+            {error ? (
+              <Alert
+                onClose={handleCloseSnackbar}
+                severity="error"
+                sx={{ borderRadius: '8px' }}
+              >
+                {error}
+              </Alert>
+            ) : success ? (
+              <Alert
+                onClose={handleCloseSnackbar}
+                severity="success"
+                sx={{ borderRadius: '8px' }}
+              >
+                {success}
+              </Alert>
+            ) : null}
+          </Snackbar>
+        </Box>
+      </Fade>
+    </Container>
+  );
+}
 
 export default BrandCampaign;

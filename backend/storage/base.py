@@ -6,7 +6,7 @@ class StorageProvider(ABC):
     """Abstract base class for storage providers"""
     
     @abstractmethod
-    def upload(self, file_data: Union[bytes, BinaryIO], filename: str, folder: str = "") -> str:
+    def upload(self, file_data: Union[bytes, BinaryIO], filename: str, folder: str = "", preserve_name: bool = False) -> str:
         """Upload file and return file path/identifier"""
         pass
     

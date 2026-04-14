@@ -5,8 +5,8 @@ const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
 
 const ProfessionalChatbot = () => {
   const [messages, setMessages] = useState([
-    { 
-      sender: "bot", 
+    {
+      sender: "bot",
       text: "Hello! 👋 I'm your AI Marketing Assistant. How can I help you today?",
       timestamp: new Date(),
       type: "text"
@@ -16,7 +16,7 @@ const ProfessionalChatbot = () => {
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
-  
+
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
 
@@ -44,13 +44,13 @@ const ProfessionalChatbot = () => {
   const sendMessage = async (messageText = input) => {
     if (!messageText.trim()) return;
 
-    const userMessage = { 
-      sender: "user", 
-      text: messageText, 
+    const userMessage = {
+      sender: "user",
+      text: messageText,
       timestamp: new Date(),
       type: "text"
     };
-    
+
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setLoading(true);
@@ -62,12 +62,12 @@ const ProfessionalChatbot = () => {
       });
 
       const botResponse = response.data?.response || "I apologize, but I couldn't process your request. Please try again.";
-      
+
       // Simulate typing delay for better UX
       setTimeout(() => {
-        setMessages((prev) => [...prev, { 
-          sender: "bot", 
-          text: botResponse, 
+        setMessages((prev) => [...prev, {
+          sender: "bot",
+          text: botResponse,
           timestamp: new Date(),
           type: "text"
         }]);
@@ -80,9 +80,9 @@ const ProfessionalChatbot = () => {
       setTimeout(() => {
         setMessages((prev) => [
           ...prev,
-          { 
-            sender: "bot", 
-            text: "I'm having trouble connecting right now. Please try again in a moment.", 
+          {
+            sender: "bot",
+            text: "I'm having trouble connecting right now. Please try again in a moment.",
             timestamp: new Date(),
             type: "text"
           },
@@ -122,9 +122,9 @@ const ProfessionalChatbot = () => {
           aria-label="Open chat"
         >
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-  <path d="M12 2a9 9 0 0 0-9 9v4a3 3 0 0 0 3 3h3l3 4 3-4h3a3 3 0 0 0 3-3v-4a9 9 0 0 0-9-9z"/>
-  <path d="M9 11h.01M12 11h.01M15 11h.01"/>
-</svg>
+            <path d="M12 2a9 9 0 0 0-9 9v4a3 3 0 0 0 3 3h3l3 4 3-4h3a3 3 0 0 0 3-3v-4a9 9 0 0 0-9-9z" />
+            <path d="M9 11h.01M12 11h.01M15 11h.01" />
+          </svg>
 
           <div className="chatbot-badge">AI</div>
         </button>
@@ -178,8 +178,8 @@ const ProfessionalChatbot = () => {
           {/* Messages Container */}
           <div className="messages-container">
             {messages.map((msg, idx) => (
-              <div 
-                key={idx} 
+              <div
+                key={idx}
                 className={`message-wrapper ${msg.sender === 'user' ? 'user-message' : 'bot-message'}`}
               >
                 {msg.sender === 'bot' && (
@@ -195,7 +195,7 @@ const ProfessionalChatbot = () => {
                 </div>
               </div>
             ))}
-            
+
             {/* Typing Indicator */}
             {isTyping && (
               <div className="message-wrapper bot-message">

@@ -3,7 +3,7 @@ from fastapi.security import OAuth2PasswordBearer
 from database import db
 from pydantic import BaseModel, Field, validator
 from typing import Dict, Optional, List, Any
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from bson import ObjectId
 from bson.errors import InvalidId
 import logging
@@ -173,17 +173,26 @@ class MessageService:
             if not sender or not receiver:
                 raise ValueError("Sender or receiver not found")
             
-            current_time = datetime.utcnow()
+            current_time = datetime.now(timezone.utc)
             
             # Get or create conversation
+            is_valid_conv_id = False
             if conversation_id:
+                try:
+                    ObjectId(conversation_id)
+                    is_valid_conv_id = True
+                except:
+                    is_valid_conv_id = False
+
+            if conversation_id and is_valid_conv_id:
                 # Validate conversation exists and user is part of it
                 conversation = conversations_collection.find_one({
                     "_id": ObjectId(conversation_id),
-                    "participants": {"$all": [sender_id, receiver_id]}
+                    "participants": {"$all": [sender_id, receiver_id]},
+                    "type": "direct"
                 })
                 if not conversation:
-                    raise ValueError("Invalid conversation or not authorized")
+                    raise ValueError("Invalid direct conversation or not authorized")
             else:
                 # Create new conversation
                 conversation = await MessageService._create_conversation(sender_id, receiver_id)
@@ -244,6 +253,37 @@ class MessageService:
             
             logger.info(f"✅ Message created: {message_id} in conversation: {conversation_id}")
             
+            def format_user(u):
+                if not u: return None
+                role = u.get("role")
+                profile_pic = u.get("profile_picture")
+                if role == "brand":
+                    bp = u.get("brand_profile", {})
+                    if not profile_pic: profile_pic = bp.get("logo")
+                    return {
+                        "id": str(u["_id"]),
+                        "username": u.get("username"),
+                        "role": role,
+                        "profile_picture": profile_pic,
+                        "brand_profile": bp
+                    }
+                elif role == "influencer":
+                    ip = u.get("influencer_profile", {})
+                    if not profile_pic: profile_pic = ip.get("profile_thumbnail") or ip.get("profile_picture")
+                    return {
+                        "id": str(u["_id"]),
+                        "username": u.get("username"),
+                        "role": role,
+                        "profile_picture": profile_pic,
+                        "influencer_profile": ip
+                    }
+                return {
+                    "id": str(u["_id"]),
+                    "username": u.get("username"),
+                    "role": role,
+                    "profile_picture": profile_pic
+                }
+
             # Prepare response
             response_message = {
                 "id": message_id,
@@ -259,16 +299,8 @@ class MessageService:
                 "is_edited": False,
                 "created_at": current_time,
                 "updated_at": current_time,
-                "sender": {
-                    "id": sender_id,
-                    "username": sender["username"],
-                    "profile_picture": sender.get("profile_picture")
-                },
-                "receiver": {
-                    "id": receiver_id,
-                    "username": receiver["username"],
-                    "profile_picture": receiver.get("profile_picture")
-                }
+                "sender": format_user(sender),
+                "receiver": format_user(receiver)
             }
             
             return response_message
@@ -296,7 +328,7 @@ class MessageService:
             sender = users_collection.find_one({"_id": ObjectId(sender_id)})
             receiver = users_collection.find_one({"_id": ObjectId(receiver_id)})
             
-            current_time = datetime.utcnow()
+            current_time = datetime.now(timezone.utc)
             conversation_data = {
                 "type": "direct",
                 "participants": [sender_id, receiver_id],
@@ -374,21 +406,44 @@ class MessageService:
                 sender = users_collection.find_one({"_id": msg["sender_id"]})
                 receiver = users_collection.find_one({"_id": msg["receiver_id"]})
                 
+                def format_user(u):
+                    if not u: return {"id": "unknown", "username": "Unknown", "profile_picture": None}
+                    role = u.get("role")
+                    profile_pic = u.get("profile_picture")
+                    if role == "brand":
+                        bp = u.get("brand_profile", {})
+                        if not profile_pic: profile_pic = bp.get("logo")
+                        return {
+                            "id": str(u["_id"]),
+                            "username": u.get("username"),
+                            "role": role,
+                            "profile_picture": profile_pic,
+                            "brand_profile": bp
+                        }
+                    elif role == "influencer":
+                        ip = u.get("influencer_profile", {})
+                        if not profile_pic: profile_pic = ip.get("profile_thumbnail") or ip.get("profile_picture")
+                        return {
+                            "id": str(u["_id"]),
+                            "username": u.get("username"),
+                            "role": role,
+                            "profile_picture": profile_pic,
+                            "influencer_profile": ip
+                        }
+                    return {
+                        "id": str(u["_id"]),
+                        "username": u.get("username"),
+                        "role": role,
+                        "profile_picture": profile_pic
+                    }
+
                 formatted_messages.append({
                     "id": str(msg["_id"]),
                     "content": msg["content"],
                     "message_type": msg["message_type"],
                     "attachment_url": msg.get("attachment_url"),
-                    "sender": {
-                        "id": str(msg["sender_id"]),
-                        "username": sender["username"] if sender else "Unknown",
-                        "profile_picture": sender.get("profile_picture") if sender else None
-                    },
-                    "receiver": {
-                        "id": str(msg["receiver_id"]),
-                        "username": receiver["username"] if receiver else "Unknown",
-                        "profile_picture": receiver.get("profile_picture") if receiver else None
-                    },
+                    "sender": format_user(sender),
+                    "receiver": format_user(receiver),
                     "is_read": msg.get("is_read", False),
                     "is_delivered": msg.get("is_delivered", False),
                     "is_edited": msg.get("is_edited", False),
@@ -429,7 +484,10 @@ class MessageService:
         """Get all conversations for a user"""
         try:
             # Build query
-            query = {"participants": user_id}
+            query = {
+                "participants": user_id,
+                "type": "direct"
+            }
             
             if status:
                 query["status"] = status
@@ -447,10 +505,17 @@ class MessageService:
             formatted_conversations = []
             for conv in conversations:
                 # Get other participant details
-                other_participant_id = next(
-                    pid for pid in conv["participants"] if pid != user_id
-                )
+                other_participant_id = None
+                participants = conv.get("participants", [])
+                for pid in participants:
+                    if str(pid) != str(user_id):
+                        other_participant_id = str(pid)
+                        break
                 
+                if not other_participant_id:
+                    logger.warning(f"⚠️ Conversation {conv.get('_id')} has no other participant")
+                    continue
+
                 other_user = users_collection.find_one(
                     {"_id": ObjectId(other_participant_id)}
                 )
@@ -462,6 +527,12 @@ class MessageService:
                     "is_read": False
                 })
                 
+                participant_details = conv.get("participant_details", {})
+                if not isinstance(participant_details, dict):
+                    participant_details = {}
+                
+                user_details = participant_details.get(str(user_id), {})
+                
                 formatted_conversations.append({
                     "id": str(conv["_id"]),
                     "title": conv.get("title"),
@@ -470,15 +541,17 @@ class MessageService:
                         "id": other_participant_id,
                         "username": other_user["username"] if other_user else "Unknown",
                         "profile_picture": other_user.get("profile_picture") if other_user else None,
-                        "role": other_user.get("role") if other_user else None
+                        "role": other_user.get("role") if other_user else None,
+                        "is_online": other_user.get("is_online", False) if other_user else False,
+                        "last_seen": other_user.get("last_seen") if other_user else None
                     },
                     "last_message": conv.get("last_message"),
                     "unread_count": unread_count,
                     "message_count": conv.get("message_count", 0),
-                    "updated_at": conv["updated_at"],
+                    "updated_at": conv.get("updated_at"),
                     "status": conv.get("status", "active"),
-                    "is_muted": conv["participant_details"].get(user_id, {}).get("is_muted", False),
-                    "is_archived": conv["participant_details"].get(user_id, {}).get("is_archived", False)
+                    "is_muted": user_details.get("is_muted", False) if isinstance(user_details, dict) else False,
+                    "is_archived": user_details.get("is_archived", False) if isinstance(user_details, dict) else False
                 })
             
             # Get total count
@@ -516,7 +589,7 @@ class MessageService:
             if str(message["sender_id"]) != user_id:
                 raise ValueError("Not authorized to update this message")
             
-            update_data = {"updated_at": datetime.utcnow()}
+            update_data = {"updated_at": datetime.now(timezone.utc)}
             if content is not None:
                 update_data["content"] = content
                 update_data["is_edited"] = True
@@ -566,10 +639,10 @@ class MessageService:
                 {"_id": ObjectId(message_id)},
                 {"$set": {
                     "is_deleted": True,
-                    "deleted_at": datetime.utcnow(),
+                    "deleted_at": datetime.now(timezone.utc),
                     "deleted_by": user_id,
                     "content": "[Message deleted]",
-                    "updated_at": datetime.utcnow()
+                    "updated_at": datetime.now(timezone.utc)
                 }}
             )
             
@@ -679,12 +752,12 @@ class GroupService:
                     "username": user["username"],
                     "role": user.get("role"),
                     "profile_picture": user.get("profile_picture"),
-                    "joined_at": datetime.utcnow(),
+                    "joined_at": datetime.now(timezone.utc),
                     "is_admin": user_id == creator_id,
                     "is_muted": False
                 })
             
-            current_time = datetime.utcnow()
+            current_time = datetime.now(timezone.utc)
             
             # Create group document
             group_data = {
@@ -752,7 +825,7 @@ class GroupService:
             if not sender:
                 raise ValueError("Sender not found")
             
-            current_time = datetime.utcnow()
+            current_time = datetime.now(timezone.utc)
             
             # Create message document (separate from direct messages)
             # You might want to create a separate collection for group messages
@@ -1496,7 +1569,7 @@ async def send_typing_indicator(
             "user_id": user_id,
             "username": current_user["username"],
             "is_typing": is_typing,
-            "timestamp": datetime.utcnow()
+            "timestamp": datetime.now(timezone.utc)
         }
         
     except Exception as e:
@@ -1780,16 +1853,43 @@ async def get_group_messages(
         for msg in messages:
             sender = users_collection.find_one({"_id": msg["sender_id"]})
             
+            def format_user(u):
+                if not u: return {"id": "unknown", "username": "Unknown", "profile_picture": None}
+                role = u.get("role")
+                profile_pic = u.get("profile_picture")
+                if role == "brand":
+                    bp = u.get("brand_profile", {})
+                    if not profile_pic: profile_pic = bp.get("logo")
+                    return {
+                        "id": str(u["_id"]),
+                        "username": u.get("username"),
+                        "role": role,
+                        "profile_picture": profile_pic,
+                        "brand_profile": bp
+                    }
+                elif role == "influencer":
+                    ip = u.get("influencer_profile", {})
+                    if not profile_pic: profile_pic = ip.get("profile_thumbnail") or ip.get("profile_picture")
+                    return {
+                        "id": str(u["_id"]),
+                        "username": u.get("username"),
+                        "role": role,
+                        "profile_picture": profile_pic,
+                        "influencer_profile": ip
+                    }
+                return {
+                    "id": str(u["_id"]),
+                    "username": u.get("username"),
+                    "role": role,
+                    "profile_picture": profile_pic
+                }
+
             formatted_messages.append({
                 "id": str(msg["_id"]),
                 "content": msg["content"],
                 "message_type": msg["message_type"],
                 "attachment_url": msg.get("attachment_url"),
-                "sender": {
-                    "id": str(msg["sender_id"]),
-                    "username": sender["username"] if sender else "Unknown",
-                    "profile_picture": sender.get("profile_picture") if sender else None
-                },
+                "sender": format_user(sender),
                 "is_read": user_id in msg.get("is_read_by", []),
                 "is_delivered": user_id in msg.get("is_delivered_to", []),
                 "created_at": msg["created_at"],

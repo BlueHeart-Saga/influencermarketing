@@ -28,11 +28,11 @@ ALLOWED_ICON_EXTENSIONS: Set[str] = {"ico"}
 ALLOWED_EXTENSIONS: Set[str] = ALLOWED_IMAGE_EXTENSIONS | ALLOWED_SVG_EXTENSIONS | ALLOWED_ICON_EXTENSIONS
 
 # ------------------- Pydantic Models -------------------
-IconType = Literal["url", "upload", "emoji", "fa_icon"]
+IconType = str  # Relaxed from Literal to str to prevent 422 on legacy data
 
 class IconData(BaseModel):
-    type: IconType  # "url", "upload", "emoji", "fa_icon"
-    value: str      # url or GridFS id (string) or emoji or fontawesome class
+    type: IconType  # "url", "upload", "emoji", "fa_icon", or legacy strings
+    value: str      # url or id (string) or emoji or fontawesome class
     alt_text: Optional[str] = ""
 
 class SubMenuItem(BaseModel):
@@ -108,15 +108,27 @@ async def upload_icon(file: UploadFile = File(...), user: Dict[str, Any] = Depen
         uploaded_at=datetime.utcnow()
     )
 
-@router.get("/icon/{icon_id}", summary="Fetch icon by GridFS id")
+@router.get("/icon/{icon_id:path}", summary="Fetch icon by id")
 def get_icon(icon_id: str):
     try:
-        content = storage_provider.download(icon_id)
+        # Clean legacy paths: extract just the filename
+        clean_id = icon_id.replace("\\", "/")
+        base_name = clean_id.split("/")[-1]
+        
+        # Ensure it resolves correctly in default folder 'icons/'
+        storage_path = f"icons/{base_name}"
+        
+        try:
+            content = storage_provider.download(storage_path)
+        except Exception:
+            # Fallback for exact match if it was stored without 'icons/' or custom path
+            content = storage_provider.download(icon_id)
+            
         # Basic content type detection
         content_type = "image/png"
-        if icon_id.lower().endswith(".svg"):
+        if base_name.lower().endswith(".svg"):
             content_type = "image/svg+xml"
-        elif icon_id.lower().endswith(".ico"):
+        elif base_name.lower().endswith(".ico"):
             content_type = "image/x-icon"
             
         return Response(content=content, media_type=content_type)

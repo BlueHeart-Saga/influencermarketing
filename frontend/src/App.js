@@ -68,6 +68,7 @@ import AICalculator from "./pages/influencer/AICalculator";
 import VoiceToTextAI from "./pages/influencer/VoiceToTextAI";
 
 import InfluencerNotification from "./pages/influencer/InfluencerNotification";
+import ActivityLog from "./pages/common/ActivityLog";
 
 
 
@@ -159,7 +160,7 @@ import CurrencyProvider from "./context/CurrencyContext";
 import ChatApp from "./pages/brand/ChatApp";
 
 
-import {setFavicon} from "./components/utils/branding";
+import { setFavicon } from "./components/utils/branding";
 import ChatContainer from "./components/chating";
 import DirectPayCampaign from "./pages/brand/DirectPayCampaign";
 import PendingPayments from "./pages/brand/PendingPayments";
@@ -187,75 +188,75 @@ function AppRoutes() {
 
 
 
-  
-const location = useLocation();
 
-useEffect(() => {
-  const path = location.pathname;
+  const location = useLocation();
 
-  if (path.startsWith("/brand")) {
-    setPageTitle("Brand Portal – AI Influencer Marketing Platform");
-  } else if (path.startsWith("/influencer")) {
-    setPageTitle("Influencer Portal – Collaborate with Brands");
-  } else if (path.startsWith("/admin")) {
-    setPageTitle("Admin Panel – Platform Management");
-  }
-}, [location.pathname]);
+  useEffect(() => {
+    const path = location.pathname;
 
-
-
-
-
-
-useEffect(() => {
-  let abort = false;
-
-  const loadBranding = async () => {
-    try {
-      // 1) Immediate fallbacks (no white screen)
-      document.title = "Brio";
-      setFavicon("/favicon.ico");
-
-      // 2) timeout guard for slow backend
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 5000);
-
-      const branding = await fetchPlatformBranding({ signal: controller.signal });
-
-      clearTimeout(timeout);
-      if (abort) return;
-
-      // 3) Save platform globally for dynamic titles
-      if (branding?.platformName) {
-        window.__PLATFORM_NAME__ = branding.platformName;
-        document.title = branding.platformName;
-      }
-
-      // 4) favicon or fallback logo
-      if (branding?.favicon) {
-        setFavicon(branding.favicon);
-      } else if (branding?.logo) {
-        setFavicon(branding.logo);
-      }
-
-    } catch (e) {
-      console.error("Branding load failed", e);
-      // keep defaults — never block UI
+    if (path.startsWith("/brand")) {
+      setPageTitle("Brand Portal – AI Influencer Marketing Platform");
+    } else if (path.startsWith("/influencer")) {
+      setPageTitle("Influencer Portal – Collaborate with Brands");
+    } else if (path.startsWith("/admin")) {
+      setPageTitle("Admin Panel – Platform Management");
     }
-  };
-
-  loadBranding();
-
-  return () => {
-    abort = true;
-  };
-}, []);
+  }, [location.pathname]);
 
 
 
 
 
-  
+
+  useEffect(() => {
+    let abort = false;
+
+    const loadBranding = async () => {
+      try {
+        // 1) Immediate fallbacks (no white screen)
+        document.title = "Brio";
+        setFavicon("/favicon.ico");
+
+        // 2) timeout guard for slow backend
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 5000);
+
+        const branding = await fetchPlatformBranding({ signal: controller.signal });
+
+        clearTimeout(timeout);
+        if (abort) return;
+
+        // 3) Save platform globally for dynamic titles
+        if (branding?.platformName) {
+          window.__PLATFORM_NAME__ = branding.platformName;
+          document.title = branding.platformName;
+        }
+
+        // 4) favicon or fallback logo
+        if (branding?.favicon) {
+          setFavicon(branding.favicon);
+        } else if (branding?.logo) {
+          setFavicon(branding.logo);
+        }
+
+      } catch (e) {
+        console.error("Branding load failed", e);
+        // keep defaults — never block UI
+      }
+    };
+
+    loadBranding();
+
+    return () => {
+      abort = true;
+    };
+  }, []);
+
+
+
+
+
+
 
   // Initial Loader
   useEffect(() => {
@@ -265,48 +266,48 @@ useEffect(() => {
 
   // Maintenance Check
   // Auto-update maintenance status every 5 sec
-// useEffect(() => {
-//   const checkStatus = () => {
-//     fetch("http://localhost:7000/maintenance/status/")
-//       .then((res) => res.json())
-//       .then((data) => {
-//         setMaintenance(data.maintenance);
-//         setMaintenanceMessage(data.message);
-//       setEndTime(data.end_time);
-//       })
-//       .catch(() => {});
-//   };
+  // useEffect(() => {
+  //   const checkStatus = () => {
+  //     fetch("http://localhost:7000/maintenance/status/")
+  //       .then((res) => res.json())
+  //       .then((data) => {
+  //         setMaintenance(data.maintenance);
+  //         setMaintenanceMessage(data.message);
+  //       setEndTime(data.end_time);
+  //       })
+  //       .catch(() => {});
+  //   };
 
-//   checkStatus(); // initial check
-//   const interval = setInterval(checkStatus, 5000); // check every 5 sec
+  //   checkStatus(); // initial check
+  //   const interval = setInterval(checkStatus, 5000); // check every 5 sec
 
-//   return () => clearInterval(interval);
-// }, []);
+  //   return () => clearInterval(interval);
+  // }, []);
 
-//   if (loading) return <Loader />;
+  //   if (loading) return <Loader />;
 
-//   // STOP ENTIRE APP IF MAINTENANCE = TRUE
-//   if (maintenance) {
-//   return (
-//     <div style={{ height: "100vh", width: "100vw", margin: 0, padding: 0 }}>
-//       <iframe
-//         src="http://localhost:7000/maintenance/screen/"
-//         style={{
-//           width: "100%",
-//           height: "100%",
-//           border: "none",
-//         }}
-//         title="Maintenance Screen"
-//       ></iframe>
-//     </div>
-//   );
-// }
-
-
+  //   // STOP ENTIRE APP IF MAINTENANCE = TRUE
+  //   if (maintenance) {
+  //   return (
+  //     <div style={{ height: "100vh", width: "100vw", margin: 0, padding: 0 }}>
+  //       <iframe
+  //         src="http://localhost:7000/maintenance/screen/"
+  //         style={{
+  //           width: "100%",
+  //           height: "100%",
+  //           border: "none",
+  //         }}
+  //         title="Maintenance Screen"
+  //       ></iframe>
+  //     </div>
+  //   );
+  // }
 
 
 
-  
+
+
+
 
   return (
 
@@ -316,16 +317,16 @@ useEffect(() => {
 
     <Routes>
 
-    <Route path="/auth" element={<AuthPage />} />
-<Route path="/login" element={<AuthPage />} />
-<Route path="/register" element={<AuthPage />} />
+      <Route path="/auth" element={<AuthPage />} />
+      <Route path="/login" element={<AuthPage />} />
+      <Route path="/register" element={<AuthPage />} />
 
-<Route path="/admin/login" element={<AdminLogin />} />
-
-
+      <Route path="/admin/login" element={<AdminLogin />} />
 
 
-{/* 
+
+
+      {/* 
       <Route path="/auth" element={<AuthPage />} />
       <Route path="/register" element={<Register />} />
       <Route path="/login" element={<Login />} />
@@ -335,64 +336,64 @@ useEffect(() => {
 
       {/* <Route path="/chatbot" element={<Chatbot />} /> */}
       {/* <Route path="/feedback" element={<FeedbackWidget />} /> */}
-       
+
       <Route element={<MainLayout />}>
-      {/* ---------------- Public Pages ---------------- */}
-      <Route path="/" element={<Home />} />
-      
-      <Route path="/mainnavbar" element={<MainNavbar />} />
+        {/* ---------------- Public Pages ---------------- */}
+        <Route path="/" element={<Home />} />
 
-      
-      <Route path="/about" element={<About />} />
-      <Route path="/contactUs" element={<ContactUs />} />
-      <Route path="/footer" element={<Footer />} />
-       {/* Tools & Features */}
-            <Route path="/ai-chatbot" element={<MarketIdeaFinder />} />
-            <Route path="/ai-insights" element={<AIInsights />} />
-            <Route path="/trend-predictor" element={<TrendPredictor />} />
-            <Route path="/budget-planner" element={<BudgetPlanner />} />
-            <Route path="/engagement-calculator" element={<EngagementCalculator />} />
-            <Route path="/fraud-detection" element={<FraudDetection />} />
-            <Route path="/predictive-roi" element={<PredictiveROI />} />
-            <Route path="/content-analyzer" element={<ContentAnalyzer />} />
-            <Route path="/payment-automation" element={<PaymentAutomation />} />
-            <Route path="/find-influencer" element={<FindInfluencer />} />
-            <Route path="/integration" element={<Integration />} />
-            <Route path="/content-intelligence" element={<ContentIntelligence />} />
-            <Route path="/futureai" element={<FutureAI />} />
-            <Route path="/automation-marketing" element={<AutomationMarketing />} />
+        <Route path="/mainnavbar" element={<MainNavbar />} />
 
-            <Route path="/pricingsection" element={<PricingSection />} />
-            <Route path="/faq" element={<FAQPage />} />
-            <Route path="/demo" element={<DemoVideoPage />} />
 
-            
+        <Route path="/about" element={<About />} />
+        <Route path="/contactUs" element={<ContactUs />} />
+        <Route path="/footer" element={<Footer />} />
+        {/* Tools & Features */}
+        <Route path="/ai-chatbot" element={<MarketIdeaFinder />} />
+        <Route path="/ai-insights" element={<AIInsights />} />
+        <Route path="/trend-predictor" element={<TrendPredictor />} />
+        <Route path="/budget-planner" element={<BudgetPlanner />} />
+        <Route path="/engagement-calculator" element={<EngagementCalculator />} />
+        <Route path="/fraud-detection" element={<FraudDetection />} />
+        <Route path="/predictive-roi" element={<PredictiveROI />} />
+        <Route path="/content-analyzer" element={<ContentAnalyzer />} />
+        <Route path="/payment-automation" element={<PaymentAutomation />} />
+        <Route path="/find-influencer" element={<FindInfluencer />} />
+        <Route path="/integration" element={<Integration />} />
+        <Route path="/content-intelligence" element={<ContentIntelligence />} />
+        <Route path="/futureai" element={<FutureAI />} />
+        <Route path="/automation-marketing" element={<AutomationMarketing />} />
+
+        <Route path="/pricingsection" element={<PricingSection />} />
+        <Route path="/faq" element={<FAQPage />} />
+        <Route path="/demo" element={<DemoVideoPage />} />
 
 
 
-            <Route path="/resources/blog" element={<Blog />} />
-            <Route path="/resources/help-center" element={<HelpCenter />} />
-            <Route path="/resources/case-studies" element={<CaseStudies />} />
-            <Route path="/resources/documentation" element={<Documentation />} />
-            <Route path="/resources/community" element={<Community />} />
-            <Route path="/resources/support" element={<Support />} />
 
-          {/* <Route path="/brand/profile/:id" element={<BrandProfile />} />
+
+        <Route path="/resources/blog" element={<Blog />} />
+        <Route path="/resources/help-center" element={<HelpCenter />} />
+        <Route path="/resources/case-studies" element={<CaseStudies />} />
+        <Route path="/resources/documentation" element={<Documentation />} />
+        <Route path="/resources/community" element={<Community />} />
+        <Route path="/resources/support" element={<Support />} />
+
+        {/* <Route path="/brand/profile/:id" element={<BrandProfile />} />
             <Route path="/influencer/profile/:id" element={<InfluencerProfile />} /> 
             <Route path="/register/brand" element={<BrandRegister />} />
 <Route path="/register/influencer" element={<InfluencerRegister />} />*/}
 
 
 
-          <Route path="/terms" element={<TermsAndConditions />} />
-          <Route path="/privacy" element={<PrivacyPolicy />} />
-          <Route path="/payment-policy" element={<PaymentPolicy />} />
-          
-          <Route path="/ai-features" element={<AIFeatures />} />
-          <Route path="/platform-overview" element={<PlatformOverview />} />
-          
+        <Route path="/terms" element={<TermsAndConditions />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/payment-policy" element={<PaymentPolicy />} />
 
-            
+        <Route path="/ai-features" element={<AIFeatures />} />
+        <Route path="/platform-overview" element={<PlatformOverview />} />
+
+
+
 
 
       </Route>
@@ -416,7 +417,7 @@ useEffect(() => {
   }
 /> */}
 
-      
+
       {/* ---------------- Admin Pages ---------------- */}
       <Route
         path="/admin/*"
@@ -438,17 +439,17 @@ useEffect(() => {
 
 
 
-                <Route path="reports" element={<AdminReports/>} />
-                <Route path="settings" element={<Settings/>} />
-                <Route path="logo" element={<AdminLogo/>} />
+                <Route path="reports" element={<AdminReports />} />
+                <Route path="settings" element={<Settings />} />
+                <Route path="logo" element={<AdminLogo />} />
                 <Route path="contact-messages" element={<ContactMessages />} />
                 <Route path="feedback-messages" element={<FeedbackAdmin />} />
-                <Route path="footer-builder" element={<FooterBuilder />} />  
-                
+                <Route path="footer-builder" element={<FooterBuilder />} />
 
 
-                <Route path="notifications" element={<AdminLogo/>} />
-                
+
+                <Route path="notifications" element={<AdminLogo />} />
+
                 <Route
                   path="menus"
                   element={<AdminMenuManager token={user?.token} />}
@@ -459,7 +460,7 @@ useEffect(() => {
                 <Route path="/profiles/connections/:userId" element={<ConnectionsList />} />
 
 
-                
+
 
               </Routes>
             </Layout>
@@ -480,7 +481,7 @@ useEffect(() => {
                 <Route path="campaigns/create-campaign" element={<BrandCreateCampaign />} />
                 <Route path="campaigns/requests" element={<BrandApplications />} />
                 {/* <Route path="collaborations" element={<BrandMessage />} /> */}
-                <Route path="collaborations"  userRole="brand" element={<ChatApp />} />
+                <Route path="collaborations" userRole="brand" element={<ChatApp />} />
                 <Route path="automation" element={<BrandAutomation />} />
                 {/* <Route path="automation1" element={<BulkMessage />} /> */}
                 <Route path="analytics" element={<BrandAnalytics />} />
@@ -520,14 +521,15 @@ useEffect(() => {
                 <Route path="profiles/connections/:userId" element={<ConnectionsList />} />
                 <Route path="feed" element={<Feed />} />
                 <Route path="Subscription" element={<SubscriptionPage />} />
-                <Route path="notifications" element={<BrandNotification/>} />
-                
-            {/* <Route path="profile/:id" element={<InfluencerProfile />} />
+                <Route path="notifications" element={<BrandNotification />} />
+                <Route path="activity" element={<ActivityLog />} />
+
+                {/* <Route path="profile/:id" element={<InfluencerProfile />} />
             <Route path="/register/influencer" element={<InfluencerRegister />} /> */}
-                
+
                 <Route path="agreements" element={<BrandAgreements />} />
-             
-                
+
+
               </Routes>
             </Layout>
           </ProtectedRoute>
@@ -566,16 +568,17 @@ useEffect(() => {
 
                 {/* <Route path="profile/:id" element={<BrandProfile />} /> 
                 <Route path="/register/brand" element={<BrandRegister />} />*/}
-            <Route path=":id" element={<InfluencerProfile />} />
-            <Route path="register" element={<InfluencerRegister />} />
-            <Route path="profiles/public" element={<PublicProfiles />} />
-            <Route path="profile/view/:type/:id" element={<ViewProfile />} />
-            <Route path="profiles/connections/:userId" element={<ConnectionsList />} />
-            <Route path="feed" element={<Feed />} />
-            <Route path="Subscription" element={<SubscriptionPage />} />
-            <Route path="notifications" element={<InfluencerNotification/>} />
+                <Route path=":id" element={<InfluencerProfile />} />
+                <Route path="register" element={<InfluencerRegister />} />
+                <Route path="profiles/public" element={<PublicProfiles />} />
+                <Route path="profile/view/:type/:id" element={<ViewProfile />} />
+                <Route path="profiles/connections/:userId" element={<ConnectionsList />} />
+                <Route path="feed" element={<Feed />} />
+                <Route path="Subscription" element={<SubscriptionPage />} />
+                <Route path="notifications" element={<InfluencerNotification />} />
+                <Route path="activity" element={<ActivityLog />} />
 
-                
+
               </Routes>
             </Layout>
           </ProtectedRoute>
@@ -591,14 +594,14 @@ useEffect(() => {
 export default function App() {
   return (
     <AuthProvider>
-       <CurrencyProvider>
-      <Router>
-        <ScrollToTop />
-        <AppRoutes />
-        
-        {/* <AIHelpIcon /> */}
-        {/* <Chatbot /> */}
-      </Router>
+      <CurrencyProvider>
+        <Router>
+          <ScrollToTop />
+          <AppRoutes />
+
+          {/* <AIHelpIcon /> */}
+          {/* <Chatbot /> */}
+        </Router>
       </CurrencyProvider>
     </AuthProvider>
   );

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useContext, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useContext, useCallback, useRef } from 'react';
 import { useNavigate } from "react-router-dom";
 import { CurrencyContext } from '../../context/CurrencyContext'; // Adjust path as needed
 import { campaignAPI } from '../../services/api';
@@ -6,10 +6,10 @@ import BrandCreateCampaign from './BrandCreateCampaign';
 import BrandCampaigns from './BrandCampaigns';
 import BrandApplications from './BrandApplications';
 import BrandAnalytics from './BrandAnalytics';
-import { 
-  FiRefreshCw, 
-  FiAlertCircle, 
-  FiPlusCircle, 
+import {
+  FiRefreshCw,
+  FiAlertCircle,
+  FiPlusCircle,
   FiInbox,
   FiTrendingUp,
   FiBell,
@@ -26,6 +26,7 @@ import {
 } from 'react-icons/fi';
 import '../../style/BrandDashboard.css';
 import Tools from './Tools';
+import { formatCurrency as globalFormatCurrency } from '../../utils/formatters';
 
 // API configuration
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
@@ -164,7 +165,7 @@ const POPULAR_CURRENCIES = ['USD', 'GBP', 'EUR', 'JPY', 'CAD', 'AUD', 'INR'];
 // StatCard Component
 const BrandStatCard = ({ label, value, icon: Icon, color, subtitle, trend, onClick }) => {
   return (
-    <div 
+    <div
       className={`brand-stat-card ${onClick ? 'brand-stat-clickable' : ''}`}
       onClick={onClick}
     >
@@ -188,22 +189,22 @@ const BrandStatCard = ({ label, value, icon: Icon, color, subtitle, trend, onCli
 };
 
 // Currency Converter Component
-const CurrencyConverter = ({ 
-  selectedCurrency, 
-  onCurrencyChange, 
+const CurrencyConverter = ({
+  selectedCurrency,
+  onCurrencyChange,
   totalBudget,
-  rates 
+  rates
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [showAllCurrencies, setShowAllCurrencies] = useState(false);
-  
+
   // Calculate converted total budget
   const calculateConvertedTotal = () => {
     if (!totalBudget || !rates || !selectedCurrency) return 0;
-    
+
     let totalInSelectedCurrency = 0;
-    
+
     Object.entries(totalBudget).forEach(([currencyCode, amount]) => {
       if (rates[currencyCode] && rates[selectedCurrency]) {
         // Convert from currencyCode to GBP, then to selectedCurrency
@@ -212,12 +213,12 @@ const CurrencyConverter = ({
         totalInSelectedCurrency += convertedAmount;
       }
     });
-    
+
     return totalInSelectedCurrency;
   };
-  
+
   const convertedTotal = calculateConvertedTotal();
-  
+
   // Filter currencies based on search
   const filteredCurrencies = Object.keys(CURRENCY_SYMBOLS).filter(currencyCode => {
     if (!searchTerm) return true;
@@ -226,15 +227,9 @@ const CurrencyConverter = ({
       CURRENCY_NAMES[currencyCode]?.toLowerCase().includes(searchTerm.toLowerCase())
     );
   });
-  
+
   const formatCurrency = (amount, currencyCode) => {
-    const symbol = CURRENCY_SYMBOLS[currencyCode] || currencyCode;
-    const formattedAmount = new Intl.NumberFormat('en-US', {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2
-    }).format(amount);
-    
-    return `${symbol}${formattedAmount}`;
+    return globalFormatCurrency(amount, currencyCode, CURRENCY_SYMBOLS);
   };
 
   return (
@@ -246,7 +241,7 @@ const CurrencyConverter = ({
             <span>Display Currency:</span>
           </div>
           <div className="brand-currency-selector">
-            <button 
+            <button
               className="brand-currency-toggle"
               onClick={() => setIsOpen(!isOpen)}
             >
@@ -256,7 +251,7 @@ const CurrencyConverter = ({
               <span className="brand-currency-code">{selectedCurrency}</span>
               <FiChevronDown size={16} className={isOpen ? 'brand-rotate-180' : ''} />
             </button>
-            
+
             {isOpen && (
               <div className="brand-currency-dropdown brand-drop-shadow">
                 <div className="brand-currency-search">
@@ -269,7 +264,7 @@ const CurrencyConverter = ({
                     className="brand-currency-search-input"
                   />
                   {searchTerm && (
-                    <button 
+                    <button
                       onClick={() => setSearchTerm('')}
                       className="brand-clear-search"
                     >
@@ -277,7 +272,7 @@ const CurrencyConverter = ({
                     </button>
                   )}
                 </div>
-                
+
                 {/* Popular currencies */}
                 <div className="brand-currency-section">
                   <div className="brand-currency-section-title">Popular</div>
@@ -299,12 +294,12 @@ const CurrencyConverter = ({
                     ))}
                   </div>
                 </div>
-                
+
                 {/* All currencies */}
                 <div className="brand-currency-section">
                   <div className="brand-currency-section-title">
                     All Currencies
-                    <button 
+                    <button
                       className="brand-show-all-btn"
                       onClick={() => setShowAllCurrencies(!showAllCurrencies)}
                     >
@@ -343,7 +338,7 @@ const CurrencyConverter = ({
             )}
           </div>
         </div>
-        
+
         {/* <div className="brand-converted-total">
           <div className="brand-converted-label">Total Budget:</div>
           <div className="brand-converted-value">
@@ -363,18 +358,18 @@ const CurrencyConverter = ({
 // AIToolCard Component
 const BrandAIToolCard = ({ title, description, icon: Icon, color, onClick, isNew, isPro }) => {
   const [isHovered, setIsHovered] = useState(false);
-  
+
   return (
-    <div 
+    <div
       className="brand-ai-tool-card"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={onClick}
     >
       <div className="brand-ai-tool-header">
-        <div 
-          className="brand-ai-tool-icon" 
-          style={{ 
+        <div
+          className="brand-ai-tool-icon"
+          style={{
             background: isHovered ? `linear-gradient(135deg, ${color}, ${color}80)` : `${color}15`,
             color: isHovered ? 'white' : color
           }}
@@ -391,7 +386,7 @@ const BrandAIToolCard = ({ title, description, icon: Icon, color, onClick, isNew
       <div className="brand-ai-tool-footer">
         <div className="brand-ai-tool-arrow" style={{ color }}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-            <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </div>
       </div>
@@ -417,7 +412,7 @@ const BrandQuickAction = ({ title, description, icon: Icon, color, onClick }) =>
 // SearchResult Component
 const BrandSearchResult = ({ result, onClick }) => {
   const IconComponent = result.icon;
-  
+
   return (
     <div className="brand-search-result" onClick={onClick}>
       <div className="brand-result-icon" style={{ color: result.color }}>
@@ -444,12 +439,13 @@ const BrandDashboard = () => {
   const [showSearchResults, setShowSearchResults] = useState(false);
   const [showBudgetBreakdown, setShowBudgetBreakdown] = useState(false);
   const [showActivityDropdown, setShowActivityDropdown] = useState(false);
+  const activityDropdownRef = useRef(null);
   const [unreadCount, setUnreadCount] = useState(0);
 
-  
+
   const navigate = useNavigate();
   const { currency, changeCurrency, rates } = useContext(CurrencyContext);
-  
+
   const [stats, setStats] = useState({
     totalCampaigns: 0,
     activeCampaigns: 0,
@@ -506,7 +502,7 @@ const BrandDashboard = () => {
         icon: FiAward,
         color: '#3B82F6'
       })),
-      
+
       // Applications
       ...applications.map(app => ({
         type: 'application',
@@ -516,7 +512,7 @@ const BrandDashboard = () => {
         icon: FiInbox,
         color: '#10B981'
       })),
-      
+
       // AI Tools
       // ...Tools.map(tool => ({
       //   type: 'tool',
@@ -526,7 +522,7 @@ const BrandDashboard = () => {
       //   icon: tool.icon,
       //   color: tool.color
       // })),
-      
+
       // Analytics
       {
         type: 'analytics',
@@ -545,13 +541,13 @@ const BrandDashboard = () => {
         color: '#EC4899'
       }
     ];
-    
+
     return allData;
   }, [campaigns, applications]);
 
   // Fetch initial data
-  useEffect(() => { 
-    fetchData(); 
+  useEffect(() => {
+    fetchData();
   }, []);
 
   // Update stats when campaigns, applications, or currency changes
@@ -559,10 +555,10 @@ const BrandDashboard = () => {
     if (!applications || !campaigns) return;
 
     const totalCampaigns = campaigns.length;
-    const activeCampaigns = campaigns.filter(c => ['active','live'].includes(c.status?.toLowerCase())).length;
-    const completedCampaigns = campaigns.filter(c => ['completed','finished'].includes(c.status?.toLowerCase())).length;
-    
-    const pendingApplications = applications.filter(a => ['pending','review'].includes(a.status?.toLowerCase())).length;
+    const activeCampaigns = campaigns.filter(c => ['active', 'live'].includes(c.status?.toLowerCase())).length;
+    const completedCampaigns = campaigns.filter(c => ['completed', 'finished'].includes(c.status?.toLowerCase())).length;
+
+    const pendingApplications = applications.filter(a => ['pending', 'review'].includes(a.status?.toLowerCase())).length;
 
     // Calculate total budget by currency
     const budgetsByCurrency = {};
@@ -587,7 +583,7 @@ const BrandDashboard = () => {
       });
     }
 
-    setStats(prev => ({ 
+    setStats(prev => ({
       ...prev,
       totalCampaigns,
       activeCampaigns,
@@ -599,15 +595,24 @@ const BrandDashboard = () => {
     }));
   }, [campaigns, applications, currency, rates]);
 
+  // Outside click for activity dropdown
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (activityDropdownRef.current && !activityDropdownRef.current.contains(event.target)) {
+        setShowActivityDropdown(false);
+      }
+    };
+    if (showActivityDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showActivityDropdown]);
+
   // Format currency helper function
   const formatCurrency = (amount, currencyCode = currency) => {
-    const symbol = CURRENCY_SYMBOLS[currencyCode] || currencyCode;
-    const formattedAmount = new Intl.NumberFormat('en-US', {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2
-    }).format(amount);
-    
-    return `${symbol}${formattedAmount}`;
+    return globalFormatCurrency(amount, currencyCode, CURRENCY_SYMBOLS);
   };
 
   // Real-time search functionality
@@ -627,78 +632,78 @@ const BrandDashboard = () => {
   }, [searchQuery, searchData]);
 
   // Also fetch count when returning to dashboard (add to fetchData)
-const fetchData = async () => {
-  try {
-    setLoading(true);
-    setError('');
-    const [campaignsRes, applicationsRes] = await Promise.all([
-      campaignAPI.getBrandCampaigns(),
-      campaignAPI.getBrandApplications()
-    ]);
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      setError('');
+      const [campaignsRes, applicationsRes] = await Promise.all([
+        campaignAPI.getBrandCampaigns(),
+        campaignAPI.getBrandApplications()
+      ]);
 
-    const campaignsData = Array.isArray(campaignsRes?.data) ? campaignsRes.data : (Array.isArray(campaignsRes) ? campaignsRes : []);
-    const applicationsData = Array.isArray(applicationsRes?.data) ? applicationsRes.data : (Array.isArray(applicationsRes) ? applicationsRes : []);
+      const campaignsData = Array.isArray(campaignsRes?.data) ? campaignsRes.data : (Array.isArray(campaignsRes) ? campaignsRes : []);
+      const applicationsData = Array.isArray(applicationsRes?.data) ? applicationsRes.data : (Array.isArray(applicationsRes) ? applicationsRes : []);
 
-    const processedCampaigns = campaignsData.map(campaign => ({
-      ...campaign,
-      currency: campaign.currency || 'USD'
-    }));
+      const processedCampaigns = campaignsData.map(campaign => ({
+        ...campaign,
+        currency: campaign.currency || 'USD'
+      }));
 
-    setCampaigns(processedCampaigns);
-    setApplications(applicationsData);
-    
-    // Add this line to fetch notification count when data refreshes
-    await fetchNotificationCount();
-    
-  } catch (err) {
-    console.error('Failed to fetch data:', err);
-    setError('Failed to fetch data. Please check your connection and try again.');
-    setCampaigns([]);
-    setApplications([]);
-  } finally {
-    setLoading(false);
-  }
-};
+      setCampaigns(processedCampaigns);
+      setApplications(applicationsData);
 
+      // Add this line to fetch notification count when data refreshes
+      await fetchNotificationCount();
 
-// Add this function to fetch notification count
-const fetchNotificationCount = useCallback(async () => {
-  try {
-    const token = localStorage.getItem('access_token');
-    if (!token) return;
-
-    const response = await fetch(`${API_BASE_URL}/api/brand/notifications`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      // Calculate unread count from notifications
-      const unread = (data.notifications || []).filter(n => !n.is_read).length;
-      setUnreadCount(unread);
+    } catch (err) {
+      console.error('Failed to fetch data:', err);
+      setError('Failed to fetch data. Please check your connection and try again.');
+      setCampaigns([]);
+      setApplications([]);
+    } finally {
+      setLoading(false);
     }
-  } catch (err) {
-    console.error('Error fetching notification count:', err);
-  }
-}, []);
-
-// Call it when component mounts and periodically
-useEffect(() => {
-  fetchNotificationCount();
-  
-  // Set up polling for real-time updates (every 30 seconds)
-  const interval = setInterval(fetchNotificationCount, 30000);
-  
-  return () => clearInterval(interval);
-}, [fetchNotificationCount]);
+  };
 
 
-  const handleCampaignCreated = () => { 
-    fetchData(); 
-    setActiveTab('campaigns'); 
+  // Add this function to fetch notification count
+  const fetchNotificationCount = useCallback(async () => {
+    try {
+      const token = localStorage.getItem('access_token');
+      if (!token) return;
+
+      const response = await fetch(`${API_BASE_URL}/api/brand/notifications`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        // Calculate unread count from notifications
+        const unread = (data.notifications || []).filter(n => !n.is_read).length;
+        setUnreadCount(unread);
+      }
+    } catch (err) {
+      console.error('Error fetching notification count:', err);
+    }
+  }, []);
+
+  // Call it when component mounts and periodically
+  useEffect(() => {
+    fetchNotificationCount();
+
+    // Set up polling for real-time updates (every 30 seconds)
+    const interval = setInterval(fetchNotificationCount, 30000);
+
+    return () => clearInterval(interval);
+  }, [fetchNotificationCount]);
+
+
+  const handleCampaignCreated = () => {
+    fetchData();
+    setActiveTab('campaigns');
   };
 
   const handleApplicationUpdate = () => fetchData();
@@ -784,17 +789,17 @@ useEffect(() => {
             <h1 className="brand-gradient-text">Brand DashBoard</h1>
             <span className="brand-header-subtitle">Professional Marketing Dashboard</span>
           </div>
-          
+
           {/* Currency Converter */}
           <div className="brand-header-currency">
-            <CurrencyConverter 
+            <CurrencyConverter
               selectedCurrency={currency}
               onCurrencyChange={changeCurrency}
               totalBudget={stats.totalBudget}
               rates={rates}
             />
           </div>
-          
+
           {/* Search Section */}
           <div className="brand-header-search">
             <form onSubmit={handleSearchSubmit} className="brand-search-form">
@@ -808,9 +813,9 @@ useEffect(() => {
                   className="brand-search-input"
                 />
                 {searchQuery && (
-                  <button 
-                    type="button" 
-                    onClick={clearSearch} 
+                  <button
+                    type="button"
+                    onClick={clearSearch}
                     className="brand-clear-search"
                     aria-label="Clear search"
                   >
@@ -819,7 +824,7 @@ useEffect(() => {
                 )}
               </div>
             </form>
-            
+
             {/* Search Results Dropdown */}
             {showSearchResults && (
               <div className="brand-search-results brand-drop-shadow">
@@ -843,17 +848,17 @@ useEffect(() => {
           {/* Header Actions */}
           <div className="brand-header-actions">
             <button
-  className="brand-btn-icon brand-notification-btn"
-  aria-label="Notifications"
-  onClick={() => navigate("/brand/notification")}
->
-  <FiBell size={18} />
-  {unreadCount > 0 && (
-    <span className="brand-notification-badge">
-      {unreadCount > 99 ? '99+' : unreadCount}
-    </span>
-  )}
-</button>
+              className="brand-btn-icon brand-notification-btn"
+              aria-label="Notifications"
+              onClick={() => navigate("/brand/notification")}
+            >
+              <FiBell size={18} />
+              {unreadCount > 0 && (
+                <span className="brand-notification-badge">
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </span>
+              )}
+            </button>
 
             <button className="brand-btn-refresh" onClick={fetchData}>
               <FiRefreshCw size={16} />
@@ -874,63 +879,63 @@ useEffect(() => {
               <p>Real-time campaign metrics and performance indicators</p>
             </div>
             <div className="brand-stats-grid">
-              <BrandStatCard 
-                label="Total Campaigns" 
-                value={stats.totalCampaigns} 
-                icon={FiAward} 
-                color="#3B82F6" 
+              <BrandStatCard
+                label="Total Campaigns"
+                value={stats.totalCampaigns}
+                icon={FiAward}
+                color="#3B82F6"
                 subtitle="All campaigns"
                 trend={{ direction: 'up', value: '+12%' }}
                 onClick={() => setActiveTab('campaigns')}
               />
-              <BrandStatCard 
-                label="Active Campaigns" 
-                value={stats.activeCampaigns} 
-                icon={FiTrendingUp} 
-                color="#10B981" 
+              <BrandStatCard
+                label="Active Campaigns"
+                value={stats.activeCampaigns}
+                icon={FiTrendingUp}
+                color="#10B981"
                 subtitle="Live now"
                 onClick={() => setActiveTab('campaigns')}
               />
-              <BrandStatCard 
-                label="Pending Applications" 
-                value={stats.pendingApplications} 
-                icon={FiInbox} 
-                color="#F59E0B" 
+              <BrandStatCard
+                label="Pending Applications"
+                value={stats.pendingApplications}
+                icon={FiInbox}
+                color="#F59E0B"
                 subtitle="Needs review"
                 trend={{ direction: 'up', value: '+5' }}
                 onClick={() => setActiveTab('applications')}
               />
-              <BrandStatCard 
-                label="Total Budget" 
-                value={formatCurrency(stats.convertedTotal)} 
-                icon={FiDollarSign} 
-                color="#EC4899" 
+              <BrandStatCard
+                label="Total Budget"
+                value={formatCurrency(stats.convertedTotal)}
+                icon={FiDollarSign}
+                color="#EC4899"
                 subtitle={`In ${currency}`}
                 onClick={() => setShowBudgetBreakdown(!showBudgetBreakdown)}
               />
-              <BrandStatCard 
-                label="Conversion Rate" 
-                value={stats.conversionRate} 
-                icon={FiUserCheck} 
-                color="#06B6D4" 
+              <BrandStatCard
+                label="Conversion Rate"
+                value={stats.conversionRate}
+                icon={FiUserCheck}
+                color="#06B6D4"
                 subtitle="Application success"
                 trend={{ direction: 'up', value: '+3%' }}
               />
-              <BrandStatCard 
-                label="Engagement Rate" 
-                value={stats.engagementRate} 
-                icon={FiEye} 
-                color="#8B5CF6" 
+              <BrandStatCard
+                label="Engagement Rate"
+                value={stats.engagementRate}
+                icon={FiEye}
+                color="#8B5CF6"
                 subtitle="Avg. performance"
               />
             </div>
-            
+
             {/* Budget Breakdown */}
             {showBudgetBreakdown && stats.totalBudget && Object.keys(stats.totalBudget).length > 0 && (
               <div className="brand-budget-breakdown">
                 <div className="brand-budget-breakdown-header">
                   <h4>Budget Breakdown by Currency</h4>
-                  <button 
+                  <button
                     className="brand-close-breakdown"
                     onClick={() => setShowBudgetBreakdown(false)}
                   >
@@ -964,302 +969,315 @@ useEffect(() => {
           </section>
 
           {/* Recent Activity */}
-          <section className="brand-recent-activity">
-  <div className="brand-section-header">
-    <h2>Recent Activity</h2>
-    <p>Latest updates and actions</p>
-  </div>
+          <section className="brand-recent-activity" ref={activityDropdownRef}>
+            <div className="brand-section-header">
+              <div>
+                <h2>Recent Activity</h2>
+                <p>Latest updates and actions</p>
+              </div>
 
-  {/* Default 3 activities */}
-  <div className="brand-activity-list">
-  {applications.slice(0, 3).map((app, index) => (
-    <div key={index} className="brand-activity-item">
-      <div className="brand-activity-icon">
-        <FiInbox />
-      </div>
-
-      <div className="brand-activity-content">
-        <p className="brand-activity-title">
-          <strong>{app.influencer_name}</strong> applied to{" "}
-          <span>{app.campaign_title}</span>
-        </p>
-        <span className="brand-activity-meta">
-          Just now • Application submitted
-        </span>
-      </div>
-
-      <span className={`brand-activity-status brand-status-${app.status}`}>
-        {app.status}
-      </span>
-    </div>
-  ))}
-</div>
-
-  {/* View more */}
-  {applications.length > 3 && (
-    <div className="brand-activity-view-more">
-      <button
-        onClick={() => setShowActivityDropdown(true)}
-        className="brand-link-btn"
-      >
-        View more activity
-      </button>
-    </div>
-  )}
-
-  {/* Dropdown / Expanded list */}
-  {showActivityDropdown && (
-    <div className="brand-activity-dropdown brand-drop-shadow">
-      <div className="brand-activity-dropdown-header">
-        <h4>All Recent Activity</h4>
-        <button className='brand-activity-close-btn' onClick={() => setShowActivityDropdown(false)}>
-          <FiX size={14} />
-        </button>
-      </div>
-
-      <div className="brand-activity-dropdown-list">
-        {applications.map((app, index) => (
-          <div key={index} className="brand-activity-row">
-            <div className="brand-activity-icon">
-              <FiInbox />
+              {applications.length > 3 && (
+                <button
+                  onClick={() => setShowActivityDropdown(!showActivityDropdown)}
+                  className={`brand-link-btn ${showActivityDropdown ? 'brand-link-btn--active' : ''}`}
+                >
+                  View All
+                  <FiChevronDown
+                    size={14}
+                    style={{
+                      transition: 'transform 0.2s ease',
+                      transform: showActivityDropdown ? 'rotate(180deg)' : 'rotate(0deg)'
+                    }}
+                  />
+                </button>
+              )}
             </div>
 
-            <div className="brand-activity-info">
-              <p>
-                <strong>{app.influencer_name}</strong> applied to{" "}
-                {app.campaign_title}
-              </p>
-              <span className="brand-activity-time">Just now</span>
+            {/* Default 5 activities */}
+            <div className="brand-activity-list">
+              {applications.slice(0, 5).map((app, index) => (
+                <div key={index} className="brand-activity-item">
+                  <div className="brand-activity-icon">
+                    <FiInbox />
+                  </div>
+
+                  <div className="brand-activity-content">
+                    <p className="brand-activity-title">
+                      <strong>{app.influencer_profile_name || app.influencer_name}</strong> applied to{" "}
+                      <span>{app.campaign_title || app.title}</span>
+                    </p>
+                    <span className="brand-activity-meta">
+                      {new Date(app.applied_at).toLocaleDateString()} • Application submitted
+                    </span>
+                  </div>
+
+                  <span className={`brand-activity-pill brand-status-${app.status}`}>
+                    {app.status}
+                  </span>
+                </div>
+              ))}
             </div>
 
-            <span
-              className={`brand-activity-pill brand-status-${app.status}`}
-            >
-              {app.status}
-            </span>
-          </div>
-        ))}
-      </div>
-    </div>
-  )}
-</section>
+            {/* Dropdown — floats freely over page content */}
+            {showActivityDropdown && (
+              <div className="brand-activity-dropdown brand-drop-shadow">
+                <div className="brand-activity-dropdown-header">
+                  <h4>All Recent Activity</h4>
+                  <button className="brand-activity-close-btn" onClick={() => setShowActivityDropdown(false)}>
+                    <FiX size={14} />
+                  </button>
+                </div>
+
+                <div className="brand-activity-dropdown-list">
+                  {applications.slice(0, 20).map((app, index) => (
+                    <div key={index} className="brand-activity-row">
+                      <div className="brand-activity-icon">
+                        <FiInbox />
+                      </div>
+
+                      <div className="brand-activity-info">
+                        <p>
+                          <strong>{app.influencer_profile_name || app.influencer_name}</strong> applied to{" "}
+                          {app.campaign_title || app.title}
+                        </p>
+                        <span className="brand-activity-time">{new Date(app.applied_at).toLocaleDateString()}</span>
+                      </div>
+
+                      <span className={`brand-activity-pill brand-status-${app.status}`}>
+                        {app.status}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="brand-activity-dropdown-footer">
+                  <button
+                    className="brand-view-all-activity-btn"
+                    onClick={() => navigate('/brand/activity')}
+                  >
+                    Visit all activity page
+                  </button>
+                </div>
+              </div>
+            )}
+          </section>
 
         </div>
 
         {/* Quick Actions */}
         {/* Quick Actions */}
-{/* Quick Actions Section */}
-<section style={{
-  marginBottom: '32px',
-  padding: '24px',
-  backgroundColor: '#ffffff',
-  borderRadius: '16px',
-  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
-  border: '1px solid #f1f5f9'
-}}>
-  {/* Section Header */}
-  <div style={{
-    marginBottom: '20px',
-    paddingBottom: '16px',
-    borderBottom: '1px solid #f1f5f9'
-  }}>
-    <h2 style={{
-      fontSize: '20px',
-      fontWeight: '600',
-      color: '#1e293b',
-      marginBottom: '4px',
-      display: 'flex',
-      alignItems: 'center',
-      gap: '8px'
-    }}>
-      <div style={{
-        width: '6px',
-        height: '6px',
-        borderRadius: '50%',
-        backgroundColor: '#4f46e5'
-      }} />
-      Quick Actions
-    </h2>
-    <p style={{
-      fontSize: '14px',
-      color: '#64748b',
-      margin: 0
-    }}>
-      Switch between frequently used features and tools
-    </p>
-  </div>
+        {/* Quick Actions Section */}
+        <section style={{
+          marginBottom: '32px',
+          padding: '24px',
+          backgroundColor: '#ffffff',
+          borderRadius: '16px',
+          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
+          border: '1px solid #f1f5f9'
+        }}>
+          {/* Section Header */}
+          <div style={{
+            marginBottom: '20px',
+            paddingBottom: '16px',
+            borderBottom: '1px solid #f1f5f9'
+          }}>
+            <h2 style={{
+              fontSize: '20px',
+              fontWeight: '600',
+              color: '#1e293b',
+              marginBottom: '4px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}>
+              <div style={{
+                width: '6px',
+                height: '6px',
+                borderRadius: '50%',
+                backgroundColor: '#4f46e5'
+              }} />
+              Quick Actions
+            </h2>
+            <p style={{
+              fontSize: '14px',
+              color: '#64748b',
+              margin: 0
+            }}>
+              Switch between frequently used features and tools
+            </p>
+          </div>
 
-  {/* Quick Action Tabs */}
-  <div style={{
-    display: 'flex',
-    flexWrap: 'wrap',
-    gap: '8px',
-    padding: '4px',
-    backgroundColor: '#f8fafc',
-    borderRadius: '12px',
-    border: '1px solid #e2e8f0'
-  }}>
-    {[
-      {
-        id: 'create',
-        label: 'Create New',
-        icon: FiPlusCircle,
-        color: '#3b82f6'
-      },
-      {
-        id: 'campaigns',
-        label: 'Campaigns',
-        icon: FiAward,
-        color: '#3b82f6',
-        badge: stats.activeCampaigns,
-        badgeColor: '#10b981'
-      },
-      {
-        id: 'applications',
-        label: 'Applications',
-        icon: FiInbox,
-        color: '#3b82f6',
-        badge: stats.pendingApplications,
-        badgeColor: '#ef4444'
-      },
-      {
-        id: 'analytics',
-        label: 'Analytics',
-        icon: FiPieChart,
-        color: '#3b82f6'
-      },
-      {
-        id: 'aitools',
-        label: 'AI Tools',
-        icon: FiCpu,
-        color: '#3b82f6',
-        newBadge: true
-      }
-    ].map((tab) => {
-      const Icon = tab.icon;
-      const isActive = activeTab === tab.id;
-      
-      return (
-        <button
-          key={tab.id}
-          onClick={() => setActiveTab(tab.id)}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            padding: '10px 18px',
-            fontSize: '14px',
-            fontWeight: '500',
-            border: 'none',
-            borderRadius: '8px',
-            cursor: 'pointer',
-            transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-            backgroundColor: isActive ? '#ffffff' : 'transparent',
-            color: isActive ? tab.color : '#475569',
-            boxShadow: isActive ? '0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.05)' : 'none',
-            transform: isActive ? 'translateY(-1px)' : 'none',
-            flex: '1 0 auto',
-            minWidth: '120px',
-            position: 'relative',
-            overflow: 'hidden'
-          }}
-          onMouseEnter={(e) => {
-            if (!isActive) {
-              e.currentTarget.style.backgroundColor = '#ffffff';
-              e.currentTarget.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.05)';
-            }
-          }}
-          onMouseLeave={(e) => {
-            if (!isActive) {
-              e.currentTarget.style.backgroundColor = 'transparent';
-              e.currentTarget.style.boxShadow = 'none';
-            }
-          }}
-        >
-          {/* Icon with colored circle background when active */}
+          {/* Quick Action Tabs */}
           <div style={{
             display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: '28px',
-            height: '28px',
-            borderRadius: '8px',
-            backgroundColor: isActive ? `${tab.color}15` : '#f1f5f9',
-            transition: 'all 0.2s ease'
+            flexWrap: 'wrap',
+            gap: '8px',
+            padding: '4px',
+            backgroundColor: '#f8fafc',
+            borderRadius: '12px',
+            border: '1px solid #e2e8f0'
           }}>
-            <Icon 
-              size={16} 
-              color={isActive ? tab.color : '#94a3b8'}
-            />
-          </div>
-          
-          <span style={{
-            flex: 1,
-            textAlign: 'left'
-          }}>
-            {tab.label}
-          </span>
-          
-          {/* Number Badge */}
-          {tab.badge > 0 && (
-            <span style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              minWidth: '20px',
-              height: '20px',
-              padding: '0 6px',
-              fontSize: '11px',
-              fontWeight: '700',
-              backgroundColor: tab.badgeColor,
-              color: '#ffffff',
-              borderRadius: '10px',
-              boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)'
-            }}>
-              {tab.badge}
-            </span>
-          )}
-          
-          {/* New Badge */}
-          {tab.newBadge && (
-            <span style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '2px 8px',
-              fontSize: '10px',
-              fontWeight: '700',
-              backgroundColor: '#10b981',
-              color: '#ffffff',
-              borderRadius: '10px',
-              boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)',
-              textTransform: 'uppercase',
-              letterSpacing: '0.5px'
-            }}>
-              New
-            </span>
-          )}
-          
-          {/* Active Tab Indicator */}
-          {isActive && (
-            <div style={{
-              position: 'absolute',
-              bottom: '0',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              width: '24px',
-              height: '3px',
-              backgroundColor: tab.color,
-              borderRadius: '3px 3px 0 0'
-            }} />
-          )}
-        </button>
-      );
-    })}
-  </div>
+            {[
+              {
+                id: 'create',
+                label: 'Create New',
+                icon: FiPlusCircle,
+                color: '#3b82f6'
+              },
+              {
+                id: 'campaigns',
+                label: 'Campaigns',
+                icon: FiAward,
+                color: '#3b82f6',
+                badge: stats.activeCampaigns,
+                badgeColor: '#10b981'
+              },
+              {
+                id: 'applications',
+                label: 'Applications',
+                icon: FiInbox,
+                color: '#3b82f6',
+                badge: stats.pendingApplications,
+                badgeColor: '#ef4444'
+              },
+              {
+                id: 'analytics',
+                label: 'Analytics',
+                icon: FiPieChart,
+                color: '#3b82f6'
+              },
+              {
+                id: 'aitools',
+                label: 'AI Tools',
+                icon: FiCpu,
+                color: '#3b82f6',
+                newBadge: true
+              }
+            ].map((tab) => {
+              const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
 
-  {/* Selected Tab Indicator */}
-  {/* <div style={{
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '10px 18px',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    border: 'none',
+                    borderRadius: '8px',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                    backgroundColor: isActive ? '#ffffff' : 'transparent',
+                    color: isActive ? tab.color : '#475569',
+                    boxShadow: isActive ? '0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.05)' : 'none',
+                    transform: isActive ? 'translateY(-1px)' : 'none',
+                    flex: '1 0 auto',
+                    minWidth: '120px',
+                    position: 'relative',
+                    overflow: 'hidden'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isActive) {
+                      e.currentTarget.style.backgroundColor = '#ffffff';
+                      e.currentTarget.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.05)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isActive) {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }
+                  }}
+                >
+                  {/* Icon with colored circle background when active */}
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: '28px',
+                    height: '28px',
+                    borderRadius: '8px',
+                    backgroundColor: isActive ? `${tab.color}15` : '#f1f5f9',
+                    transition: 'all 0.2s ease'
+                  }}>
+                    <Icon
+                      size={16}
+                      color={isActive ? tab.color : '#94a3b8'}
+                    />
+                  </div>
+
+                  <span style={{
+                    flex: 1,
+                    textAlign: 'left'
+                  }}>
+                    {tab.label}
+                  </span>
+
+                  {/* Number Badge */}
+                  {tab.badge > 0 && (
+                    <span style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      minWidth: '20px',
+                      height: '20px',
+                      padding: '0 6px',
+                      fontSize: '11px',
+                      fontWeight: '700',
+                      backgroundColor: tab.badgeColor,
+                      color: '#ffffff',
+                      borderRadius: '10px',
+                      boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)'
+                    }}>
+                      {tab.badge}
+                    </span>
+                  )}
+
+                  {/* New Badge */}
+                  {tab.newBadge && (
+                    <span style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      padding: '2px 8px',
+                      fontSize: '10px',
+                      fontWeight: '700',
+                      backgroundColor: '#10b981',
+                      color: '#ffffff',
+                      borderRadius: '10px',
+                      boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.5px'
+                    }}>
+                      New
+                    </span>
+                  )}
+
+                  {/* Active Tab Indicator */}
+                  {isActive && (
+                    <div style={{
+                      position: 'absolute',
+                      bottom: '0',
+                      left: '50%',
+                      transform: 'translateX(-50%)',
+                      width: '24px',
+                      height: '3px',
+                      backgroundColor: tab.color,
+                      borderRadius: '3px 3px 0 0'
+                    }} />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Selected Tab Indicator */}
+          {/* <div style={{
     marginTop: '16px',
     padding: '12px 16px',
     backgroundColor: '#f8fafc',
@@ -1289,7 +1307,7 @@ useEffect(() => {
       </span>
     </span>
   </div> */}
-</section>
+        </section>
 
 
         {/* Active Tab Content Section */}
@@ -1323,7 +1341,7 @@ useEffect(() => {
             //     <h2 className="brand-gradient-text">AI-Powered Marketing Suite</h2>
             //     <p>Leverage artificial intelligence to optimize your marketing campaigns and maximize ROI</p>
             //   </div>
-              
+
             //   {/* AI Tools Grid */}
             //   <div className="brand-ai-tools-grid">
             //     {brandAITools.map((tool) => (
@@ -1402,26 +1420,26 @@ useEffect(() => {
       {/* Footer Quick Links */}
       <section className="brand-footer-links">
         <div className="brand-quick-actions-grid">
-  {quickActions.map((action, index) => (
-    <div
-      key={index}
-      className="brand-quick-action-card"
-      onClick={action.action}
-    >
-      <div
-        className="brand-quick-action-icon"
-        style={{ backgroundColor: `${action.color}15`, color: action.color }}
-      >
-        <action.icon size={20} />
-      </div>
+          {quickActions.map((action, index) => (
+            <div
+              key={index}
+              className="brand-quick-action-card"
+              onClick={action.action}
+            >
+              <div
+                className="brand-quick-action-icon"
+                style={{ backgroundColor: `${action.color}15`, color: action.color }}
+              >
+                <action.icon size={20} />
+              </div>
 
-      <div className="brand-quick-action-content">
-        <h4>{action.title}</h4>
-        <p>{action.description}</p>
-      </div>
-    </div>
-  ))}
-</div>
+              <div className="brand-quick-action-content">
+                <h4>{action.title}</h4>
+                <p>{action.description}</p>
+              </div>
+            </div>
+          ))}
+        </div>
 
       </section>
 

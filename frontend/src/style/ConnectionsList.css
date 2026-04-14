@@ -3,12 +3,11 @@
 /* Main container */
 .connections {
   min-height: 100vh;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-  padding: 2rem 1rem;
+  
 }
 
 .connections__container {
-  max-width: 720px;
+  
   margin: 0 auto;
   background: white;
   border-radius: 20px;

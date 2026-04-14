@@ -6,9 +6,9 @@ import {
   Dialog, DialogTitle, DialogContent, DialogActions,
   TextField, Grid, Avatar, styled, Paper,
   IconButton, useTheme, useMediaQuery,
-  Tabs, Tab, Container, Table, TableBody, TableCell, 
+  Tabs, Tab, Container, Table, TableBody, TableCell,
   TableHead, TableRow, TablePagination, Stepper, Step, StepLabel,
-  List, ListItem, ListItemIcon, ListItemText, 
+  List, ListItem, ListItemIcon, ListItemText,
   Collapse, FormControl, InputLabel, Select, MenuItem,
   Tooltip, Fab, Zoom, alpha, Badge,
   InputAdornment, Divider, Menu, TableContainer
@@ -16,10 +16,10 @@ import {
 
 import {
   CalendarToday, CheckCircle, Visibility,
-  Search, Close, ArrowBack, Send, Payment, 
-  Description, Email, Chat, Image as ImageIcon, 
-  AccessTime, Refresh, VideoLibrary, PictureAsPdf, 
-  InsertDriveFile, Download, AttachMoney, Schedule, 
+  Search, Close, ArrowBack, Send, Payment,
+  Description, Email, Chat, Image as ImageIcon,
+  AccessTime, Refresh, VideoLibrary, PictureAsPdf,
+  InsertDriveFile, Download, AttachMoney, Schedule,
   FilterList, ClearAll, Audiotrack, MarkEmailRead,
   TrendingUp, Group, FileCopy, Campaign,
   MoreVert, ExpandMore, ExpandLess, Dashboard,
@@ -27,12 +27,30 @@ import {
   Check, Clear, WorkOutline, Assignment, AssignmentTurnedIn,
   MonetizationOn, ThumbUp, ThumbDown, Category, Flag,
   Business, ContactMail, Public, Analytics, LocalOffer,
-  Instagram, YouTube, DescriptionIcon
+  Instagram, YouTube, VerifiedUser
 } from '@mui/icons-material';
+import { TabContext, TabPanel } from "@mui/lab";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faBullseye,
+  faUser,
+  faChartPie,
+  faArrowsRotate,
+  faFileContract,
+  faMoneyBillWave,
+  faCalendarDays,
+  faUserTag,
+  faCircleCheck,
+  faFolderOpen,
+  faRocket,
+  faAward,
+  faMessage
+} from '@fortawesome/free-solid-svg-icons';
 
 import { campaignAPI } from '../../services/api';
 import profileAPI from "../../services/profileAPI";
 import { AuthContext } from "../../context/AuthContext";
+import { format } from 'date-fns';
 
 // =============================================
 // 🎨 STYLED COMPONENTS (Consistent with Brand Applications)
@@ -89,18 +107,18 @@ const StatusChip = styled(Chip)(({ theme, status }) => ({
 }));
 
 const GradientButton = styled(Button)(({ theme }) => ({
-  background: '#2563eb',
+  background: '#1976d2',
   color: 'white',
   fontWeight: 600,
   borderRadius: '12px',
   padding: '10px 24px',
   textTransform: 'none',
   fontSize: '0.875rem',
-  boxShadow: '0 4px 15px rgba(102, 126, 234, 0.3)',
+  boxShadow: '0 4px 15px rgba(25, 118, 210, 0.3)',
   transition: 'all 0.3s ease',
   '&:hover': {
-    background: '#2563eb',
-    boxShadow: '0 6px 20px rgba(102, 126, 234, 0.4)',
+    background: '#1976d2',
+    boxShadow: '0 6px 20px rgba(25, 118, 210, 0.4)',
     transform: 'translateY(-1px)'
   },
   '&.Mui-disabled': {
@@ -164,10 +182,10 @@ const ProfileImage = ({ userId, profileType, alt, size = 40, onClick }) => {
         setLoading(true);
         const response = await profileAPI.getProfileById(userId);
         if (response?.profile) {
-          const imageId = profileType === 'influencer' 
-            ? response.profile.profile_picture 
+          const imageId = profileType === 'influencer'
+            ? response.profile.profile_picture
             : response.profile.logo;
-          
+
           if (imageId) {
             setImageUrl(`${process.env.REACT_APP_API_URL}/profiles/image/${imageId}`);
           } else {
@@ -186,10 +204,10 @@ const ProfileImage = ({ userId, profileType, alt, size = 40, onClick }) => {
 
   if (loading) {
     return (
-      <Avatar 
-        sx={{ 
-          width: size, 
-          height: size, 
+      <Avatar
+        sx={{
+          width: size,
+          height: size,
           bgcolor: 'action.hover',
           cursor: onClick ? 'pointer' : 'default'
         }}
@@ -201,10 +219,10 @@ const ProfileImage = ({ userId, profileType, alt, size = 40, onClick }) => {
 
   if (error || !imageUrl) {
     return (
-      <Avatar 
-        sx={{ 
-          width: size, 
-          height: size, 
+      <Avatar
+        sx={{
+          width: size,
+          height: size,
           bgcolor: 'primary.light',
           cursor: onClick ? 'pointer' : 'default',
           transition: 'all 0.3s ease',
@@ -221,11 +239,11 @@ const ProfileImage = ({ userId, profileType, alt, size = 40, onClick }) => {
   }
 
   return (
-    <Avatar 
+    <Avatar
       src={imageUrl}
       alt={alt}
-      sx={{ 
-        width: size, 
+      sx={{
+        width: size,
         height: size,
         cursor: onClick ? 'pointer' : 'default',
         transition: 'all 0.3s ease',
@@ -264,15 +282,15 @@ const UserInfo = ({ userId, profileType, showEmail = false, size = 40, showStats
   };
 
   const getDisplayName = () => {
-    if (!userData) return 'Loading...';
-    return profileType === 'influencer' 
+    if (!userData) return 'Brio User';
+    return profileType === 'influencer'
       ? userData.nickname || userData.full_name || 'Unknown Influencer'
       : userData.company_name || userData.contact_person_name || 'Unknown Brand';
   };
 
   const getStats = () => {
     if (!userData || !showStats) return null;
-    
+
     if (profileType === 'influencer') {
       return {
         followers: userData.followers_count || 'N/A',
@@ -299,10 +317,10 @@ const UserInfo = ({ userId, profileType, showEmail = false, size = 40, showStats
         size={size}
       />
       <Box flex={1}>
-        <Typography 
-          variant="subtitle2" 
+        <Typography
+          variant="subtitle2"
           fontWeight="700"
-          sx={{ 
+          sx={{
             cursor: 'pointer',
             '&:hover': { color: 'primary.main', textDecoration: 'underline' }
           }}
@@ -310,7 +328,7 @@ const UserInfo = ({ userId, profileType, showEmail = false, size = 40, showStats
         >
           {getDisplayName()}
         </Typography>
-        
+
         {showStats && stats && (
           <Box display="flex" gap={1} mt={0.5} flexWrap="wrap">
             {stats.followers !== 'N/A' && profileType === 'influencer' && (
@@ -335,7 +353,7 @@ const UserInfo = ({ userId, profileType, showEmail = false, size = 40, showStats
             )}
           </Box>
         )}
-        
+
         {showEmail && userData?.email && (
           <Typography variant="caption" color="text.secondary" display="block">
             {userData.email}
@@ -361,45 +379,45 @@ const StatsOverview = ({ agreements, onTabChange }) => {
   };
 
   const statItems = [
-    { 
-      label: 'Total Agreements', 
-      value: stats.total, 
-      icon: <Description sx={{ fontSize: 32 }} />, 
+    {
+      label: 'Total Agreements',
+      value: stats.total,
+      icon: <Description sx={{ fontSize: 32 }} />,
       color: 'primary',
       tab: 'all'
     },
-    { 
-      label: 'Ready for Contract', 
-      value: stats.pending, 
-      icon: <AccessTime sx={{ fontSize: 32 }} />, 
+    {
+      label: 'Ready for Contract',
+      value: stats.pending,
+      icon: <AccessTime sx={{ fontSize: 32 }} />,
       color: 'warning',
       tab: 'approved'
     },
-    { 
-      label: 'Contract Sent', 
-      value: stats.sent, 
-      icon: <Send sx={{ fontSize: 32 }} />, 
+    {
+      label: 'Contract Sent',
+      value: stats.sent,
+      icon: <Send sx={{ fontSize: 32 }} />,
       color: 'info',
       tab: 'sent'
     },
-    { 
-      label: 'Contract Signed', 
-      value: stats.contracted, 
-      icon: <CheckCircle sx={{ fontSize: 32 }} />, 
+    {
+      label: 'Contract Signed',
+      value: stats.contracted,
+      icon: <CheckCircle sx={{ fontSize: 32 }} />,
       color: 'success',
       tab: 'contracted'
     },
-    { 
-      label: 'Media Ready', 
-      value: stats.mediaReady, 
-      icon: <ImageIcon sx={{ fontSize: 32 }} />, 
+    {
+      label: 'Media Ready',
+      value: stats.mediaReady,
+      icon: <ImageIcon sx={{ fontSize: 32 }} />,
       color: 'secondary',
       tab: 'media_submitted'
     },
-    { 
-      label: 'Completed', 
-      value: stats.completed, 
-      icon: <TrendingUp sx={{ fontSize: 32 }} />, 
+    {
+      label: 'Completed',
+      value: stats.completed,
+      icon: <TrendingUp sx={{ fontSize: 32 }} />,
       color: 'primary',
       tab: 'completed'
     }
@@ -409,14 +427,14 @@ const StatsOverview = ({ agreements, onTabChange }) => {
     <Grid container spacing={3} sx={{ mb: 4 }}>
       {statItems.map((stat, index) => (
         <Grid item xs={12} sm={6} md={4} lg={2} key={stat.label}>
-          <StatsCard 
+          <StatsCard
             color={stat.color}
             onClick={() => onTabChange(stat.tab)}
             sx={{ height: '100%' }}
           >
             <Box display="flex" alignItems="center" justifyContent="center" mb={2}>
-              <Avatar sx={{ 
-                bgcolor: `${stat.color}.light`, 
+              <Avatar sx={{
+                bgcolor: `${stat.color}.light`,
                 color: `${stat.color}.dark`,
                 width: 60,
                 height: 60
@@ -460,8 +478,8 @@ const AgreementWorkflow = ({ agreement }) => {
     {
       label: 'Contract Sent',
       status: agreement.contract_sent ? 'completed' : agreement.contract_signed ? 'completed' : 'pending',
-      description: agreement.contract_sent ? 
-        `Contract sent to influencer on ${new Date(agreement.contract_sent_at).toLocaleDateString()}` : 
+      description: agreement.contract_sent ?
+        `Contract sent to influencer on ${new Date(agreement.contract_sent_at).toLocaleDateString()}` :
         'Ready to send contract agreement',
       date: agreement.contract_sent_at,
       icon: <Send />
@@ -469,8 +487,8 @@ const AgreementWorkflow = ({ agreement }) => {
     {
       label: 'Contract Signed',
       status: agreement.contract_signed ? 'completed' : 'pending',
-      description: agreement.contract_signed ? 
-        `Contract signed by influencer on ${new Date(agreement.contract_signed_at).toLocaleDateString()}` : 
+      description: agreement.contract_signed ?
+        `Contract signed by influencer on ${new Date(agreement.contract_signed_at).toLocaleDateString()}` :
         'Waiting for influencer signature',
       date: agreement.contract_signed_at,
       icon: <CheckCircle />
@@ -478,8 +496,8 @@ const AgreementWorkflow = ({ agreement }) => {
     {
       label: 'Media Submission',
       status: ['media_submitted', 'completed'].includes(agreement.status) ? 'completed' : 'pending',
-      description: agreement.media_submitted_at ? 
-        `Media submitted on ${new Date(agreement.media_submitted_at).toLocaleDateString()}` : 
+      description: agreement.media_submitted_at ?
+        `Media submitted on ${new Date(agreement.media_submitted_at).toLocaleDateString()}` :
         'Waiting for media submission',
       date: agreement.media_submitted_at,
       icon: <ImageIcon />
@@ -487,8 +505,8 @@ const AgreementWorkflow = ({ agreement }) => {
     {
       label: 'Payment Processed',
       status: agreement.status === 'completed' ? 'completed' : 'pending',
-      description: agreement.payment_date ? 
-        `Payment completed on ${new Date(agreement.payment_date).toLocaleDateString()}` : 
+      description: agreement.payment_date ?
+        `Payment completed on ${new Date(agreement.payment_date).toLocaleDateString()}` :
         'Ready for payment processing',
       date: agreement.payment_date,
       icon: <MonetizationOn />
@@ -546,12 +564,13 @@ const AgreementWorkflow = ({ agreement }) => {
 
 const CampaignDetailsSection = ({ agreement }) => {
   const [campaignData, setCampaignData] = useState(null);
+  const theme = useTheme();
 
   useEffect(() => {
     const fetchCampaignData = async () => {
       if (agreement?.campaign_id) {
         try {
-          const response = await campaignAPI.getCampaignById(agreement.campaign_id);
+          const response = await campaignAPI.getCampaignDetail(agreement.campaign_id);
           setCampaignData(response);
         } catch (error) {
           console.error('Error fetching campaign data:', error);
@@ -563,137 +582,154 @@ const CampaignDetailsSection = ({ agreement }) => {
   }, [agreement]);
 
   return (
-    <DetailSection>
-      <Typography variant="h6" gutterBottom fontWeight="700" color="primary">
-        🎯 Campaign Details
-      </Typography>
-      
-      <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
-          <Box mb={2}>
-            <Typography variant="h5" fontWeight="700" gutterBottom color="primary">
+    <Box sx={{ p: 4 }}>
+      {/* Campaign Details - FULL WIDTH High-Fidelity Design */}
+      <Box sx={{ mb: 4 }}>
+        <Typography variant="h6" gutterBottom color="primary" fontWeight="700" sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 1.5 }}>
+          <FontAwesomeIcon icon={faBullseye} />
+          Campaign Overview
+        </Typography>
+
+        {agreement && (
+          <Box sx={{
+            p: 4,
+            background: 'white',
+            borderRadius: '24px',
+            boxShadow: '0 10px 40px rgba(0, 0, 0, 0.05)',
+            border: '1px solid rgba(0, 0, 0, 0.04)',
+            position: 'relative',
+            overflow: 'hidden'
+          }}>
+            {/* Status Indicator */}
+            <Box sx={{
+              position: 'absolute',
+              top: 0,
+              right: 0,
+              p: 3
+            }}>
+              <StatusChip
+                label={agreement.status?.toUpperCase() || 'ACTIVE'}
+                status={agreement.status}
+              />
+            </Box>
+
+            <Typography variant="h4" fontWeight="800" gutterBottom color="primary">
               {agreement.title}
             </Typography>
-            <Box display="flex" alignItems="center" gap={2} mb={2}>
-              <Chip 
-                label={agreement.category || 'General'} 
-                color="primary" 
-                variant="outlined" 
-                size="small" 
-              />
-              <Box display="flex" alignItems="center">
-                <AttachMoney sx={{ fontSize: 16, mr: 0.5, color: 'success.main' }} />
-                <Typography variant="body1" fontWeight="600" color="success.main">
-                  {agreement.currency || 'USD'} {agreement.budget?.toLocaleString()}
+
+            <Grid container spacing={4} sx={{ mt: 2 }}>
+              <Grid item xs={12} sm={6} md={3}>
+                <Box display="flex" alignItems="center" gap={2}>
+                  <Box sx={{ p: 1.5, bgcolor: 'success.light', borderRadius: '12px', color: 'success.main', display: 'flex' }}>
+                    <AttachMoney />
+                  </Box>
+                  <Box>
+                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                      Package Price
+                    </Typography>
+                    <Typography variant="h6" fontWeight="700">
+                      {agreement.currency || 'USD'} {agreement.budget?.toLocaleString()}
+                    </Typography>
+                  </Box>
+                </Box>
+              </Grid>
+
+              <Grid item xs={12} sm={6} md={3}>
+                <Box display="flex" alignItems="center" gap={2}>
+                  <Box sx={{ p: 1.5, bgcolor: 'info.light', borderRadius: '12px', color: 'info.main', display: 'flex' }}>
+                    <Category />
+                  </Box>
+                  <Box>
+                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                      Niche Category
+                    </Typography>
+                    <Typography variant="h6" fontWeight="700">
+                      {agreement.category || 'Lifestyle'}
+                    </Typography>
+                  </Box>
+                </Box>
+              </Grid>
+
+              <Grid item xs={12} sm={6} md={3}>
+                <Box display="flex" alignItems="center" gap={2}>
+                  <Box sx={{ p: 1.5, bgcolor: 'warning.light', borderRadius: '12px', color: 'warning.main', display: 'flex' }}>
+                    <Schedule />
+                  </Box>
+                  <Box>
+                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                      Submission Deadline
+                    </Typography>
+                    <Typography variant="h6" fontWeight="700">
+                      {agreement.deadline ? format(new Date(agreement.deadline), 'MMM dd, yyyy') : 'No Date Set'}
+                    </Typography>
+                  </Box>
+                </Box>
+              </Grid>
+
+              <Grid item xs={12} sm={6} md={3}>
+                <Box display="flex" alignItems="center" gap={2}>
+                  <Box sx={{ p: 1.5, bgcolor: 'secondary.light', borderRadius: '12px', color: 'secondary.main', display: 'flex' }}>
+                    <Flag />
+                  </Box>
+                  <Box>
+                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                      Campaign Priority
+                    </Typography>
+                    <Typography variant="h6" fontWeight="700">
+                      {campaignData?.priority || 'Normal'}
+                    </Typography>
+                  </Box>
+                </Box>
+              </Grid>
+            </Grid>
+
+            {campaignData?.description && (
+              <Box sx={{ mt: 5 }}>
+                <Typography variant="subtitle1" color="primary" fontWeight="700" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Description sx={{ fontSize: 20 }} />
+                  About the Collaboration
+                </Typography>
+                <Typography variant="body1" sx={{
+                  p: 3,
+                  background: 'linear-gradient(135deg, #f8faff 0%, #f0f4ff 100%)',
+                  borderRadius: '16px',
+                  lineHeight: 1.8,
+                  fontSize: '1rem',
+                  color: 'text.primary',
+                  border: '1px solid rgba(0, 0, 0, 0.05)'
+                }}>
+                  {campaignData.description}
                 </Typography>
               </Box>
-            </Box>
+            )}
+
+            {campaignData?.requirements && (
+              <Box sx={{ mt: 4 }}>
+                <Typography variant="subtitle1" color="primary" fontWeight="700" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Assignment sx={{ fontSize: 20 }} />
+                  Campaign Requirements
+                </Typography>
+                <Typography variant="body1" sx={{
+                  p: 3,
+                  background: 'linear-gradient(135deg, #fff9f0 0%, #fff4e5 100%)',
+                  borderRadius: '16px',
+                  lineHeight: 1.8,
+                  fontSize: '1rem',
+                  color: 'text.primary',
+                  border: '1px solid rgba(0, 0, 0, 0.05)'
+                }}>
+                  {campaignData.requirements}
+                </Typography>
+              </Box>
+            )}
           </Box>
-
-          {campaignData?.description && (
-            <Box mb={3}>
-              <Typography variant="subtitle2" gutterBottom color="text.secondary">
-                DESCRIPTION
-              </Typography>
-              <Typography variant="body2" sx={{ 
-                p: 2, 
-                background: 'grey.50', 
-                borderRadius: '8px', 
-                lineHeight: 1.6 
-              }}>
-                {campaignData.description}
-              </Typography>
-            </Box>
-          )}
-
-          {campaignData?.requirements && (
-            <Box mb={3}>
-              <Typography variant="subtitle2" gutterBottom color="text.secondary">
-                REQUIREMENTS
-              </Typography>
-              <Typography variant="body2" sx={{ 
-                p: 2, 
-                background: 'grey.50', 
-                borderRadius: '8px', 
-                lineHeight: 1.6 
-              }}>
-                {campaignData.requirements}
-              </Typography>
-            </Box>
-          )}
-        </Grid>
-
-        <Grid item xs={12} md={6}>
-          <GlassCard sx={{ p: 3 }}>
-            <Typography variant="subtitle2" gutterBottom color="text.secondary">
-              CAMPAIGN TIMELINE
-            </Typography>
-            
-            <List dense>
-              <ListItem>
-                <ListItemIcon>
-                  <CalendarToday color="primary" />
-                </ListItemIcon>
-                <ListItemText 
-                  primary="Applied Date" 
-                  secondary={new Date(agreement.applied_at).toLocaleDateString()} 
-                />
-              </ListItem>
-              
-              {agreement.deadline && (
-                <ListItem>
-                  <ListItemIcon>
-                    <Schedule color="warning" />
-                  </ListItemIcon>
-                  <ListItemText 
-                    primary="Submission Deadline" 
-                    secondary={new Date(agreement.deadline).toLocaleDateString()} 
-                  />
-                </ListItem>
-              )}
-
-              {agreement.contract_sent_at && (
-                <ListItem>
-                  <ListItemIcon>
-                    <Send color="info" />
-                  </ListItemIcon>
-                  <ListItemText 
-                    primary="Contract Sent" 
-                    secondary={new Date(agreement.contract_sent_at).toLocaleDateString()} 
-                  />
-                </ListItem>
-              )}
-
-              {agreement.contract_signed_at && (
-                <ListItem>
-                  <ListItemIcon>
-                    <CheckCircle color="success" />
-                  </ListItemIcon>
-                  <ListItemText 
-                    primary="Contract Signed" 
-                    secondary={new Date(agreement.contract_signed_at).toLocaleDateString()} 
-                  />
-                </ListItem>
-              )}
-
-              {agreement.media_submitted_at && (
-                <ListItem>
-                  <ListItemIcon>
-                    <ImageIcon color="secondary" />
-                  </ListItemIcon>
-                  <ListItemText 
-                    primary="Media Submitted" 
-                    secondary={new Date(agreement.media_submitted_at).toLocaleDateString()} 
-                  />
-                </ListItem>
-              )}
-            </List>
-          </GlassCard>
-        </Grid>
-      </Grid>
-    </DetailSection>
+        )}
+      </Box>
+    </Box>
   );
 };
+
+
 
 // =============================================
 // 💰 SEND CONTRACT DIALOG (Enhanced)
@@ -774,7 +810,7 @@ const SendContractDialog = ({ open, onClose, agreement, onSendContract }) => {
 
   const handleSendContract = async () => {
     if (!agreement) return;
-    
+
     setSending(true);
     try {
       await onSendContract(agreement, isResend);
@@ -806,287 +842,228 @@ const SendContractDialog = ({ open, onClose, agreement, onSendContract }) => {
       onClose={onClose}
       maxWidth="lg"
       fullWidth
-      PaperProps={{ 
-        sx: { 
-          borderRadius: '20px', 
-          minHeight: '700px',
-          background: 'linear-gradient(135deg, #ffffff 0%, #f8faff 100%)'
-        } 
+      PaperProps={{
+        sx: {
+          borderRadius: '24px',
+          minHeight: '80vh',
+          background: '#ffffff',
+          overflow: 'hidden'
+        }
       }}
     >
-      <DialogTitle sx={{ 
-        background: `linear-gradient(135deg, ${isResend ? theme.palette.warning.main : theme.palette.primary.main} 0%, ${isResend ? theme.palette.warning.dark : theme.palette.primary.dark} 100%)`,
-        color: 'white', 
-        fontWeight: 700,
-        py: 3
+      <DialogTitle sx={{
+        background: isResend ? 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)' : 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
+        color: 'white',
+        fontWeight: 800,
+        py: 4,
+        px: 4
       }}>
         <Box display="flex" alignItems="center" justifyContent="space-between">
-          <Box display="flex" alignItems="center" gap={2}>
-            <Description sx={{ fontSize: 32 }} />
+          <Box display="flex" alignItems="center" gap={3}>
+            <Box sx={{
+              bgcolor: 'rgba(255, 255, 255, 0.2)',
+              p: 2,
+              borderRadius: '16px',
+              display: 'flex'
+            }}>
+              <FontAwesomeIcon icon={faFileContract} size="2x" />
+            </Box>
             <Box>
-              <Typography variant="h5">
-                {isResend ? 'Resend Contract Agreement' : 'Send Contract Agreement'}
+              <Typography variant="h4" fontWeight="800">
+                {isResend ? 'Resend Digital Contract' : 'Send Agreement Contract'}
               </Typography>
-              <Typography variant="body2" sx={{ opacity: 0.9 }}>
-                {isResend ? 'Resending contract to' : 'Formalize collaboration with'} {influencerData?.nickname || influencerData?.full_name || 'the influencer'}
+              <Typography variant="body1" sx={{ opacity: 0.9, fontWeight: 500 }}>
+                {isResend ? 'Updating terms for' : 'Initiating collaboration with'} {influencerData?.nickname || influencerData?.full_name || 'Brio User'}
               </Typography>
             </Box>
           </Box>
-          <IconButton onClick={onClose} sx={{ color: 'white' }}>
+          <IconButton onClick={onClose} sx={{ color: 'white', bgcolor: 'rgba(255, 255, 255, 0.1)', '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.2)' } }}>
             <Close />
           </IconButton>
         </Box>
       </DialogTitle>
-      
-      <DialogContent dividers sx={{ p: 4 }}>
+
+      <DialogContent sx={{ p: 0, border: 'none' }}>
         {loading ? (
           <Box display="flex" justifyContent="center" alignItems="center" height="400px" flexDirection="column">
-            <CircularProgress size={60} />
-            <Typography variant="h6" sx={{ mt: 2 }}>
-              Loading contract details...
+            <CircularProgress size={60} thickness={5} />
+            <Typography variant="h6" sx={{ mt: 3, fontWeight: 700, color: 'primary.main' }}>
+              Preparing high-fidelity contract...
             </Typography>
           </Box>
         ) : (
-          <Grid container spacing={4}>
-            {/* Left Column - Campaign Details */}
-            <Grid item xs={12} md={6}>
-              <Typography variant="h6" gutterBottom color="primary" fontWeight="700" sx={{ mb: 3 }}>
-                🎯 Campaign Overview
+          <Box sx={{ p: 4 }}>
+            {/* Full-Width Section 1: Influencer Discovery & Context */}
+            <Box sx={{ mb: 5 }}>
+              <Typography variant="h6" fontWeight="800" color="primary" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
+                <FontAwesomeIcon icon={faUserTag} />
+                Creator Selection
               </Typography>
-              
-              {campaignData ? (
-                <Box sx={{ p: 3, background: 'white', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)' }}>
-                  <Typography variant="h5" fontWeight="700" gutterBottom color="primary">
-                    {campaignData.title}
+
+              <Box sx={{
+                p: 4,
+                background: 'linear-gradient(135deg, #ffffff 0%, #f9faff 100%)',
+                borderRadius: '24px',
+                border: '1px solid rgba(0, 0, 0, 0.05)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.03)'
+              }}>
+                <UserInfo
+                  userId={safeAgreement.influencer_id}
+                  profileType="influencer"
+                  showEmail={true}
+                  showStats={true}
+                  size={90}
+                />
+
+                <Box sx={{ textAlign: 'right', display: { xs: 'none', md: 'block' } }}>
+                  <Typography variant="caption" color="text.secondary" fontWeight="800" sx={{ textTransform: 'uppercase' }}>
+                    Status
                   </Typography>
-                  
-                  <Grid container spacing={2} sx={{ mt: 2 }}>
-                    <Grid item xs={6}>
-                      <Box display="flex" alignItems="center" gap={1}>
-                        <AttachMoney color="success" />
-                        <Box>
-                          <Typography variant="caption" color="text.secondary">
-                            Budget
-                          </Typography>
-                          <Typography variant="body2" fontWeight="600">
-                            {campaignData.currency || 'USD'} {campaignData.budget?.toLocaleString()}
-                          </Typography>
-                        </Box>
-                      </Box>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <Box display="flex" alignItems="center" gap={1}>
-                        <Category color="info" />
-                        <Box>
-                          <Typography variant="caption" color="text.secondary">
-                            Category
-                          </Typography>
-                          <Typography variant="body2" fontWeight="600">
-                            {campaignData.category || 'General'}
-                          </Typography>
-                        </Box>
-                      </Box>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <Box display="flex" alignItems="center" gap={1}>
-                        <Schedule color="warning" />
-                        <Box>
-                          <Typography variant="caption" color="text.secondary">
-                            Deadline
-                          </Typography>
-                          <Typography variant="body2" fontWeight="600">
-                            {campaignData.deadline ? new Date(campaignData.deadline).toLocaleDateString() : 'N/A'}
-                          </Typography>
-                        </Box>
-                      </Box>
-                    </Grid>
-                    <Grid item xs={6}>
-                      <Box display="flex" alignItems="center" gap={1}>
-                        <Flag color="secondary" />
-                        <Box>
-                          <Typography variant="caption" color="text.secondary">
-                            Status
-                          </Typography>
-                          <Typography variant="body2" fontWeight="600">
-                            {campaignData.status || 'Active'}
-                          </Typography>
-                        </Box>
-                      </Box>
-                    </Grid>
+                  <Box sx={{ mt: 1 }}>
+                    <StatusChip
+                      label={isResend ? 'REVISION REQUEST' : 'READY FOR CONTRACT'}
+                      status={isResend ? 'sent' : 'approved'}
+                    />
+                  </Box>
+                </Box>
+              </Box>
+            </Box>
+
+            {/* Full-Width Section 2: Campaign Terms */}
+            <Box sx={{ mb: 5 }}>
+              <Typography variant="h6" fontWeight="800" color="primary" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
+                <FontAwesomeIcon icon={faBullseye} />
+                Agreement Parameters
+              </Typography>
+
+              <Box sx={{
+                p: 4,
+                bgcolor: '#ffffff',
+                borderRadius: '24px',
+                border: '1px solid rgba(0, 0, 0, 0.04)',
+                boxShadow: '0 10px 40px rgba(0, 0, 0, 0.05)'
+              }}>
+                <Grid container spacing={4}>
+                  <Grid item xs={12} md={3}>
+                    <Box sx={{ p: 2.5, bgcolor: 'success.light', borderRadius: '20px', textAlign: 'center' }}>
+                      <FontAwesomeIcon icon={faMoneyBillWave} style={{ fontSize: '1.5rem', color: '#059669', marginBottom: '12px' }} />
+                      <Typography variant="h5" fontWeight="900" color="#047857">
+                        {campaignData?.currency || 'USD'} {campaignData?.budget?.toLocaleString()}
+                      </Typography>
+                      <Typography variant="caption" fontWeight="700" sx={{ color: '#047857', opacity: 0.8 }}>
+                        PROPOSED BUDGET
+                      </Typography>
+                    </Box>
                   </Grid>
 
-                  {campaignData.description && (
-                    <Box sx={{ mt: 3 }}>
-                      <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-                        Description
+                  <Grid item xs={12} md={9}>
+                    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                      <Typography variant="h5" fontWeight="800" color="primary" gutterBottom>
+                        {campaignData?.title || 'Loading Campaign...'}
                       </Typography>
-                      <Typography variant="body2" sx={{ p: 1.5, background: 'grey.50', borderRadius: '8px', lineHeight: 1.6 }}>
-                        {campaignData.description}
-                      </Typography>
-                    </Box>
-                  )}
-
-                  {campaignData.requirements && (
-                    <Box sx={{ mt: 2 }}>
-                      <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-                        Requirements
-                      </Typography>
-                      <Typography variant="body2" sx={{ p: 1.5, background: 'grey.50', borderRadius: '8px', lineHeight: 1.6 }}>
-                        {campaignData.requirements}
-                      </Typography>
-                    </Box>
-                  )}
-                </Box>
-              ) : (
-                <Box sx={{ p: 3, textAlign: 'center', background: 'white', borderRadius: '16px' }}>
-                  <Typography variant="body2" color="text.secondary">
-                    Campaign details not available
-                  </Typography>
-                </Box>
-              )}
-            </Grid>
-
-            {/* Right Column - Influencer & Contract Details */}
-            <Grid item xs={12} md={6}>
-              <Typography variant="h6" gutterBottom color="primary" fontWeight="700" sx={{ mb: 3 }}>
-                👤 Influencer Profile
-              </Typography>
-              
-              {influencerData ? (
-                <Box sx={{ p: 3, background: 'white', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)', mb: 3 }}>
-                  <Box display="flex" alignItems="center" gap={2} mb={2}>
-                    <ProfileImage
-                      userId={safeAgreement.influencer_id}
-                      profileType="influencer"
-                      size={60}
-                    />
-                    <Box flex={1}>
-                      <Typography variant="h6" fontWeight="700">
-                        {influencerData.nickname || influencerData.full_name || 'Unknown Influencer'}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {influencerData.email || 'No email available'}
-                      </Typography>
-                    </Box>
-                  </Box>
-
-                  {/* Categories */}
-                  {influencerData.categories && influencerData.categories.length > 0 && (
-                    <Box sx={{ mt: 2 }}>
-                      <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-                        Categories
-                      </Typography>
-                      <Box display="flex" gap={0.5} flexWrap="wrap">
-                        {influencerData.categories.slice(0, 3).map((category, index) => (
-                          <Chip
-                            key={index}
-                            label={category}
-                            size="small"
-                            sx={{ 
-                              background: '#2563eb',
-                              color: 'white',
-                              fontSize: '0.7rem'
-                            }}
-                          />
-                        ))}
-                        {influencerData.categories.length > 3 && (
-                          <Chip
-                            label={`+${influencerData.categories.length - 3} more`}
-                            size="small"
-                            variant="outlined"
-                          />
-                        )}
+                      <Box display="flex" gap={2} mt={1}>
+                        <Chip
+                          icon={<CalendarToday sx={{ fontSize: '14px !important' }} />}
+                          label={`Deadline: ${campaignData?.deadline ? format(new Date(campaignData.deadline), 'PPP') : 'N/A'}`}
+                          size="small"
+                          sx={{ borderRadius: '8px', fontWeight: 600 }}
+                        />
+                        <Chip
+                          icon={<Flag sx={{ fontSize: '14px !important' }} />}
+                          label={`Priority: ${campaignData?.priority || 'Standard'}`}
+                          size="small"
+                          variant="outlined"
+                          sx={{ borderRadius: '8px', fontWeight: 600 }}
+                        />
                       </Box>
                     </Box>
-                  )}
+                  </Grid>
+                </Grid>
 
-                  {/* Bio */}
-                  {influencerData.bio && (
-                    <Box sx={{ mt: 2 }}>
-                      <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-                        About
-                      </Typography>
-                      <Typography variant="body2" sx={{ fontStyle: 'italic', lineHeight: 1.5 }}>
-                        "{influencerData.bio}"
-                      </Typography>
-                    </Box>
-                  )}
-                </Box>
-              ) : (
-                <Box sx={{ p: 3, textAlign: 'center', background: 'white', borderRadius: '16px' }}>
-                  <Typography variant="body2" color="text.secondary">
-                    Influencer details not available
+                <Divider sx={{ my: 4, opacity: 0.6 }} />
+
+                <Box>
+                  <Typography variant="subtitle2" fontWeight="800" color="text.secondary" gutterBottom sx={{ textTransform: 'uppercase', letterSpacing: '1px' }}>
+                    Deliverables & Requirements
+                  </Typography>
+                  <Typography variant="body1" sx={{
+                    mt: 2,
+                    p: 3,
+                    bgcolor: '#fcfcfd',
+                    borderRadius: '16px',
+                    lineHeight: 1.8,
+                    border: '1px solid rgba(0,0,0,0.03)'
+                  }}>
+                    {campaignData?.requirements || 'No specific requirements defined for this collaboration.'}
                   </Typography>
                 </Box>
-              )}
+              </Box>
+            </Box>
 
-              {/* Contract Terms */}
-              <Typography variant="h6" gutterBottom color="primary" fontWeight="700">
-                📝 Contract Terms
+            {/* Full-Width Section 3: Legal Terms List */}
+            <Box>
+              <Typography variant="h6" fontWeight="800" color="primary" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 3 }}>
+                <FontAwesomeIcon icon={faCircleCheck} />
+                Contract Execution Terms
               </Typography>
 
-              <Box sx={{ p: 2.5, background: 'linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%)', borderRadius: '12px', mb: 3 }}>
-                <Typography variant="body2" color="info.dark" fontWeight="600">
-                  {isResend 
-                    ? 'This will resend the contract agreement with updated terms and timeline.'
-                    : 'This agreement formalizes the collaboration between your brand and the influencer.'
-                  }
+              <Box sx={{
+                p: 2,
+                bgcolor: 'info.light',
+                borderRadius: '16px',
+                mb: 3,
+                border: '1px solid',
+                borderColor: 'info.main',
+                opacity: 0.9,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 2
+              }}>
+                <FontAwesomeIcon icon={faRocket} style={{ color: '#0284c7' }} />
+                <Typography variant="body2" fontWeight="700" color="info.dark">
+                  By sending this contract, you formalize the professional collaboration between your brand and the creator.
                 </Typography>
               </Box>
 
-              <List dense>
+              <Grid container spacing={2}>
                 {[
-                  { 
-                    icon: <CheckCircle color="success" />, 
-                    text: "Deliverables & Timeline", 
-                    subtext: "Clear specification of required content and submission deadlines" 
-                  },
-                  { 
-                    icon: <AttachMoney color="primary" />, 
-                    text: "Compensation", 
-                    subtext: `${safeAgreement.currency || 'USD'} ${safeAgreement.budget || 'N/A'} upon satisfactory completion` 
-                  },
-                  { 
-                    icon: <Business color="info" />, 
-                    text: "Content Usage Rights", 
-                    subtext: "Brand receives rights to use submitted content for marketing" 
-                  },
-                  { 
-                    icon: <CheckCircle color="warning" />, 
-                    text: "Approval Process", 
-                    subtext: "Brand approval required before content publication" 
-                  },
-                  { 
-                    icon: <Payment color="secondary" />, 
-                    text: "Payment Terms", 
-                    subtext: "Payment released within 7 days of content approval" 
-                  }
-                ].map((item, index) => (
-                  <ListItem key={index}>
-                    <ListItemIcon>{item.icon}</ListItemIcon>
-                    <ListItemText 
-                      primary={item.text} 
-                      secondary={item.subtext}
-                    />
-                  </ListItem>
+                  { icon: <CheckCircle color="success" />, title: "Usage Rights", desc: "Brand receives full rights to use submitted content for marketing purposes." },
+                  { icon: <MonetizationOn color="primary" />, title: "Payment Flow", desc: "Digital payment release within 7 days of final content approval." },
+                  { icon: <VerifiedUser color="info" />, title: "Legal Binding", desc: "This agreement is legally binding once digitally signed by both parties." }
+                ].map((term, i) => (
+                  <Grid item xs={12} md={4} key={i}>
+                    <Box sx={{ p: 2.5, height: '100%', bgcolor: '#ffffff', borderRadius: '16px', border: '1px solid rgba(0,0,0,0.05)', boxShadow: '0 2px 10px rgba(0,0,0,0.02)' }}>
+                      <Box display="flex" alignItems="center" gap={1.5} mb={1}>
+                        <Box sx={{ display: 'flex' }}>{term.icon}</Box>
+                        <Typography variant="subtitle2" fontWeight="800">{term.title}</Typography>
+                      </Box>
+                      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', lineHeight: 1.4 }}>
+                        {term.desc}
+                      </Typography>
+                    </Box>
+                  </Grid>
                 ))}
-              </List>
+              </Grid>
+            </Box>
 
-              {isResend && safeAgreement.contract_sent_at && (
-                <Alert severity="info" sx={{ mt: 2, borderRadius: '8px' }}>
-                  Contract was previously sent on {new Date(safeAgreement.contract_sent_at).toLocaleDateString()}
-                </Alert>
-              )}
-            </Grid>
-          </Grid>
+            {isResend && safeAgreement.contract_sent_at && (
+              <Alert severity="warning" sx={{ mt: 4, borderRadius: '16px', fontWeight: 600, border: '1px solid rgba(245, 158, 11, 0.2)' }}>
+                Attention: This contract was previously dispatched on {format(new Date(safeAgreement.contract_sent_at), 'PPP')}. Resending will override previous terms.
+              </Alert>
+            )}
+          </Box>
         )}
       </DialogContent>
 
-      <DialogActions sx={{ p: 3, gap: 2 }}>
-        <Button 
-          onClick={onClose} 
-          sx={{ borderRadius: '12px', px: 4, py: 1 }}
+      <DialogActions sx={{ p: 4, bgcolor: '#fcfcfd', gap: 2 }}>
+        <Button
+          onClick={onClose}
+          sx={{ borderRadius: '14px', px: 6, py: 1.5, fontWeight: 800 }}
           variant="outlined"
+          size="large"
         >
           Cancel
         </Button>
@@ -1094,22 +1071,60 @@ const SendContractDialog = ({ open, onClose, agreement, onSendContract }) => {
           variant="contained"
           onClick={handleSendContract}
           disabled={sending || loading}
-          startIcon={sending ? <CircularProgress size={16} /> : <Email />}
-          sx={{ 
-            borderRadius: '12px', 
-            px: 4,
-            py: 1,
-            background: `linear-gradient(135deg, ${isResend ? theme.palette.warning.main : theme.palette.primary.main} 0%, ${isResend ? theme.palette.warning.dark : theme.palette.primary.dark} 100%)`,
+          startIcon={sending ? <CircularProgress size={20} color="inherit" /> : <FontAwesomeIcon icon={faRocket} />}
+          sx={{
+            borderRadius: '14px',
+            px: 6,
+            py: 1.5,
+            fontWeight: 800,
+            fontSize: '1rem',
+            background: isResend ? 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)' : 'linear-gradient(135deg, #1976d2 0%, #1565c0 100%)',
+            boxShadow: '0 10px 30px rgba(37, 99, 235, 0.2)',
             '&:hover': {
-              background: `linear-gradient(135deg, ${isResend ? theme.palette.warning.dark : theme.palette.primary.dark} 0%, ${isResend ? theme.palette.warning.main : theme.palette.primary.main} 100%)`
+              boxShadow: '0 15px 40px rgba(37, 99, 235, 0.3)',
+              transform: 'translateY(-2px)'
             }
           }}
         >
-          {sending ? 'Sending Contract...' : (isResend ? 'Resend Contract Agreement' : 'Send Contract Agreement')}
+          {sending ? (isResend ? 'Resending...' : 'Sending...') : (isResend ? 'Confirm & Resend Contract' : 'Authorize & Send Contract')}
         </Button>
       </DialogActions>
     </Dialog>
   );
+};
+
+// =============================================
+// 🛠 UTILITY FUNCTIONS
+// =============================================
+
+const getStatusText = (agreement) => {
+  if (!agreement) return '';
+  if (agreement.contract_signed) {
+    return 'Contract Signed';
+  } else if (agreement.contract_sent) {
+    return 'Contract Sent';
+  } else if (agreement.status === 'media_submitted') {
+    return 'Media Submitted';
+  } else if (agreement.status === 'completed') {
+    return 'Completed';
+  } else {
+    return 'Ready for Contract';
+  }
+};
+
+const getStatusColor = (agreement) => {
+  if (!agreement) return 'pending';
+  if (agreement.contract_signed) {
+    return 'contracted';
+  } else if (agreement.contract_sent) {
+    return 'sent';
+  } else if (agreement.status === 'media_submitted') {
+    return 'media_submitted';
+  } else if (agreement.status === 'completed') {
+    return 'completed';
+  } else {
+    return 'approved';
+  }
 };
 
 // =============================================
@@ -1119,6 +1134,7 @@ const SendContractDialog = ({ open, onClose, agreement, onSendContract }) => {
 const AgreementDetailsDialog = ({ open, onClose, agreement }) => {
   const [activeDetailTab, setActiveDetailTab] = useState('overview');
   const theme = useTheme();
+  const navigate = useNavigate();
 
   if (!agreement) return null;
 
@@ -1128,270 +1144,449 @@ const AgreementDetailsDialog = ({ open, onClose, agreement }) => {
       onClose={onClose}
       maxWidth="lg"
       fullWidth
-      PaperProps={{ 
-        sx: { 
-          borderRadius: '20px', 
+      PaperProps={{
+        sx: {
+          borderRadius: '24px',
           minHeight: '80vh',
-          background: 'linear-gradient(135deg, #ffffff 0%, #f8faff 100%)'
-        } 
+          background: '#ffffff',
+          overflow: 'hidden'
+        }
       }}
     >
-      <DialogTitle sx={{ 
-        background: '#2563eb', 
-        color: 'white', 
-        fontWeight: 700,
-        borderRadius: '20px 20px 0 0',
-        py: 3
+      <DialogTitle sx={{
+        background: 'linear-gradient(135deg, #1976d2 0%, #1565c0 100%)',
+        color: 'white',
+        fontWeight: 800,
+        py: 1.5,
+        px: 4
       }}>
         <Box display="flex" alignItems="center" justifyContent="space-between">
-          <Box display="flex" alignItems="center" gap={2}>
-            <Description sx={{ fontSize: 32 }} />
+          <Box display="flex" alignItems="center" gap={3}>
+            <Box sx={{
+              bgcolor: 'rgba(255, 255, 255, 0.2)',
+              p: 2,
+              borderRadius: '16px',
+              display: 'flex'
+            }}>
+              <FontAwesomeIcon icon={faFileContract} size="2x" />
+            </Box>
             <Box>
-              <Typography variant="h5">Agreement Details</Typography>
-              <Typography variant="body2" sx={{ opacity: 0.9 }}>
-                {agreement.title} - {agreement.influencer_name}
+              <Typography variant="h5" fontWeight="800">Agreement Intel</Typography>
+              <Typography variant="body2" sx={{ opacity: 0.8, fontWeight: 500 }}>
+                {agreement.title} • {getStatusText(agreement)}
               </Typography>
             </Box>
           </Box>
-          <IconButton onClick={onClose} sx={{ color: 'white' }}>
+          <IconButton onClick={onClose} sx={{ color: 'white', bgcolor: 'rgba(255, 255, 255, 0.1)', '&:hover': { bgcolor: 'rgba(255, 255, 255, 0.2)' } }}>
             <Close />
           </IconButton>
         </Box>
       </DialogTitle>
-      
-      <DialogContent dividers sx={{ p: 0 }}>
-        <Box sx={{ borderBottom: 1, borderColor: 'divider', background: 'white' }}>
-          <Tabs
-            value={activeDetailTab}
-            onChange={(e, newValue) => setActiveDetailTab(newValue)}
-            sx={{ px: 3 }}
-            textColor="primary"
-            indicatorColor="primary"
-          >
-            <Tab label="📊 Overview" value="overview" />
-            <Tab label="🎯 Campaign Details" value="campaign" />
-            <Tab label="🔄 Workflow" value="workflow" />
-            <Tab label="👤 Influencer Profile" value="profile" />
-          </Tabs>
-        </Box>
 
-        <Box sx={{ p: 3 }}>
-          {activeDetailTab === 'overview' && (
-            <Grid container spacing={3}>
-              <Grid item xs={12} md={6}>
-                <Typography variant="h6" gutterBottom color="primary" fontWeight="700">
-                  👤 Influencer Information
+      <DialogContent dividers sx={{ p: 0, border: 'none' }}>
+        <TabContext value={activeDetailTab}>
+          <Box sx={{ borderBottom: 1, borderColor: 'divider', background: '#fcfcfd', px: 4 }}>
+            <Tabs
+              value={activeDetailTab}
+              onChange={(e, newValue) => setActiveDetailTab(newValue)}
+              sx={{
+                '& .MuiTabs-indicator': {
+                  height: 3,
+                  borderRadius: '3px'
+                },
+                '& .MuiTab-root': {
+                  fontWeight: 700,
+                  fontSize: '0.85rem',
+                  py: 1.5,
+                  minHeight: '48px',
+                  minWidth: '120px'
+                }
+              }}
+              textColor="primary"
+              indicatorColor="primary"
+            >
+              <Tab
+                label={
+                  <Box display="flex" alignItems="center" gap={1.5}>
+                    <FontAwesomeIcon icon={faChartPie} />
+                    Overview
+                  </Box>
+                }
+                value="overview"
+              />
+              <Tab
+                label={
+                  <Box display="flex" alignItems="center" gap={1.5}>
+                    <FontAwesomeIcon icon={faBullseye} />
+                    Campaign
+                  </Box>
+                }
+                value="campaign"
+              />
+              <Tab
+                label={
+                  <Box display="flex" alignItems="center" gap={1.5}>
+                    <FontAwesomeIcon icon={faArrowsRotate} />
+                    Workflow
+                  </Box>
+                }
+                value="workflow"
+              />
+              <Tab
+                label={
+                  <Box display="flex" alignItems="center" gap={1.5}>
+                    <FontAwesomeIcon icon={faUser} />
+                    Influencer
+                  </Box>
+                }
+                value="profile"
+              />
+            </Tabs>
+          </Box>
+
+          <TabPanel value="overview" sx={{ p: 4, bgcolor: '#fcfcfd' }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+              {/* 1. Influencer Partnership Section */}
+              <Box>
+                <Typography variant="subtitle1" fontWeight="800" color="primary" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5 }}>
+                  <FontAwesomeIcon icon={faUserTag} />
+                  Assigned Partnership
                 </Typography>
-                <UserInfo
-                  userId={agreement.influencer_id}
-                  profileType="influencer"
-                  showEmail={true}
-                  showStats={true}
-                  size={64}
-                />
-                
-                {/* Agreement Timeline */}
-                <Box sx={{ mt: 3 }}>
-                  <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-                    AGREEMENT TIMELINE
-                  </Typography>
-                  <GlassCard sx={{ p: 2 }}>
-                    <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
-                      <Typography variant="body2">
-                        Applied
-                      </Typography>
-                      <Typography variant="body2" fontWeight="600">
-                        {new Date(agreement.applied_at).toLocaleDateString()}
-                      </Typography>
-                    </Box>
-                    {agreement.contract_sent_at && (
-                      <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
-                        <Typography variant="body2">
-                          Contract Sent
-                        </Typography>
-                        <Typography variant="body2" fontWeight="600">
-                          {new Date(agreement.contract_sent_at).toLocaleDateString()}
-                        </Typography>
-                      </Box>
-                    )}
-                    {agreement.contract_signed_at && (
-                      <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
-                        <Typography variant="body2" color="success.main">
-                          Contract Signed
-                        </Typography>
-                        <Typography variant="body2" fontWeight="600" color="success.main">
-                          {new Date(agreement.contract_signed_at).toLocaleDateString()}
-                        </Typography>
-                      </Box>
-                    )}
-                    {agreement.media_submitted_at && (
-                      <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
-                        <Typography variant="body2" color="info.main">
-                          Media Submitted
-                        </Typography>
-                        <Typography variant="body2" fontWeight="600" color="info.main">
-                          {new Date(agreement.media_submitted_at).toLocaleDateString()}
-                        </Typography>
-                      </Box>
-                    )}
-                    {agreement.deadline && (
-                      <Box display="flex" justifyContent="space-between" alignItems="center">
-                        <Typography variant="body2" color="warning.main">
-                          Deadline
-                        </Typography>
-                        <Typography variant="body2" fontWeight="600" color="warning.main">
-                          {new Date(agreement.deadline).toLocaleDateString()}
-                        </Typography>
-                      </Box>
-                    )}
-                  </GlassCard>
+                <Box sx={{
+                  p: 3,
+                  bgcolor: '#ffffff',
+                  borderRadius: '20px',
+                  border: '1px solid rgba(0,0,0,0.05)',
+                  boxShadow: '0 4px 20px rgba(0,0,0,0.02)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  transition: 'all 0.3s ease',
+                  '&:hover': { boxShadow: '0 8px 32px rgba(0,0,0,0.04)' }
+                }}>
+                  <UserInfo
+                    userId={agreement.influencer_id}
+                    profileType="influencer"
+                    showEmail={true}
+                    showStats={true}
+                    size={64}
+                  />
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    startIcon={<FontAwesomeIcon icon={faRocket} />}
+                    onClick={() => window.open(`/brand/profile/view/influencer/${agreement.influencer_id}`, '_blank')}
+                    sx={{ borderRadius: '10px', px: 3, py: 1, fontWeight: 700, display: { xs: 'none', md: 'flex' } }}
+                  >
+                    View Insights
+                  </Button>
                 </Box>
-              </Grid>
-              
-              <Grid item xs={12} md={6}>
-                <Typography variant="h6" gutterBottom color="primary" fontWeight="700">
-                  📄 Agreement Status
+              </Box>
+
+              {/* 2. Strategic Status Section */}
+              <Box>
+                <Typography variant="subtitle1" fontWeight="800" color="primary" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5 }}>
+                  <FontAwesomeIcon icon={faCircleCheck} />
+                  Strategic Milestone
                 </Typography>
-                <StatusChip 
-                  label={agreement.contract_signed ? 'Contract Signed' : 
-                         agreement.contract_sent ? 'Contract Sent' : 
-                         'Ready for Contract'} 
-                  status={agreement.contract_signed ? 'contracted' : 
-                          agreement.contract_sent ? 'sent' : 'approved'}
-                  sx={{ fontSize: '1rem', padding: '8px 16px', mb: 2 }}
-                />
-                
-                {/* Quick Actions */}
-                <Box sx={{ mt: 3 }}>
-                  <Typography variant="h6" gutterBottom color="primary" fontWeight="700">
-                    🚀 Quick Actions
-                  </Typography>
-                  <Box display="flex" gap={1} flexWrap="wrap">
-                    <Button
-                      variant="outlined"
-                      startIcon={<Person />}
-                      onClick={() => window.open(`/brand/profile/view/influencer/${agreement.influencer_id}`, '_blank')}
-                      sx={{ borderRadius: '8px' }}
-                    >
-                      View Profile
-                    </Button>
-                    <Button
-                      variant="contained"
-                      startIcon={<Chat />}
-                      onClick={() => window.open(`/brand/collaborations?user=${agreement.influencer_id}&campaign=${agreement.campaign_id}`, '_blank')}
-                      sx={{ borderRadius: '8px' }}
-                    >
-                      Open Chat
-                    </Button>
-                    {agreement.status === 'approved' && !agreement.contract_sent && (
-                      <Button
-                        variant="contained"
-                        startIcon={<Send />}
-                        onClick={() => {
-                          // This would be handled by parent component
-                        }}
-                        sx={{
-                          borderRadius: '8px',
-                          background: 'linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%)'
-                        }}
-                      >
-                        Send Contract
-                      </Button>
-                    )}
-                    {agreement.status === 'media_submitted' && (
-                      <Button
-                        variant="contained"
-                        startIcon={<Payment />}
-                        onClick={() => window.open(`/brand/payments?campaign=${agreement.campaign_id}&user=${agreement.influencer_id}`, '_blank')}
-                        sx={{
-                          borderRadius: '8px',
-                          background: 'linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%)'
-                        }}
-                      >
-                        Process Payment
-                      </Button>
-                    )}
+                <Box sx={{
+                  p: 4,
+                  background: 'linear-gradient(135deg, #1976d2 0%, #1565c0 100%)',
+                  borderRadius: '24px',
+                  color: 'white',
+                  boxShadow: '0 12px 32px rgba(25, 118, 210, 0.15)',
+                  display: 'flex',
+                  flexDirection: { xs: 'column', md: 'row' },
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: 3
+                }}>
+                  <Box>
+                    <Typography variant="h4" fontWeight="800" gutterBottom>
+                      {getStatusText(agreement)}
+                    </Typography>
+                    <Typography variant="body2" sx={{ opacity: 0.9, fontWeight: 500, maxWidth: '500px', lineHeight: 1.6 }}>
+                      {agreement.contract_signed
+                        ? 'This collaboration is legally active. All parties are bound by the agreed terms and conditions.'
+                        : 'The agreement is currently in the negotiation phase. Waiting for legal finalization.'}
+                    </Typography>
+                  </Box>
+                  <Box sx={{
+                    bgcolor: 'rgba(255, 255, 255, 0.12)',
+                    p: 3,
+                    borderRadius: '16px',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    textAlign: 'center',
+                    minWidth: '200px'
+                  }}>
+                    <Typography variant="caption" sx={{ fontWeight: 800, letterSpacing: 1.5, opacity: 0.8, display: 'block' }}>
+                      LEGAL COMPLIANCE
+                    </Typography>
+                    <Typography variant="h5" fontWeight="900" sx={{ mt: 0.5 }}>
+                      {agreement.contract_signed ? 'SIGNED' : 'PENDING'}
+                    </Typography>
                   </Box>
                 </Box>
+              </Box>
 
-                {/* Budget Summary */}
-                <Box sx={{ mt: 3 }}>
-                  <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-                    BUDGET SUMMARY
+              {/* 3. Campaign Context Section */}
+              <Box>
+                <Typography variant="subtitle1" fontWeight="800" color="primary" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5 }}>
+                  <FontAwesomeIcon icon={faBullseye} />
+                  Campaign Context
+                </Typography>
+                <Box sx={{
+                  p: 3,
+                  bgcolor: '#ffffff',
+                  borderRadius: '20px',
+                  border: '1px solid rgba(0,0,0,0.05)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 1
+                }}>
+                  <Typography variant="h6" fontWeight="800">{agreement.campaign_title || 'Active Campaign'}</Typography>
+                  <Typography variant="body2" color="text.secondary" sx={{ lineHeight: 1.6 }}>
+                    This agreement is tied to the strategic initiatives of the primary campaign.
+                    All deliverables must align with the brand guidelines specified in the campaign brief.
                   </Typography>
-                  <GlassCard sx={{ p: 2 }}>
-                    <Box display="flex" justifyContent="space-between" alignItems="center">
-                      <Typography variant="body2">
-                        Agreement Value
-                      </Typography>
-                      <Typography variant="h6" fontWeight="700" color="success.main">
-                        {agreement.currency || 'USD'} {agreement.budget}
-                      </Typography>
-                    </Box>
-                    <Box display="flex" justifyContent="space-between" alignItems="center" mt={1}>
-                      <Typography variant="body2">
-                        Status
-                      </Typography>
-                      <StatusChip 
-                        label={agreement.contract_signed ? 'Contract Active' : 'Pending Signature'} 
-                        status={agreement.contract_signed ? 'contracted' : 'pending'}
-                        size="small"
-                      />
-                    </Box>
-                  </GlassCard>
                 </Box>
-              </Grid>
-            </Grid>
-          )}
+              </Box>
 
-          {activeDetailTab === 'campaign' && (
-            <CampaignDetailsSection agreement={agreement} />
-          )}
+              {/* 4. Timeline Section */}
+              <Box>
+                <Typography variant="subtitle1" fontWeight="800" color="primary" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5 }}>
+                  <FontAwesomeIcon icon={faCalendarDays} />
+                  Operational Roadmap
+                </Typography>
+                <Box sx={{
+                  p: 3,
+                  background: 'rgba(255,255,255,0.6)',
+                  borderRadius: '24px',
+                  border: '1px dashed #e0e6ed',
+                  backdropFilter: 'blur(10px)'
+                }}>
+                  <Grid container spacing={2}>
+                    {[
+                      { label: 'Applied Date', value: agreement.applied_at, color: '#6366f1', icon: <CalendarToday sx={{ fontSize: 18 }} /> },
+                      { label: 'Contract Sent', value: agreement.contract_sent_at, color: '#0ea5e9', icon: <Send sx={{ fontSize: 18 }} /> },
+                      { label: 'Signed Date', value: agreement.contract_signed_at, color: '#10b981', icon: <VerifiedUser sx={{ fontSize: 18 }} /> },
+                      { label: 'Final Deadline', value: agreement.deadline, color: '#f43f5e', icon: <Schedule sx={{ fontSize: 18 }} /> }
+                    ].map((item, idx) => (
+                      <Grid item xs={12} sm={6} md={3} key={idx}>
+                        <Box sx={{
+                          p: 2,
+                          bgcolor: 'white',
+                          borderRadius: '16px',
+                          border: '1px solid rgba(0,0,0,0.03)',
+                          boxShadow: '0 2px 10px rgba(0,0,0,0.02)',
+                          height: '100%',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: 0.5
+                        }}>
+                          <Box sx={{ color: item.color, opacity: 0.8, display: 'flex' }}>{item.icon}</Box>
+                          <Typography variant="caption" color="text.secondary" fontWeight="700" sx={{ fontSize: '0.7rem' }}>
+                            {item.label.toUpperCase()}
+                          </Typography>
+                          <Typography variant="body2" fontWeight="800">
+                            {item.value ? format(new Date(item.value), 'PPP') : 'N/A'}
+                          </Typography>
+                        </Box>
+                      </Grid>
+                    ))}
+                  </Grid>
+                </Box>
+              </Box>
 
-          {activeDetailTab === 'workflow' && (
-            <AgreementWorkflow agreement={agreement} />
-          )}
+              {/* 5. Financial Value Section */}
+              <Box>
+                <Typography variant="subtitle1" fontWeight="800" color="primary" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5 }}>
+                  <FontAwesomeIcon icon={faMoneyBillWave} />
+                  Contractual Investment
+                </Typography>
+                <Box sx={{
+                  p: 4,
+                  background: 'linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%)',
+                  borderRadius: '24px',
+                  border: '1px solid rgba(22, 163, 74, 0.1)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between'
+                }}>
+                  <Box>
+                    <Typography variant="h4" fontWeight="900" color="#166534">
+                      {agreement.currency || 'USD'} {agreement.budget?.toLocaleString()}
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: '#166534', opacity: 0.8, fontWeight: 700, letterSpacing: 1 }}>
+                      TOTAL ALLOCATED BUDGET
+                    </Typography>
+                  </Box>
+                  <Box sx={{ textAlign: 'right', display: { xs: 'none', md: 'block' } }}>
+                    <Typography variant="body2" color="success.dark" fontWeight="700" sx={{ fontSize: '0.8rem' }}>
+                      Status: Secured via Escrow
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      Released on approval
+                    </Typography>
+                  </Box>
+                </Box>
+              </Box>
 
-          {activeDetailTab === 'profile' && (
-            <Box>
-              <Typography variant="h6" gutterBottom color="primary" fontWeight="700">
-                👤 Influencer Profile Details
-              </Typography>
-              <Box display="flex" justifyContent="center" flexDirection="column" alignItems="center">
-                <UserInfo
-                  userId={agreement.influencer_id}
-                  profileType="influencer"
-                  showEmail={true}
-                  showStats={true}
-                  size={80}
-                />
+              {/* Notes Context */}
+              {agreement.notes && (
+                <Box>
+                  <Typography variant="subtitle1" fontWeight="800" color="primary" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5 }}>
+                    <FontAwesomeIcon icon={faFileContract} />
+                    Administrative Notes
+                  </Typography>
+                  <Box sx={{
+                    p: 3,
+                    bgcolor: '#fffbeb',
+                    borderRadius: '20px',
+                    border: '1px solid rgba(245, 158, 11, 0.1)',
+                    color: '#92400e',
+                    fontStyle: 'italic',
+                    fontSize: '0.9rem',
+                    lineHeight: 1.6
+                  }}>
+                    "{agreement.notes}"
+                  </Box>
+                </Box>
+              )}
+
+              {/* Bottom Actions */}
+              <Box sx={{
+                mt: 3,
+                pt: 4,
+                borderTop: '1px solid',
+                borderColor: 'divider',
+                display: 'flex',
+                gap: 2,
+                justifyContent: 'flex-end',
+              }}>
+                <Button
+                  variant="outlined"
+                  onClick={() => navigate(`/brand/collaborations?user=${agreement.influencer_id}&campaign=${agreement.campaign_id}&title=${encodeURIComponent(agreement.campaign_title || '')}`)}
+                  sx={{ borderRadius: '12px', px: 4, py: 1.5, fontWeight: 700 }}
+                >
+                  Message Partner
+                </Button>
                 <Button
                   variant="contained"
-                  startIcon={<Launch />}
-                  onClick={() => window.open(`/brand/profile/view/influencer/${agreement.influencer_id}`, '_blank')}
-                  sx={{ mt: 3, borderRadius: '12px', px: 4 }}
+                  startIcon={<FontAwesomeIcon icon={faMessage} />}
+                  onClick={() => navigate(`/brand/collaborations?user=${agreement.influencer_id}&campaign=${agreement.campaign_id}&title=${encodeURIComponent(agreement.campaign_title || '')}&autoSend=true`)}
+                  sx={{ borderRadius: '12px', px: 4, py: 1.5, fontWeight: 700 }}
                 >
-                  View Full Profile Page
+                  Urgent Update
                 </Button>
               </Box>
             </Box>
-          )}
-        </Box>
+          </TabPanel>
+
+          <TabPanel value="campaign" sx={{ p: 0 }}>
+            <CampaignDetailsSection agreement={agreement} />
+          </TabPanel>
+
+          <TabPanel value="workflow" sx={{ p: 4 }}>
+            <Box sx={{ mb: 4 }}>
+              <Typography variant="h5" fontWeight="800" color="primary" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                <FontAwesomeIcon icon={faArrowsRotate} />
+                Agreemement Progress
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 4 }}>
+                Track the end-to-end journey of this collaboration from application to final payment.
+              </Typography>
+              <AgreementWorkflow agreement={agreement} />
+            </Box>
+          </TabPanel>
+
+          <TabPanel value="profile" sx={{ p: 4 }}>
+            <Grid container spacing={4}>
+              <Grid item xs={12} md={4}>
+                <Box sx={{
+                  p: 4,
+                  bgcolor: 'white',
+                  borderRadius: '24px',
+                  border: '1px solid rgba(0,0,0,0.05)',
+                  textAlign: 'center'
+                }}>
+                  <UserInfo
+                    userId={agreement.influencer_id}
+                    profileType="influencer"
+                    showEmail={false}
+                    showStats={false}
+                    size={120}
+                  />
+                  <Typography variant="h6" fontWeight="800" sx={{ mt: 2 }}>{agreement.influencer_name || 'Creator'}</Typography>
+                  <Typography variant="body2" color="text.secondary" gutterBottom>Verified Influencer</Typography>
+                  <Box sx={{ mt: 3, display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                    <Button
+                      variant="contained"
+                      fullWidth
+                      startIcon={<Launch />}
+                      onClick={() => window.open(`/brand/profile/view/influencer/${agreement.influencer_id}`, '_blank')}
+                      sx={{ borderRadius: '12px', fontWeight: 800, py: 1.2 }}
+                    >
+                      Full Analysis
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      fullWidth
+                      startIcon={<FontAwesomeIcon icon={faMessage} />}
+                      onClick={() => navigate(`/brand/collaborations?user=${agreement.influencer_id}&campaign=${agreement.campaign_id}&title=${encodeURIComponent(agreement.campaign_title || '')}`)}
+                      sx={{ borderRadius: '12px', fontWeight: 800, py: 1.2 }}
+                    >
+                      Quick Message
+                    </Button>
+                  </Box>
+                </Box>
+              </Grid>
+              <Grid item xs={12} md={8}>
+                <Box sx={{ p: 4, bgcolor: '#f8fafc', borderRadius: '24px', height: '100%' }}>
+                  <Typography variant="h6" fontWeight="800" color="primary" gutterBottom>Influencer Context</Typography>
+                  <Typography variant="body2" color="text.secondary" sx={{ mb: 3, lineHeight: 1.6 }}>
+                    This creator has been vetted for this campaign. Review their performance metrics or initiate direct communication for specific deliverable adjustments.
+                  </Typography>
+
+                  <Grid container spacing={2}>
+                    {[
+                      { label: 'Platform Expertise', value: 'Instagram, TikTok', icon: <FontAwesomeIcon icon={faAward} /> },
+                      { label: 'Audience Match', value: 'High Alignment', icon: <FontAwesomeIcon icon={faBullseye} /> },
+                      { label: 'Avg. Engagement', value: '4.8%', icon: <FontAwesomeIcon icon={faChartPie} /> }
+                    ].map((feat, i) => (
+                      <Grid item xs={12} sm={6} key={i}>
+                        <Box sx={{ p: 2.5, bgcolor: 'white', borderRadius: '16px', display: 'flex', alignItems: 'center', gap: 2 }}>
+                          <Box sx={{ color: 'primary.main' }}>{feat.icon}</Box>
+                          <Box>
+                            <Typography variant="caption" color="text.secondary" sx={{ display: 'block' }}>{feat.label}</Typography>
+                            <Typography variant="body2" fontWeight="800">{feat.value}</Typography>
+                          </Box>
+                        </Box>
+                      </Grid>
+                    ))}
+                  </Grid>
+                </Box>
+              </Grid>
+            </Grid>
+          </TabPanel>
+        </TabContext>
       </DialogContent>
 
-      <DialogActions sx={{ p: 3 }}>
-        <Button 
-          onClick={onClose} 
-          startIcon={<ArrowBack />} 
-          sx={{ borderRadius: '12px', px: 4 }}
+      <DialogActions sx={{ p: 4, bgcolor: '#fcfcfd' }}>
+        <Button
+          onClick={onClose}
+          startIcon={<ArrowBack />}
+          sx={{ borderRadius: '14px', px: 6, py: 1.5, fontWeight: 800, fontSize: '0.9rem' }}
           variant="outlined"
         >
-          Back to List
+          Back to Agreements
         </Button>
       </DialogActions>
     </Dialog>
   );
 };
+
+
 
 // =============================================
 // 🎯 MAIN COMPONENT - BRAND AGREEMENTS
@@ -1403,7 +1598,7 @@ const BrandAgreements = () => {
   const isTablet = useMediaQuery(theme.breakpoints.down('lg'));
   const navigate = useNavigate();
   const { token } = useContext(AuthContext);
-  
+
   const [agreements, setAgreements] = useState([]);
   const [filteredAgreements, setFilteredAgreements] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -1419,7 +1614,11 @@ const BrandAgreements = () => {
   const [filters, setFilters] = useState({
     status: '',
     minBudget: '',
-    maxBudget: ''
+    maxBudget: '',
+    category: '',
+    dateFrom: '',
+    dateTo: '',
+    currency: ''
   });
   const [showFilters, setShowFilters] = useState(false);
   const [actionMenuAnchor, setActionMenuAnchor] = useState(null);
@@ -1451,7 +1650,7 @@ const BrandAgreements = () => {
     // Search filtering
     if (searchTerm) {
       const query = searchTerm.toLowerCase();
-      filtered = filtered.filter(agreement => 
+      filtered = filtered.filter(agreement =>
         agreement.influencer_name?.toLowerCase().includes(query) ||
         agreement.title?.toLowerCase().includes(query) ||
         agreement.influencer_email?.toLowerCase().includes(query) ||
@@ -1470,11 +1669,24 @@ const BrandAgreements = () => {
     }
 
     if (filters.minBudget) {
-      filtered = filtered.filter(agreement => agreement.budget >= parseFloat(filters.minBudget));
+      filtered = filtered.filter(agreement => (agreement.budget || 0) >= parseFloat(filters.minBudget));
     }
-
     if (filters.maxBudget) {
-      filtered = filtered.filter(agreement => agreement.budget <= parseFloat(filters.maxBudget));
+      filtered = filtered.filter(agreement => (agreement.budget || 0) <= parseFloat(filters.maxBudget));
+    }
+    if (filters.category) {
+      filtered = filtered.filter(agreement => agreement.category?.toLowerCase() === filters.category.toLowerCase());
+    }
+    if (filters.currency) {
+      filtered = filtered.filter(agreement => agreement.currency === filters.currency);
+    }
+    if (filters.dateFrom) {
+      filtered = filtered.filter(agreement => new Date(agreement.applied_at) >= new Date(filters.dateFrom));
+    }
+    if (filters.dateTo) {
+      const toDate = new Date(filters.dateTo);
+      toDate.setHours(23, 59, 59, 999);
+      filtered = filtered.filter(agreement => new Date(agreement.applied_at) <= toDate);
     }
 
     setFilteredAgreements(filtered);
@@ -1486,17 +1698,17 @@ const BrandAgreements = () => {
       setLoading(true);
       setError('');
       const response = await campaignAPI.getBrandApplications();
-      
-      const appsData = Array.isArray(response) ? response : 
-                      response.data ? response.data : 
-                      response.applications ? response.applications : [];
-      
+
+      const appsData = Array.isArray(response) ? response :
+        response.data ? response.data :
+          response.applications ? response.applications : [];
+
       // Filter only approved applications that can have contracts
-      const approvedApps = appsData.filter(app => 
-        app.status === 'approved' || app.contract_sent || app.contract_signed || 
+      const approvedApps = appsData.filter(app =>
+        app.status === 'approved' || app.contract_sent || app.contract_signed ||
         app.status === 'media_submitted' || app.status === 'completed'
       );
-      
+
       setAgreements(approvedApps);
     } catch (err) {
       setError('Failed to load agreements. Please check your connection and try again.');
@@ -1529,7 +1741,14 @@ const BrandAgreements = () => {
   };
 
   const handleDirectChat = (agreement) => {
-    navigate(`/brand/collaborations?user=${agreement.influencer_id}&campaign=${agreement.campaign_id}`);
+    const params = new URLSearchParams({
+      user: agreement.influencer_id,
+      campaign: agreement.campaign_id,
+      title: agreement.title,
+      budget: agreement.budget || '',
+      currency: agreement.currency || 'USD'
+    });
+    navigate(`/brand/collaborations?${params.toString()}`);
   };
 
   const handleViewDetails = (agreement) => {
@@ -1560,44 +1779,16 @@ const BrandAgreements = () => {
     const now = new Date();
     const diffTime = Math.abs(now - date);
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
+
     if (diffDays === 1) return 'Yesterday';
     if (diffDays < 7) return `${diffDays} days ago`;
     if (diffDays < 30) return `${Math.ceil(diffDays / 7)} weeks ago`;
-    
+
     return date.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
       day: 'numeric'
     });
-  };
-
-  const getStatusText = (agreement) => {
-    if (agreement.contract_signed) {
-      return 'Contract Signed';
-    } else if (agreement.contract_sent) {
-      return 'Contract Sent';
-    } else if (agreement.status === 'media_submitted') {
-      return 'Media Submitted';
-    } else if (agreement.status === 'completed') {
-      return 'Completed';
-    } else {
-      return 'Ready for Contract';
-    }
-  };
-
-  const getStatusColor = (agreement) => {
-    if (agreement.contract_signed) {
-      return 'contracted';
-    } else if (agreement.contract_sent) {
-      return 'sent';
-    } else if (agreement.status === 'media_submitted') {
-      return 'media_submitted';
-    } else if (agreement.status === 'completed') {
-      return 'completed';
-    } else {
-      return 'approved';
-    }
   };
 
   const getPriorityActions = (agreement) => {
@@ -1633,7 +1824,7 @@ const BrandAgreements = () => {
           disabled
           sx={{ borderRadius: '8px' }}
         >
-          Awaiting Signature
+          Awaiting Accept
         </Button>
       );
     } else if (agreement.status === 'completed') {
@@ -1682,7 +1873,11 @@ const BrandAgreements = () => {
     setFilters({
       status: '',
       minBudget: '',
-      maxBudget: ''
+      maxBudget: '',
+      category: '',
+      dateFrom: '',
+      dateTo: '',
+      currency: ''
     });
   };
 
@@ -1710,8 +1905,8 @@ const BrandAgreements = () => {
       <Box sx={{ mb: 4 }}>
         <Box display="flex" justifyContent="space-between" alignItems={isMobile ? "flex-start" : "center"} flexDirection={isMobile ? "column" : "row"} gap={3} mb={4}>
           <Box>
-            <Typography variant="h3" component="h1" fontWeight="800" gutterBottom sx={{ 
-              background: '#2563eb',
+            <Typography variant="h3" component="h1" fontWeight="800" gutterBottom sx={{
+              background: '#1976d2',
               backgroundClip: 'text',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent'
@@ -1760,7 +1955,7 @@ const BrandAgreements = () => {
                     <Search sx={{ color: 'primary.main' }} />
                   </InputAdornment>
                 ),
-                sx: { 
+                sx: {
                   borderRadius: '12px',
                   background: alpha(theme.palette.background.paper, 0.8),
                   '& .MuiOutlinedInput-notchedOutline': {
@@ -1770,10 +1965,10 @@ const BrandAgreements = () => {
               }}
             />
             <Tooltip title={showFilters ? "Hide Filters" : "Show Filters"}>
-              <IconButton 
+              <IconButton
                 onClick={() => setShowFilters(!showFilters)}
                 color={showFilters ? "primary" : "default"}
-                sx={{ 
+                sx={{
                   border: `2px solid ${showFilters ? theme.palette.primary.main : alpha(theme.palette.text.secondary, 0.2)}`,
                   borderRadius: '10px',
                   width: 48,
@@ -1785,10 +1980,10 @@ const BrandAgreements = () => {
             </Tooltip>
             {(searchTerm || Object.values(filters).some(f => f !== '')) && (
               <Tooltip title="Clear All Filters">
-                <IconButton 
-                  onClick={clearAllFilters} 
+                <IconButton
+                  onClick={clearAllFilters}
                   color="error"
-                  sx={{ 
+                  sx={{
                     border: `2px solid ${alpha(theme.palette.error.main, 0.2)}`,
                     borderRadius: '10px',
                     width: 48,
@@ -1802,53 +1997,130 @@ const BrandAgreements = () => {
           </Box>
 
           <Collapse in={showFilters}>
-            <Divider sx={{ my: 2 }} />
-            <Grid container spacing={3}>
-              <Grid item xs={12} sm={6} md={4}>
-                <FormControl fullWidth size="medium">
-                  <InputLabel>Filter by Status</InputLabel>
-                  <Select
-                    value={filters.status}
-                    onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value }))}
-                    label="Filter by Status"
-                    sx={{ borderRadius: '10px' }}
+            <Divider sx={{ my: 3 }} />
+            <Grid container spacing={3} sx={{ width: '100%' }}>
+              {/* Row 1: Status, Category, Currency */}
+              <Grid item xs={12} md={6}>
+                <TextField
+                  select
+                  fullWidth
+                  size="small"
+                  label="Status"
+                  value={filters.status}
+                  onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value }))}
+                  InputLabelProps={{ shrink: true }}
+                  InputProps={{ sx: { borderRadius: '12px', minWidth: '200px' } }}
+                >
+                  <MenuItem value="">All Statuses</MenuItem>
+                  <MenuItem value="approved">Ready for Contract</MenuItem>
+                  <MenuItem value="sent">Contract Sent</MenuItem>
+                  <MenuItem value="contracted">Contract Signed</MenuItem>
+                  <MenuItem value="media_submitted">Media Submitted</MenuItem>
+                  <MenuItem value="completed">Completed</MenuItem>
+                </TextField>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  select
+                  fullWidth
+                  size="small"
+                  label="Category"
+                  value={filters.category}
+                  onChange={(e) => setFilters(prev => ({ ...prev, category: e.target.value }))}
+                  InputLabelProps={{ shrink: true }}
+                  InputProps={{ sx: { borderRadius: '12px', minWidth: '200px' } }}
+                >
+                  <MenuItem value="">All Categories</MenuItem>
+                  {Array.from(new Set(agreements.map(a => a.category).filter(Boolean))).map(cat => (
+                    <MenuItem key={cat} value={cat}>{cat}</MenuItem>
+                  ))}
+                </TextField>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <TextField
+                  select
+                  fullWidth
+                  size="small"
+                  label="Currency"
+                  value={filters.currency}
+                  onChange={(e) => setFilters(prev => ({ ...prev, currency: e.target.value }))}
+                  InputLabelProps={{ shrink: true }}
+                  InputProps={{ sx: { borderRadius: '12px', minWidth: '200px' } }}
+                >
+                  <MenuItem value="">All Currencies</MenuItem>
+                  <MenuItem value="USD">USD ($)</MenuItem>
+                  <MenuItem value="EUR">EUR (€)</MenuItem>
+                  <MenuItem value="GBP">GBP (£)</MenuItem>
+                  <MenuItem value="INR">INR (₹)</MenuItem>
+                </TextField>
+              </Grid>
+
+              {/* Budget Range */}
+              <Grid item xs={12} md={6}>
+                <Box display="flex" gap={1.5}>
+                  <TextField
+                    fullWidth
+                    size="small"
+                    label="Min Budget"
+                    type="number"
+                    value={filters.minBudget}
+                    onChange={(e) => setFilters(prev => ({ ...prev, minBudget: e.target.value }))}
+                    InputLabelProps={{ shrink: true }}
+                    InputProps={{ sx: { borderRadius: '12px', minWidth: '100px' } }}
+                  />
+                  <TextField
+                    fullWidth
+                    size="small"
+                    label="Max Budget"
+                    type="number"
+                    value={filters.maxBudget}
+                    onChange={(e) => setFilters(prev => ({ ...prev, maxBudget: e.target.value }))}
+                    InputLabelProps={{ shrink: true }}
+                    InputProps={{ sx: { borderRadius: '12px', minWidth: '100px' } }}
+                  />
+                </Box>
+              </Grid>
+
+              {/* Date From */}
+              <Grid item xs={12} md={6}>
+                <TextField
+                  fullWidth
+                  size="small"
+                  label="Applied From"
+                  type="date"
+                  value={filters.dateFrom}
+                  onChange={(e) => setFilters(prev => ({ ...prev, dateFrom: e.target.value }))}
+                  InputLabelProps={{ shrink: true }}
+                  InputProps={{ sx: { borderRadius: '12px', minWidth: '200px' } }}
+                />
+              </Grid>
+
+              {/* Date To */}
+              <Grid item xs={12} md={6}>
+                <TextField
+                  fullWidth
+                  size="small"
+                  label="Applied To"
+                  type="date"
+                  value={filters.dateTo}
+                  onChange={(e) => setFilters(prev => ({ ...prev, dateTo: e.target.value }))}
+                  InputLabelProps={{ shrink: true }}
+                  InputProps={{ sx: { borderRadius: '12px', minWidth: '200px' } }}
+                />
+              </Grid>
+
+              {/* Row 3: Action */}
+              <Grid item xs={12}>
+                <Box display="flex" justifyContent="flex-end" sx={{ mt: 1 }}>
+                  <Button
+                    onClick={clearAllFilters}
+                    size="small"
+                    startIcon={<Search sx={{ fontSize: 18 }} />}
+                    sx={{ fontWeight: 700, borderRadius: '10px', textTransform: 'none', color: 'text.secondary' }}
                   >
-                    <MenuItem value="">All Statuses</MenuItem>
-                    <MenuItem value="approved">Ready for Contract</MenuItem>
-                    <MenuItem value="sent">Contract Sent</MenuItem>
-                    <MenuItem value="contracted">Contract Signed</MenuItem>
-                    <MenuItem value="media_submitted">Media Submitted</MenuItem>
-                    <MenuItem value="completed">Completed</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={12} sm={6} md={4}>
-                <TextField
-                  fullWidth
-                  size="medium"
-                  label="Minimum Budget"
-                  type="number"
-                  value={filters.minBudget}
-                  onChange={(e) => setFilters(prev => ({ ...prev, minBudget: e.target.value }))}
-                  InputProps={{
-                    startAdornment: <InputAdornment position="start">$</InputAdornment>,
-                  }}
-                  sx={{ borderRadius: '10px' }}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6} md={4}>
-                <TextField
-                  fullWidth
-                  size="medium"
-                  label="Maximum Budget"
-                  type="number"
-                  value={filters.maxBudget}
-                  onChange={(e) => setFilters(prev => ({ ...prev, maxBudget: e.target.value }))}
-                  InputProps={{
-                    startAdornment: <InputAdornment position="start">$</InputAdornment>,
-                  }}
-                  sx={{ borderRadius: '10px' }}
-                />
+                    Reset All Sorting Parameters
+                  </Button>
+                </Box>
               </Grid>
             </Grid>
           </Collapse>
@@ -1880,53 +2152,53 @@ const BrandAgreements = () => {
               }
             }}
           >
-            <Tab 
+            <Tab
               label={
                 <Badge badgeContent={tabCounts.all} color="primary" showZero sx={{ '& .MuiBadge-badge': { fontSize: '0.7rem', fontWeight: 700 } }}>
                   All Agreements
                 </Badge>
-              } 
-              value="all" 
+              }
+              value="all"
             />
-            <Tab 
+            <Tab
               label={
                 <Badge badgeContent={tabCounts.approved} color="warning" showZero sx={{ '& .MuiBadge-badge': { fontSize: '0.7rem', fontWeight: 700 } }}>
                   Ready for Contract
                 </Badge>
-              } 
-              value="approved" 
+              }
+              value="approved"
             />
-            <Tab 
+            <Tab
               label={
                 <Badge badgeContent={tabCounts.sent} color="info" showZero sx={{ '& .MuiBadge-badge': { fontSize: '0.7rem', fontWeight: 700 } }}>
                   Contract Sent
                 </Badge>
-              } 
-              value="sent" 
+              }
+              value="sent"
             />
-            <Tab 
+            <Tab
               label={
                 <Badge badgeContent={tabCounts.contracted} color="success" showZero sx={{ '& .MuiBadge-badge': { fontSize: '0.7rem', fontWeight: 700 } }}>
                   Contract Signed
                 </Badge>
-              } 
-              value="contracted" 
+              }
+              value="contracted"
             />
-            <Tab 
+            <Tab
               label={
                 <Badge badgeContent={tabCounts.media_submitted} color="secondary" showZero sx={{ '& .MuiBadge-badge': { fontSize: '0.7rem', fontWeight: 700 } }}>
                   Media Ready
                 </Badge>
-              } 
-              value="media_submitted" 
+              }
+              value="media_submitted"
             />
-            <Tab 
+            <Tab
               label={
                 <Badge badgeContent={tabCounts.completed} color="primary" showZero sx={{ '& .MuiBadge-badge': { fontSize: '0.7rem', fontWeight: 700 } }}>
                   Completed
                 </Badge>
-              } 
-              value="completed" 
+              }
+              value="completed"
             />
           </Tabs>
         </Paper>
@@ -1934,9 +2206,9 @@ const BrandAgreements = () => {
 
       {/* Alerts */}
       {error && (
-        <Alert 
-          severity="error" 
-          sx={{ mb: 3, borderRadius: '12px', border: `1px solid ${alpha(theme.palette.error.main, 0.2)}` }} 
+        <Alert
+          severity="error"
+          sx={{ mb: 3, borderRadius: '12px', border: `1px solid ${alpha(theme.palette.error.main, 0.2)}` }}
           onClose={() => setError('')}
           icon={<Close fontSize="small" />}
         >
@@ -1945,9 +2217,9 @@ const BrandAgreements = () => {
       )}
 
       {success && (
-        <Alert 
-          severity="success" 
-          sx={{ mb: 3, borderRadius: '12px', border: `1px solid ${alpha(theme.palette.success.main, 0.2)}` }} 
+        <Alert
+          severity="success"
+          sx={{ mb: 3, borderRadius: '12px', border: `1px solid ${alpha(theme.palette.success.main, 0.2)}` }}
           onClose={() => setSuccess('')}
           icon={<CheckCircle fontSize="small" />}
         >
@@ -1964,15 +2236,15 @@ const BrandAgreements = () => {
               {searchTerm || activeTab !== 'all' ? 'No Matching Agreements Found' : 'No Agreements Yet'}
             </Typography>
             <Typography variant="body1" sx={{ mb: 4, maxWidth: '500px', mx: 'auto', lineHeight: 1.6 }}>
-              {searchTerm || activeTab !== 'all' 
+              {searchTerm || activeTab !== 'all'
                 ? 'Try adjusting your search criteria or filters to find what you\'re looking for.'
                 : 'Approved applications will appear here for contract management. Start by reviewing your campaign applications.'
               }
             </Typography>
             <Box display="flex" gap={2} justifyContent="center" flexWrap="wrap">
-              <Button 
-                variant="outlined" 
-                startIcon={<ArrowBack />} 
+              <Button
+                variant="outlined"
+                startIcon={<ArrowBack />}
                 onClick={handleViewApplications}
                 sx={{ borderRadius: '10px', fontWeight: 600 }}
               >
@@ -1993,7 +2265,7 @@ const BrandAgreements = () => {
             <TableContainer>
               <Table>
                 <TableHead>
-                  <TableRow sx={{ 
+                  <TableRow sx={{
                     background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.05)} 0%, ${alpha(theme.palette.primary.main, 0.02)} 100%)`,
                     borderBottom: `2px solid ${alpha(theme.palette.primary.main, 0.1)}`
                   }}>
@@ -2007,7 +2279,7 @@ const BrandAgreements = () => {
                 </TableHead>
                 <TableBody>
                   {paginatedAgreements.map((agreement) => (
-                    <AnimatedTableRow 
+                    <AnimatedTableRow
                       key={`${agreement.campaign_id}-${agreement.influencer_id}`}
                     >
                       <TableCell sx={{ py: 3 }}>
@@ -2024,9 +2296,9 @@ const BrandAgreements = () => {
                           {agreement.title}
                         </Typography>
                         {agreement.category && (
-                          <Chip 
-                            label={agreement.category} 
-                            size="small" 
+                          <Chip
+                            label={agreement.category}
+                            size="small"
                             variant="outlined"
                             sx={{ borderRadius: '6px', fontSize: '0.7rem' }}
                           />
@@ -2051,8 +2323,8 @@ const BrandAgreements = () => {
                         )}
                       </TableCell>
                       <TableCell sx={{ py: 3 }}>
-                        <StatusChip 
-                          label={getStatusText(agreement)} 
+                        <StatusChip
+                          label={getStatusText(agreement)}
                           status={getStatusColor(agreement)}
                         />
                       </TableCell>
@@ -2066,7 +2338,7 @@ const BrandAgreements = () => {
                               size="small"
                               color="primary"
                               onClick={() => handleViewDetails(agreement)}
-                              sx={{ 
+                              sx={{
                                 bgcolor: alpha(theme.palette.primary.main, 0.1),
                                 '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.2) }
                               }}
@@ -2074,13 +2346,13 @@ const BrandAgreements = () => {
                               <Visibility />
                             </IconButton>
                           </Tooltip>
-                          
+
                           <Tooltip title="Open Chat">
                             <IconButton
                               size="small"
                               color="secondary"
                               onClick={() => handleDirectChat(agreement)}
-                              sx={{ 
+                              sx={{
                                 bgcolor: alpha(theme.palette.secondary.main, 0.1),
                                 '&:hover': { bgcolor: alpha(theme.palette.secondary.main, 0.2) }
                               }}
@@ -2093,7 +2365,7 @@ const BrandAgreements = () => {
                             <IconButton
                               size="small"
                               onClick={(e) => handleActionMenuOpen(e, agreement)}
-                              sx={{ 
+                              sx={{
                                 bgcolor: alpha(theme.palette.text.primary, 0.1),
                                 '&:hover': { bgcolor: alpha(theme.palette.text.primary, 0.2) }
                               }}
@@ -2135,16 +2407,16 @@ const BrandAgreements = () => {
 
       {/* Floating Action Button */}
       <Zoom in={true}>
-        <Fab 
+        <Fab
           onClick={fetchAgreements}
           sx={{
             position: 'fixed',
             bottom: 24,
             right: 24,
-            background: '#2563eb',
+            background: '#1976d2',
             color: 'white',
             '&:hover': {
-              background: '#2563eb',
+              background: '#1565c0',
             }
           }}
         >

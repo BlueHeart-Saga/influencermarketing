@@ -1,6 +1,6 @@
 // src/components/BrandInfluencerMessenger.jsx
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import {
   Box,
@@ -32,7 +32,8 @@ import {
   InputAdornment,
   Tooltip,
   useTheme,
-  useMediaQuery
+  useMediaQuery,
+  LinearProgress
 } from '@mui/material';
 import {
   Send as SendIcon,
@@ -51,7 +52,7 @@ import {
   VolumeOff as MuteIcon,
   VolumeUp as UnmuteIcon,
   ArrowBack as ArrowBackIcon,
- Check as CheckIcon,
+  Check as CheckIcon,
   CheckCircle as CheckCircleIcon,
   DoneAll as DoubleCheckIcon,
   Schedule as ScheduleIcon,
@@ -79,12 +80,13 @@ import { useAuth } from '../../context/AuthContext';
 
 const BrandInfluencerMessenger = () => {
   const theme = useTheme();
-   const { user } = useAuth();
+  const { user } = useAuth();
   const userRole = user?.role; // 'brand' | 'influencer'
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
- const navigate = useNavigate();
+  const navigate = useNavigate();
+  const location = useLocation();
   const token = localStorage.getItem('access_token');
-  
+
   // State Management
   const [conversations, setConversations] = useState([]);
   const [selectedConversation, setSelectedConversation] = useState(null);
@@ -117,254 +119,55 @@ const BrandInfluencerMessenger = () => {
   const messagesEndRef = useRef(null);
   const typingTimeoutRef = useRef(null);
   const [hasMoreMessages, setHasMoreMessages] = useState(true);
-const [isLoadingMore, setIsLoadingMore] = useState(false);
-const [page, setPage] = useState(1);
-const messagesContainerRef = useRef(null);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [page, setPage] = useState(1);
+  const messagesContainerRef = useRef(null);
 
   const [previewOpen, setPreviewOpen] = useState(false);
-const [currentPreview, setCurrentPreview] = useState(null);
-const [previewType, setPreviewType] = useState('image'); // 'image', 'file', 'video'
+  const [currentPreview, setCurrentPreview] = useState(null);
+  const [previewType, setPreviewType] = useState('image'); // 'image', 'file', 'video'
 
-const [groups, setGroups] = useState([]);
-const [selectedGroup, setSelectedGroup] = useState(null);
-const [groupMessages, setGroupMessages] = useState([]);
-const [showNewGroup, setShowNewGroup] = useState(false);
-const [activeTab, setActiveTab] = useState('direct'); // 'direct' or 'groups'
-const [groupPage, setGroupPage] = useState(1);
-const [hasMoreGroupMessages, setHasMoreGroupMessages] = useState(true);
-const [isLoadingGroups, setIsLoadingGroups] = useState(false);
-  
+  const [groups, setGroups] = useState([]);
+  const [selectedGroup, setSelectedGroup] = useState(null);
+  const [groupMessages, setGroupMessages] = useState([]);
+  const [showNewGroup, setShowNewGroup] = useState(false);
+  const [activeTab, setActiveTab] = useState('direct'); // 'direct' or 'groups'
+  const [groupPage, setGroupPage] = useState(1);
+  const [hasMoreGroupMessages, setHasMoreGroupMessages] = useState(true);
+  const [isLoadingGroups, setIsLoadingGroups] = useState(false);
+  const [userProfiles, setUserProfiles] = useState({});
+  const handledParamsRef = useRef('');
   const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
-
   const shouldAutoScrollRef = useRef(true);
 
   const handleViewProfile = (participant) => {
-  if (!participant?.id || !participant?.role) return;
-
-  // viewer role = logged-in user role
-  // profile role = other participant role
-  navigate(`/${userRole}/profile/view/${participant.role}/${participant.id}`);
-};
-// const participant = selectedConversation?.other_participant || null;
-
-const headerData =
-  activeTab === 'groups'
-    ? selectedGroup
-    : selectedConversation?.other_participant;
-
-
-
-  // ==================== WEBSOCKET SETUP ====================
-  useEffect(() => {
-    if (!token || !user) return;
-
-    const newSocket = io(API_URL, {
-      auth: { token },
-      transports: ['websocket', 'polling']
-    });
-
-    newSocket.on('connect', () => {
-      console.log('✅ Connected to messaging server');
-    });
-
-    newSocket.on('new_message', (data) => {
-      handleIncomingMessage(data);
-    });
-
-    newSocket.on('message_updated', (data) => {
-      handleMessageUpdated(data);
-    });
-
-    newSocket.on('message_deleted', (data) => {
-      handleMessageDeleted(data);
-    });
-
-    newSocket.on('typing', (data) => {
-      handleTypingIndicator(data);
-    });
-
-    newSocket.on('user_online', (data) => {
-      showNotification(`${data.username} is now online`, 'info');
-      updateUserOnlineStatus(data.userId, true);
-    });
-
-    newSocket.on('user_offline', (data) => {
-      showNotification(`${data.username} is now offline`, 'info');
-      updateUserOnlineStatus(data.userId, false);
-    });
-
-    newSocket.on('error', (error) => {
-      console.error('Socket error:', error);
-      showNotification('Connection error. Please refresh.', 'error');
-    });
-
-    setSocket(newSocket);
-
-    return () => {
-      newSocket.disconnect();
-    };
-  }, [token, user]);
-
-  const sortByTime = (arr) =>
-  [...arr].sort(
-    (a, b) => new Date(a.created_at) - new Date(b.created_at)
-  );
-
-
-  // ==================== DATA LOADING ====================
-  useEffect(() => {
-    if (user) {
-      loadConversations();
-      loadUnreadCount();
-    }
-  }, [user]);
-
-  // useEffect(() => {
-  //   scrollToBottom();
-  // }, [messages]);
-
-  useEffect(() => {
-  if (!shouldAutoScrollRef.current) return;
-  messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-}, [messages]);
-
-
-  useEffect(() => {
-    if (showNewChat) {
-      loadUsers();
-    } else {
-      setSearchQuery('');
-      setSelectedUsers([]);
-    }
-  }, [showNewChat]);
-
-
- useEffect(() => {
-  if (!socket) return;
-
-  socket.on("receive_message", (raw) => {
-    // normalize message object safely
-    const msg = raw?.message || raw;
-
-    if (!msg) return;
-
-    const safe = {
-      id: msg.id || msg._id || `sock_${Date.now()}`,
-      content: msg.content ?? msg.text ?? '',
-      sender_id: msg.sender_id || msg.sender?.id,
-      sender: msg.sender || {},
-      receiver_id: msg.receiver_id,
-      conversation_id: msg.conversation_id,
-      created_at: msg.created_at || new Date().toISOString(),
-      message_type: msg.message_type || 'text',
-    };
-
-    // Append to active chat if open
-    setMessages(prev => [...prev, safe]);
-    shouldAutoScrollRef.current = true;
-
-
-    // If message belongs to other chat increase unread
-    setConversations(prev =>
-      prev.map(c =>
-        c.id === safe.conversation_id
-          ? { ...c, unread_count: (c.unread_count || 0) + 1 }
-          : c
-      )
-    );
-  });
-
-  return () => socket.off("receive_message");
-}, [socket]);
-
-
-// Add this useEffect to clean up timeouts
-useEffect(() => {
-  return () => {
-    // Clear all timeouts
-    if (typingTimeoutRef.current) {
-      clearTimeout(typingTimeoutRef.current);
-    }
-    
-    // Clear socket timeouts
-    if (typingTimeoutRef.current) {
-      Object.values(typingTimeoutRef.current).forEach(timeout => {
-        clearTimeout(timeout);
-      });
-    }
+    if (!participant?.id || !participant?.role) return;
+    navigate(`/${userRole}/profile/view/${participant.role}/${participant.id}`);
   };
-}, []);
 
-useEffect(() => {
-  messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-}, [messages]);
-
-// Add to WebSocket setup
-useEffect(() => {
-  if (!socket) return;
-
-  // Handle group messages
-  socket.on('new_group_message', (data) => {
-    if (selectedGroup && selectedGroup.id === data.group_id) {
-      setGroupMessages(prev => [...prev, data.message]);
-    } else {
-      // Update groups list
-      setGroups(prev => prev.map(g => {
-        if (g.id === data.group_id) {
-          return {
-            ...g,
-            last_message: {
-              content: data.message.content?.substring(0, 100),
-              timestamp: data.message.created_at,
-              sender_id: data.message.sender_id
-            },
-            unread_count: (g.unread_count || 0) + 1,
-            updated_at: data.message.created_at
-          };
-        }
-        return g;
-      }));
-      
-      // Show notification
-      const groupName = groups.find(g => g.id === data.group_id)?.name || 'Group';
-      showNotification(`New message in ${groupName}`, 'info');
-    }
-  });
-
-  // Add other group-related socket events...
-
-  return () => {
-    socket.off('new_group_message');
-  };
-}, [socket, selectedGroup, groups]);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isUploading, setIsUploading] = useState(false);
 
   // ==================== API FUNCTIONS ====================
   const api = {
     get: async (endpoint, params = {}) => {
       try {
-        const queryString = Object.keys(params).length > 0 
-          ? `?${new URLSearchParams(params)}` 
+        const queryString = Object.keys(params).length > 0
+          ? `?${new URLSearchParams(params)}`
           : '';
         const response = await fetch(`${API_URL}${endpoint}${queryString}`, {
-          headers: { 
+          headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
           }
         });
-        
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-        
-        const data = await response.json();
-        console.log(`GET ${endpoint} response:`, data);
-        return data;
+        if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        return await response.json();
       } catch (error) {
         console.error(`API GET error for ${endpoint}:`, error);
         throw error;
       }
     },
-    
     post: async (endpoint, data) => {
       try {
         const response = await fetch(`${API_URL}${endpoint}`, {
@@ -375,20 +178,46 @@ useEffect(() => {
           },
           body: JSON.stringify(data)
         });
-        
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-        
-        const responseData = await response.json();
-        console.log(`POST ${endpoint} response:`, responseData);
-        return responseData;
+        if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        return await response.json();
       } catch (error) {
         console.error(`API POST error for ${endpoint}:`, error);
         throw error;
       }
     },
-    
+    upload: async (endpoint, file, onProgress) => {
+      return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        const formData = new FormData();
+        formData.append('file', file);
+
+        xhr.upload.addEventListener('progress', (event) => {
+          if (event.lengthComputable) {
+            const progress = Math.round((event.loaded / event.total) * 100);
+            if (onProgress) onProgress(progress);
+          }
+        });
+
+        xhr.addEventListener('load', () => {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            try {
+              resolve(JSON.parse(xhr.responseText));
+            } catch (e) {
+              resolve(xhr.responseText);
+            }
+          } else {
+            reject(new Error(`Upload failed with status ${xhr.status}`));
+          }
+        });
+
+        xhr.addEventListener('error', () => reject(new Error('Network error')));
+        xhr.addEventListener('abort', () => reject(new Error('Upload aborted')));
+
+        xhr.open('POST', `${API_URL}${endpoint}`);
+        xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+        xhr.send(formData);
+      });
+    },
     put: async (endpoint, data) => {
       try {
         const response = await fetch(`${API_URL}${endpoint}`, {
@@ -399,34 +228,21 @@ useEffect(() => {
           },
           body: JSON.stringify(data)
         });
-        
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-        
-        const responseData = await response.json();
-        console.log(`PUT ${endpoint} response:`, responseData);
-        return responseData;
+        if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        return await response.json();
       } catch (error) {
         console.error(`API PUT error for ${endpoint}:`, error);
         throw error;
       }
     },
-    
     delete: async (endpoint) => {
       try {
         const response = await fetch(`${API_URL}${endpoint}`, {
           method: 'DELETE',
           headers: { 'Authorization': `Bearer ${token}` }
         });
-        
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-        
-        const responseData = await response.json();
-        console.log(`DELETE ${endpoint} response:`, responseData);
-        return responseData;
+        if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        return await response.json();
       } catch (error) {
         console.error(`API DELETE error for ${endpoint}:`, error);
         throw error;
@@ -434,1366 +250,1022 @@ useEffect(() => {
     }
   };
 
-
-  // Update get user display info function
-const getProfileDisplayName = (user) => {
-  if (!user) return 'Unknown User';
-  
-  // Use profile name if available
-  if (user.display_name) return user.display_name;
-  if (user.name) return user.name;
-  if (user.username) return user.username;
-  if (user.company_name) return user.company_name;
-  
-  return 'Unknown User';
-};
-
-const getProfileImage = (user) => {
-  if (!user) return null;
-  
-  // Use profile picture if available
-  if (user.profile_picture) {
-    // Convert file ID to URL if needed
-    if (user.profile_picture.startsWith('68')) {
-      return `${API_URL}/profiles/image/${user.profile_picture}`;
-    }
-    return user.profile_picture;
-  }
-  
-  if (user.logo) {
-    if (user.logo.startsWith('68')) {
-      return `${API_URL}/profiles/image/${user.logo}`;
-    }
-    return user.logo;
-  }
-  
-  return null;
-};
-
-const getProfileDetails = (user) => {
-  if (!user) return {};
-  
-  if (user.role === 'brand') {
-    return {
-      company_name: user.company_name,
-      contact_person: user.contact_person,
-      industry: user.industry,
-      categories: user.categories || [],
-      location: user.location
-    };
-  } else if (user.role === 'influencer') {
-    return {
-      full_name: user.full_name,
-      nickname: user.nickname,
-      niche: user.niche,
-      categories: user.categories || [],
-      location: user.location
-    };
-  }
-  
-  return {};
-};
-
-  // ==================== DATA LOADING FUNCTIONS ====================
-  // Update loadConversations function to fetch profile data for each conversation
-const loadConversations = async () => {
-  try {
-    setLoading(prev => ({ ...prev, conversations: true }));
-    setError('');
-    
-    console.log('Loading conversations...');
-    const response = await api.get('/messages/conversations');
-    
-    console.log('Conversations response:', response);
-    
-    let conversationsData = [];
-    if (response && (response.conversations || response.data)) {
-      conversationsData = response.conversations || response.data?.conversations || [];
-    } else if (response && Array.isArray(response)) {
-      conversationsData = response;
-    }
-    
-    // Fetch profile data for each conversation's other participant
-    const conversationsWithProfiles = await Promise.all(
-      conversationsData.map(async (conv) => {
-        if (!conv.other_participant?.id) return conv;
-        
-        // Check if we already have the profile cached
-        if (userProfiles[conv.other_participant.id]) {
-          return {
-            ...conv,
-            other_participant: {
-              ...conv.other_participant,
-              ...userProfiles[conv.other_participant.id]
-            }
-          };
+  const getUserDetails = async (userId) => {
+    try {
+      const response = await fetch(`${API_URL}/messages/user/${userId}/details`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
-        
-        // Fetch profile details
-        try {
-          const userDetails = await getUserDetails(conv.other_participant.id);
-          if (userDetails) {
-            // Update cache
-            setUserProfiles(prev => ({
-              ...prev,
-              [conv.other_participant.id]: userDetails.profile
-            }));
-            
-            return {
-              ...conv,
-              other_participant: {
-                ...conv.other_participant,
-                ...userDetails.profile
-              }
-            };
-          }
-        } catch (err) {
-          console.error('Error fetching user profile:', err);
-        }
-        
-        return conv;
-      })
-    );
-    
-    console.log('Setting conversations with profiles:', conversationsWithProfiles);
-    setConversations(conversationsWithProfiles);
-    
-  } catch (err) {
-    console.error('Error loading conversations:', err);
-    setError('Failed to load conversations. Please try again.');
-    setConversations([]);
-  } finally {
-    setLoading(prev => ({ ...prev, conversations: false }));
-  }
-};
-
- const loadMessages = async (conversationId, loadMore = false) => {
-  try {
-    if (loadMore) {
-      setIsLoadingMore(true);
-    } else {
-      setLoading(prev => ({ ...prev, messages: true }));
-      setPage(1);
-    }
-    
-    setError('');
-    
-    console.log(`Loading messages for conversation ${conversationId}, page ${page}...`);
-    const response = await api.get(`/messages/conversations/${conversationId}/messages`, {
-      page: loadMore ? page + 1 : 1,
-      limit: 20
-    });
-    
-    console.log('Messages response:', response);
-    
-    if (!response) {
-      console.warn('Empty response from server');
-      setMessages([]);
-      return;
-    }
-    
-    // Handle different response structures
-    let messagesData = [];
-    let pagination = {};
-    
-    if (Array.isArray(response)) {
-      messagesData = response;
-    } else if (response.messages && Array.isArray(response.messages)) {
-      messagesData = response.messages;
-      pagination = response.pagination || {};
-    } else if (response.data?.messages && Array.isArray(response.data.messages)) {
-      messagesData = response.data.messages;
-      pagination = response.data.pagination || {};
-    } else if (response.data && Array.isArray(response.data)) {
-      messagesData = response.data;
-    }
-    
-    // Filter out any null/undefined messages
-    const filteredMessages = messagesData.filter(msg => msg != null);
-    
-    // Ensure each message has required fields
-    const safeMessages = filteredMessages.map((msg, index) => ({
-      id: msg.id || msg._id || `msg_${conversationId}_${index}_${Date.now()}`,
-      content: msg.content || msg.text || msg.body || '',
-      sender: msg.sender || { 
-        id: msg.sender_id,
-        username: 'Unknown User'
-      },
-      sender_id: msg.sender_id,
-      receiver_id: msg.receiver_id,
-      created_at: msg.created_at || msg.timestamp || new Date().toISOString(),
-      message_type: msg.message_type || 'text',
-      attachment_url: msg.attachment_url || null,
-      is_read: msg.is_read || false,
-      is_delivered: msg.is_delivered || false
-    }));
-    
-    if (loadMore) {
-      setMessages(prev =>
-  sortByTime([...safeMessages, ...prev])
-);
-shouldAutoScrollRef.current = true;
-
-      setPage(prev => prev + 1);
-      setHasMoreMessages(pagination.has_more || safeMessages.length > 0);
-    } else {
-      setMessages(sortByTime(safeMessages));
-      setPage(1);
-      setHasMoreMessages(pagination.has_more || false);
-    }
-    
-    // Mark conversation as read
-    if (!loadMore) {
-      await markConversationAsRead(conversationId);
-    }
-  } catch (err) {
-    console.error('Error loading messages:', err);
-    setError('Failed to load messages. Please try again.');
-  } finally {
-    if (loadMore) {
-      setIsLoadingMore(false);
-    } else {
-      setLoading(prev => ({ ...prev, messages: false }));
-    }
-  }
-};
-
-// Add scroll event handler for infinite scroll
-useEffect(() => {
-  const container = messagesContainerRef.current;
-  if (!container) return;
-
-  const handleScroll = () => {
-    if (container.scrollTop === 0 && hasMoreMessages && !isLoadingMore) {
-      loadMessages(selectedConversation.id, true);
+      });
+      if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      return await response.json();
+    } catch (err) {
+      console.error('Error getting user details:', err);
+      return null;
     }
   };
 
-  container.addEventListener('scroll', handleScroll);
-  return () => container.removeEventListener('scroll', handleScroll);
-}, [selectedConversation, hasMoreMessages, isLoadingMore]);
-  
+  // ==================== HELPERS ====================
+  const sortByTime = (arr) => [...arr].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
 
- // Add to API functions
-const loadGroups = async () => {
-  try {
-    setIsLoadingGroups(true);
-    const response = await api.get('/messages/groups');
-    
-    let groupsData = [];
-    if (response && (response.groups || response.data)) {
-      groupsData = response.groups || response.data?.groups || [];
-    } else if (response && Array.isArray(response)) {
-      groupsData = response;
+  const getProfileDetails = (user) => {
+    if (!user) return {};
+    if (user.role === 'brand') {
+      return { company_name: user.company_name, contact_person: user.contact_person, industry: user.industry, categories: user.categories || [], location: user.location };
+    } else if (user.role === 'influencer') {
+      return { full_name: user.full_name, nickname: user.nickname, niche: user.niche, categories: user.categories || [], location: user.location };
     }
-    
-    setGroups(groupsData);
-  } catch (err) {
-    console.error('Error loading groups:', err);
-    setGroups([]);
-  } finally {
-    setIsLoadingGroups(false);
-  }
-};
+    return {};
+  };
 
-useEffect(() => {
-  if (user && activeTab === 'groups') {
-    loadGroups();
-  }
-}, [user, activeTab]);
+  const getProfileDisplayName = (user) => {
+    if (!user) return 'Unknown User';
+    return user.display_name || user.company_name || user.full_name || user.name || user.username || 'User';
+  };
 
-const createGroup = async (groupData) => {
-  try {
-    const response = await api.post('/messages/groups/create', groupData);
-    
-    if (response && (response.data || response.group)) {
-      const newGroup = response.data || response.group;
-      setGroups(prev => [newGroup, ...prev]);
-      setSelectedGroup(newGroup);
-      setActiveTab('groups');
-      setShowNewGroup(false);
-      showNotification('Group created successfully', 'success');
-      return newGroup;
-    }
-  } catch (err) {
-    console.error('Error creating group:', err);
-    showNotification('Failed to create group', 'error');
-    throw err;
-  }
-};
+  const getProfileImage = (user) => {
+    if (!user) return null;
+    const pic = user.profile_picture || user.logo || user.avatar_url;
+    if (!pic) return null;
+    if (pic.startsWith('http')) return pic;
+    if (pic.startsWith('data:')) return pic;
+    if (pic.startsWith('/static')) return `${API_URL}${pic}`;
+    return `${API_URL}/profiles/image/${pic}`;
+  };
 
-const sendGroupMessage = async (groupId, content, attachment = null) => {
-  try {
-    const messageData = {
-      group_id: groupId,
-      content: content,
-      message_type: attachment ? 'file' : 'text',
-      ...(attachment && { attachment_url: attachment.url })
-    };
-
-    const response = await api.post(`/messages/groups/${groupId}/message`, messageData);
-    
-    if (response && (response.data || response.message)) {
-      const newMessage = response.data || response.message;
-      
-      // Update group messages
-      setGroupMessages(prev => [...prev, {
-        ...newMessage,
-        id: newMessage.id || `group_${Date.now()}`,
-        group_id: groupId
-      }]);
-      
-      // Update group in list
-      setGroups(prev => prev.map(g => {
-        if (g.id === groupId) {
-          return {
-            ...g,
-            last_message: {
-              content: content.substring(0, 100),
-              timestamp: new Date().toISOString(),
-              sender_id: user.id
-            },
-            updated_at: new Date().toISOString(),
-            message_count: (g.message_count || 0) + 1
-          };
-        }
-        return g;
-      }));
-      
-      // Move to top
-      setGroups(prev => {
-        const groupIndex = prev.findIndex(g => g.id === groupId);
-        if (groupIndex > 0) {
-          const [group] = prev.splice(groupIndex, 1);
-          return [group, ...prev];
-        }
-        return prev;
-      });
-      
-      // Emit socket event for group message
-      if (socket) {
-        socket.emit('group_message', {
-          group_id: groupId,
-          sender_id: user.id,
-          content: content,
-          message_type: attachment ? 'file' : 'text',
-          attachment_url: attachment?.url || null
+  const updateGroupList = (data, isNewNotification) => {
+    if (!data || !data.message) return;
+    const message = data.message;
+    const groupId = message.group_id;
+    setGroups(prev => {
+      const existingGroup = prev.find(g => g.id === groupId);
+      if (existingGroup) {
+        const updated = prev.map(group => {
+          if (group.id === groupId) {
+            return {
+              ...group,
+              last_message: {
+                content: message.content.substring(0, 100),
+                timestamp: message.created_at || new Date().toISOString(),
+                sender_id: message.sender_id
+              },
+              updated_at: message.created_at || new Date().toISOString(),
+              unread_count: (selectedGroup && selectedGroup.id === groupId) ? 0 : (group.unread_count || 0) + (isNewNotification ? 1 : 0)
+            };
+          }
+          return group;
         });
+        const idx = updated.findIndex(g => g.id === groupId);
+        if (idx > 0) {
+          const [g] = updated.splice(idx, 1);
+          updated.unshift(g);
+        }
+        return updated;
       }
-      
-      showNotification('Group message sent', 'success');
-      return newMessage;
-    }
-  } catch (err) {
-    console.error('Error sending group message:', err);
-    showNotification('Failed to send group message', 'error');
-    throw err;
-  }
-};
-
-const loadGroupMessages = async (groupId, loadMore = false) => {
-  try {
-    if (loadMore) {
-      setIsLoadingMore(true);
-    } else {
-      setLoading(prev => ({ ...prev, messages: true }));
-    }
-    
-    const response = await api.get(`/messages/groups/${groupId}/messages`, {
-      page: loadMore ? groupPage + 1 : 1,
-      limit: 20
+      return prev;
     });
-    
-    let messagesData = [];
-    if (response && response.data?.messages) {
-      messagesData = response.data.messages;
-    } else if (response && Array.isArray(response)) {
-      messagesData = response;
-    }
-    
-    if (loadMore) {
-      setGroupMessages(prev => [...messagesData, ...prev]);
-      setGroupPage(prev => prev + 1);
-    } else {
-      setGroupMessages(messagesData);
-      setGroupPage(1);
-    }
-    
-    setHasMoreGroupMessages(messagesData.length > 0);
-  } catch (err) {
-    console.error('Error loading group messages:', err);
-    showNotification('Failed to load group messages', 'error');
-  } finally {
-    if (loadMore) {
-      setIsLoadingMore(false);
-    } else {
-      setLoading(prev => ({ ...prev, messages: false }));
-    }
-  }
-};
+  };
 
+  const updateConversationList = (data, isNewNotification) => {
+    if (!data || !data.message) return;
+    const message = data.message;
+    const conversationId = data.conversation_id;
+    if (!conversationId) return;
+
+    setConversations(prev => {
+      const existingConv = prev.find(c => c.id === conversationId);
+      if (existingConv) {
+        const updated = prev.map(conv => {
+          if (conv.id === conversationId) {
+            return {
+              ...conv,
+              last_message: {
+                content: (message.content || '').substring(0, 100),
+                timestamp: message.created_at || new Date().toISOString(),
+                sender_id: message.sender?.id || user?.id || message.sender_id
+              },
+              updated_at: message.created_at || new Date().toISOString(),
+              unread_count: (selectedConversation && selectedConversation.id === conversationId) ? 0 : (conv.unread_count || 0) + (isNewNotification ? 1 : 0),
+              has_unread: (selectedConversation && selectedConversation.id === conversationId) ? false : true
+            };
+          }
+          return conv;
+        });
+        const convIndex = updated.findIndex(c => c.id === conversationId);
+        if (convIndex > 0) {
+          const [conv] = updated.splice(convIndex, 1);
+          updated.unshift(conv);
+        }
+        return updated;
+      } else {
+        if (message.group_id) return prev;
+        const newConv = {
+          id: conversationId,
+          title: message.sender?.username || 'Unknown User',
+          other_participant: message.sender || { id: message.sender_id, username: 'Unknown User', role: userRole === 'brand' ? 'influencer' : 'brand' },
+          last_message: { content: (message.content || '').substring(0, 100), timestamp: message.created_at || new Date().toISOString(), sender_id: message.sender_id },
+          updated_at: message.created_at || new Date().toISOString(),
+          unread_count: 1,
+          message_count: 1,
+          type: 'direct',
+          has_unread: true
+        };
+        return [newConv, ...prev];
+      }
+    });
+  };
+
+  const updateUserOnlineStatus = (userId, isOnline) => {
+    setConversations(prev => prev.map(conv =>
+      conv.other_participant?.id === userId ? { ...conv, other_participant: { ...conv.other_participant, is_online: isOnline } } : conv
+    ));
+  };
+
+  const showNotification = (message, severity = 'info') => {
+    setNotification({ open: true, message, severity });
+  };
+
+  const markConversationAsRead = async (conversationId) => {
+    try {
+      await api.put(`/messages/conversations/${conversationId}/read`);
+      setConversations(prev => prev.map(conv =>
+        conv.id === conversationId ? { ...conv, unread_count: 0, has_unread: false } : conv
+      ));
+      setUnreadCount(prev => Math.max(0, prev - 1));
+    } catch (err) { console.error('Error marking as read:', err); }
+  };
+
+  const handleMessageUpdated = useCallback((data) => {
+    if (selectedConversation && selectedConversation.id === data.conversation_id) {
+      setMessages(prev => prev.map(msg => msg.id === data.message.id ? { ...msg, ...data.message } : msg));
+    }
+  }, [selectedConversation]);
+
+  const handleMessageDeleted = useCallback((data) => {
+    if (selectedConversation && selectedConversation.id === data.conversation_id) {
+      setMessages(prev => prev.map(msg => msg.id === data.message_id ? { ...msg, content: '[Message deleted]', is_deleted: true } : msg));
+    }
+  }, [selectedConversation]);
+
+  const handleTypingIndicator = useCallback((data) => {
+    if (selectedConversation && selectedConversation.id === data.conversation_id) {
+      setTypingUsers(prev => ({ ...prev, [data.user_id]: { username: data.username, timestamp: Date.now(), isTyping: data.is_typing } }));
+      setTypingAnimation(data.is_typing);
+      if (typingTimeoutRef.current[data.user_id]) clearTimeout(typingTimeoutRef.current[data.user_id]);
+      typingTimeoutRef.current[data.user_id] = setTimeout(() => {
+        setTypingUsers(prev => { const n = { ...prev }; delete n[data.user_id]; return n; });
+        setTypingAnimation(false);
+      }, 3000);
+    }
+  }, [selectedConversation]);
+
+  const handleIncomingMessage = useCallback((data) => {
+    if (!data) return;
+    const message = data.message || data;
+    const conversationId = data.conversation_id || message?.conversation_id;
+    if (!message || !conversationId) return;
+    const msgId = message.id || message._id || message.message_id;
+    if (message.group_id) {
+      if (groupMessages.some(m => (m.id || m._id) === msgId)) return;
+      if (selectedGroup && selectedGroup.id === message.group_id) {
+        setGroupMessages(prev => [...prev, message]);
+        shouldAutoScrollRef.current = true;
+      }
+      updateGroupList(data, true);
+    } else {
+      if (messages.some(m => (m.id || m._id) === msgId)) return;
+      if (selectedConversation && (selectedConversation.id === conversationId || (selectedConversation.id.startsWith('new_') && message.sender_id === selectedConversation.other_participant?.id))) {
+        if (selectedConversation.id.startsWith('new_')) setSelectedConversation(prev => ({ ...prev, id: conversationId }));
+        setMessages(prev => [...prev, message]);
+        shouldAutoScrollRef.current = true;
+      }
+      updateConversationList(data, true);
+      setUnreadCount(prev => prev + 1);
+      if (!selectedConversation || selectedConversation.id !== conversationId) {
+        showNotification(`New message from ${message.sender?.username || 'User'}`, 'info');
+      }
+    }
+  }, [selectedConversation, selectedGroup, messages, groupMessages]);
 
   const loadUnreadCount = async () => {
     try {
       const response = await api.get('/messages/unread-count');
-      console.log('Unread count response:', response);
-      
-      if (response && (response.total_unread_messages !== undefined || response.data)) {
-        const count = response.total_unread_messages || response.data?.total_unread_messages || 0;
-        console.log('Setting unread count:', count);
-        setUnreadCount(count);
-      }
-    } catch (err) {
-      console.error('Error loading unread count:', err);
-      setUnreadCount(0);
-    }
+      if (response) setUnreadCount(response.total_unread_messages || response.data?.total_unread_messages || 0);
+    } catch (err) { console.error('Unread count error:', err); }
   };
 
-// Add to your API functions
-const getUserDetails = async (userId) => {
-  try {
-    const response = await fetch(`${API_URL}/messages/user/${userId}/details`, {
-      headers: { 
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
-    });
-    
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-    }
-    
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error('Error getting user details:', error);
-    return null;
-  }
-};
+  const loadConversations = async () => {
+    try {
+      setLoading(prev => ({ ...prev, conversations: true }));
+      const response = await api.get('/messages/conversations');
+      let data = response?.conversations || response?.data?.conversations || (Array.isArray(response) ? response : []);
+      const withProfiles = await Promise.all(data.map(async (conv) => {
+        if (!conv?.other_participant?.id) return conv;
+        if (userProfiles[conv.other_participant.id]) return { ...conv, other_participant: { ...conv.other_participant, ...userProfiles[conv.other_participant.id] } };
+        const details = await getUserDetails(conv.other_participant.id);
+        if (details) {
+          setUserProfiles(prev => ({ ...prev, [conv.other_participant.id]: details.profile }));
+          return { ...conv, other_participant: { ...conv.other_participant, ...details.profile } };
+        }
+        return conv;
+      }));
+      setConversations(withProfiles);
+    } catch (err) { console.error('Load conv error:', err); setError('Failed to load conversations'); }
+    finally { setLoading(prev => ({ ...prev, conversations: false })); }
+  };
 
-// Add state for storing user profile data
-const [userProfiles, setUserProfiles] = useState({});
-  
+  const loadMessages = async (conversationId, loadMore = false) => {
+    if (!conversationId || String(conversationId).startsWith('new_')) { setMessages([]); return; }
+    try {
+      if (loadMore) setIsLoadingMore(true); else setLoading(prev => ({ ...prev, messages: true }));
+      const response = await api.get(`/messages/conversations/${conversationId}/messages`, { page: loadMore ? page + 1 : 1, limit: 20 });
+      let data = response?.messages || response?.data?.messages || (Array.isArray(response) ? response : []);
+      const safe = data.map((msg, i) => ({
+        id: msg.id || msg._id || `msg_${Date.now()}_${i}`,
+        content: msg.content || msg.text || '',
+        sender: msg.sender || { id: msg.sender_id, username: 'User' },
+        sender_id: msg.sender_id,
+        created_at: msg.created_at || new Date().toISOString(),
+        message_type: msg.message_type || 'text'
+      }));
+      if (loadMore) {
+        setMessages(prev => sortByTime([...safe, ...prev]));
+        setPage(prev => prev + 1);
+        setHasMoreMessages(safe.length === 20);
+      } else {
+        setMessages(sortByTime(safe));
+        setPage(1);
+        setHasMoreMessages(safe.length === 20);
+        shouldAutoScrollRef.current = true;
+        await markConversationAsRead(conversationId);
+      }
+    } catch (err) { console.error('Load msg error:', err); }
+    finally { setIsLoadingMore(false); setLoading(prev => ({ ...prev, messages: false })); }
+  };
+
+  const loadGroups = async () => {
+    try {
+      setIsLoadingGroups(true);
+      const response = await api.get('/messages/groups');
+      setGroups(response?.groups || response?.data?.groups || (Array.isArray(response) ? response : []));
+    } catch (err) { console.error('Load groups error:', err); }
+    finally { setIsLoadingGroups(false); }
+  };
+
+  const loadGroupMessages = async (groupId, loadMore = false) => {
+    try {
+      if (loadMore) setIsLoadingMore(true); else setLoading(prev => ({ ...prev, messages: true }));
+      const response = await api.get(`/messages/groups/${groupId}/messages`, { page: loadMore ? groupPage + 1 : 1, limit: 20 });
+      const data = response?.messages || response?.data?.messages || (Array.isArray(response) ? response : []);
+      if (loadMore) {
+        setGroupMessages(prev => [...data, ...prev]);
+        setGroupPage(prev => prev + 1);
+      } else {
+        setGroupMessages(data);
+        setGroupPage(1);
+        shouldAutoScrollRef.current = true;
+      }
+      setHasMoreGroupMessages(data.length === 20);
+    } catch (err) { console.error('Load group msg error:', err); }
+    finally { setIsLoadingMore(false); setLoading(prev => ({ ...prev, messages: false })); }
+  };
+
+  const createGroup = async (groupData) => {
+    try {
+      const response = await api.post('/messages/groups/create', groupData);
+      const newGroup = response?.group || response?.data;
+      if (newGroup) {
+        setGroups(prev => [newGroup, ...prev]);
+        setSelectedGroup(newGroup);
+        setActiveTab('groups');
+        setShowNewGroup(false);
+        showNotification('Group created', 'success');
+        return newGroup;
+      }
+    } catch (err) { console.error('Create group error:', err); throw err; }
+  };
 
   const loadUsers = async () => {
     try {
-      const targetRole = userRole === 'brand' ? 'influencer' : 'brand';
-      console.log(`Loading ${targetRole} users...`);
-      
-      const response = await api.get('/auth/users', { role: targetRole });
-      console.log('Users response:', response);
-      
-      if (response && (response.users || response.data)) {
-        const usersData = response.users || response.data?.users || [];
-        console.log('Setting users:', usersData);
-        setUsers(usersData);
-      } else if (response && Array.isArray(response)) {
-        console.log('Setting users (array response):', response);
-        setUsers(response);
-      } else {
-        console.warn('No users found in response:', response);
-        setUsers([]);
-      }
-    } catch (err) {
-      console.error('Error loading users:', err);
-      setUsers([]);
-    }
+      const resp = await api.get('/auth/users', { role: 'all' });
+      setUsers(resp?.users || resp?.data?.users || (Array.isArray(resp) ? resp : []));
+    } catch (err) { console.error('Load users error:', err); }
   };
 
-  // ==================== MESSAGE HANDLING ====================
-  const handleIncomingMessage = useCallback((data) => {
-  console.log('New message received:', data);
-  
-  // Add safety checks
-  if (!data) return;
-  
-  const message = data.message || data;
-  const conversationId = data.conversation_id || message?.conversation_id;
-  
-  if (!message || !conversationId) {
-    console.error('Invalid message data:', data);
-    return;
-  }
-  
-  if (selectedConversation && selectedConversation.id === conversationId) {
-    // Add message to current chat with safety checks
-    const safeMessage = {
-      id: message.id || `temp_${Date.now()}`,
-      content: message.content || '',
-      sender: message.sender || { id: message.sender_id },
-      sender_id: message.sender_id,
-      receiver_id: message.receiver_id,
-      conversation_id: conversationId,
-      created_at: message.created_at || new Date().toISOString(),
-      message_type: message.message_type || 'text',
-      attachment_url: message.attachment_url || null
+  const sendGroupMessage = async (groupId, content, attachment = null) => {
+    try {
+      const data = {
+        group_id: groupId,
+        content: content || '',
+        message_type: attachment ? (attachment.message_type || 'file') : 'text',
+        attachment_url: attachment?.url,
+        attachment_name: attachment?.name,
+        attachment_size: attachment?.size,
+        attachment_type: attachment?.type
+      };
+      const resp = await api.post(`/messages/groups/${groupId}/message`, data);
+      const msg = resp?.message || resp?.data || resp;
+      if (msg) {
+        setGroupMessages(prev => [...prev, msg]);
+        updateGroupList({ message: msg }, false);
+        if (socket) socket.emit('group_message', { ...msg, sender_id: user.id });
+      }
+    } catch (err) { console.error('Send group msg error:', err); }
+  };
+
+  const handleConversationSelect = (conv) => {
+    setSelectedConversation(conv);
+    setSelectedGroup(null);
+    setSearchQuery('');
+    if (!conv.id.startsWith('new_')) loadMessages(conv.id);
+  };
+
+  // ==================== INITIALIZATION ====================
+  useEffect(() => {
+    if (!user || !token) return;
+
+    // Connect to Socket.io
+    const newSocket = io(API_URL, {
+      auth: { token },
+      transports: ['websocket', 'polling']
+    });
+
+    newSocket.on('connect', () => {
+      console.log('Connected to chat socket');
+      newSocket.emit('user_connected', { user_id: user.id });
+    });
+
+    // Register all event handlers
+    newSocket.on('new_message', handleIncomingMessage);
+    newSocket.on('message_updated', handleMessageUpdated);
+    newSocket.on('message_deleted', handleMessageDeleted);
+    newSocket.on('typing', handleTypingIndicator);
+    newSocket.on('unread_count_updated', (data) => setUnreadCount(data.total_unread_messages || data.count || 0));
+    newSocket.on('user_online', (data) => updateUserStatus(data.user_id, true));
+    newSocket.on('user_offline', (data) => updateUserStatus(data.user_id, false));
+
+    setSocket(newSocket);
+
+    // Initial Data Load
+    const initLoad = async () => {
+      try {
+        await Promise.all([
+          loadConversations(),
+          loadGroups(),
+          loadUnreadCount(),
+          loadUsers()
+        ]);
+      } catch (err) {
+        console.error('Initialization error:', err);
+      }
     };
-    
-    setMessages(prev => [...prev, safeMessage]);
-    updateConversationList(data, false);
-    shouldAutoScrollRef.current = true;
+    initLoad();
 
-  } else {
-    // Update conversation list and show notification
-    updateConversationList(data, true);
-    setUnreadCount(prev => prev + 1);
-    
-    const senderName = message.sender?.username || 'User';
-    showNotification(`New message from ${senderName}`, 'info');
-  }
-}, [selectedConversation]);
+    return () => {
+      if (newSocket) newSocket.disconnect();
+    };
+  }, [user, token, handleIncomingMessage, handleMessageUpdated, handleMessageDeleted, handleTypingIndicator]);
 
-  const handleMessageUpdated = (data) => {
-    console.log('Message updated:', data);
-    
-    if (selectedConversation && selectedConversation.id === data.conversation_id) {
-      setMessages(prev => prev.map(msg => 
-        msg.id === data.message.id ? { ...msg, ...data.message } : msg
-      ));
+  // Scroll to bottom when messages change
+  useEffect(() => {
+    if (shouldAutoScrollRef.current) {
+      scrollToBottom();
     }
-  };
+  }, [messages, groupMessages]);
 
-  const handleMessageDeleted = (data) => {
-    console.log('Message deleted:', data);
-    
-    if (selectedConversation && selectedConversation.id === data.conversation_id) {
-      setMessages(prev => prev.map(msg => 
-        msg.id === data.message_id ? { ...msg, content: '[Message deleted]', is_deleted: true } : msg
-      ));
-    }
-  };
-
-  const handleTypingIndicator = (data) => {
-  if (selectedConversation && selectedConversation.id === data.conversation_id) {
-    setTypingUsers(prev => ({
-      ...prev,
-      [data.user_id]: {
-        username: data.username,
-        timestamp: Date.now(),
-        isTyping: data.is_typing
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const userId = params.get('user');
+    if (!userId || !user || handledParamsRef.current === location.search) return;
+    const autoSelectUser = async () => {
+      const existing = conversations.find(c => String(c.other_participant?.id) === String(userId));
+      if (existing) {
+        handleConversationSelect(existing);
+        handledParamsRef.current = location.search;
+      } else if (!loading.conversations) {
+        const details = await getUserDetails(userId);
+        if (details?.profile) {
+          const newC = { id: `new_${Date.now()}`, other_participant: { ...details.profile, id: userId }, type: 'direct' };
+          setSelectedConversation(newC);
+          setConversations(prev => [newC, ...prev]);
+          handledParamsRef.current = location.search;
+        }
       }
-    }));
-    setTypingAnimation(true);
+    };
+    autoSelectUser();
+  }, [location.search, conversations, loading.conversations, user]);
 
-    // Clear timeout
-    if (typingTimeoutRef.current[data.user_id]) {
-      clearTimeout(typingTimeoutRef.current[data.user_id]);
+
+  const renderGroupItem = (group) => {
+    if (!group) return null;
+
+    const isSelected = selectedGroup?.id === group.id;
+    const lastMessageTime = group.last_message?.timestamp
+      ? formatDistanceToNow(parseDate(group.last_message.timestamp), { addSuffix: true })
+      : 'No messages';
+    const lastMessagePreview = group.last_message?.content || 'Start a conversation...';
+    const isSender = group.last_message?.sender_id === user.id;
+
+    return (
+      <ListItem
+        key={group.id}
+        button
+        selected={isSelected}
+        onClick={() => {
+          setSelectedGroup(group);
+          setSelectedConversation(null); // Clear direct conversation selection
+          shouldAutoScrollRef.current = true;
+          setShowInfo(false);
+          loadGroupMessages(group.id);
+        }}
+        sx={{
+          borderLeft: isSelected ? '4px solid' : 'none',
+          borderLeftColor: 'primary.main',
+          '&:hover': { backgroundColor: 'action.hover' }
+        }}
+      >
+        <ListItemAvatar>
+          <Badge
+            color="primary"
+            variant="dot"
+            invisible={!group.unread_count || group.unread_count === 0}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+          >
+            <Avatar
+              src={group.avatar_url}
+              sx={{
+                bgcolor: 'secondary.main',
+                width: 40,
+                height: 40
+              }}
+            >
+              {group.name?.charAt(0)?.toUpperCase() || 'G'}
+            </Avatar>
+          </Badge>
+        </ListItemAvatar>
+
+        <ListItemText
+          primary={
+            <Box display="flex" alignItems="center" gap={1}>
+              <Typography variant="subtitle1" noWrap sx={{ flex: 1 }}>
+                {group.name}
+              </Typography>
+              {group.is_public && (
+                <Chip
+                  label="Public"
+                  size="small"
+                  variant="outlined"
+                  color="success"
+                />
+              )}
+            </Box>
+          }
+          secondary={
+            <Box>
+              <Typography
+                variant="body2"
+                color={group.unread_count > 0 ? 'primary' : 'text.secondary'}
+                noWrap
+                sx={{ fontWeight: group.unread_count > 0 ? 'bold' : 'normal' }}
+              >
+                {isSender && group.last_message && 'You: '}
+                {lastMessagePreview}
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                {group.participant_count} members • {lastMessageTime}
+                {group.unread_count > 0 && (
+                  <Box component="span" sx={{ ml: 1 }}>
+                    • {group.unread_count} unread
+                  </Box>
+                )}
+              </Typography>
+            </Box>
+          }
+        />
+
+        <ListItemSecondaryAction>
+          <IconButton
+            edge="end"
+            size="small"
+            onClick={(e) => {
+              e.stopPropagation();
+              setMenuAnchorEl(e.currentTarget);
+              setSelectedForMenu(group);
+            }}
+          >
+            <MoreVertIcon />
+          </IconButton>
+        </ListItemSecondaryAction>
+      </ListItem>
+    );
+  };
+
+
+
+  // Update message status logic
+  const getMessageStatus = (message) => {
+    if (message.is_sending) {
+      return { icon: <ScheduleIcon fontSize="small" color="disabled" />, text: 'Sending' };
+    }
+    if (message.is_deleted) {
+      return { icon: <ErrorIcon fontSize="small" color="error" />, text: 'Failed' };
+    }
+    if (message.is_read) {
+      return { icon: <DoubleCheckIcon fontSize="small" color="primary" />, text: 'Read' };
+    }
+    if (message.is_delivered) {
+      return { icon: <DoubleCheckIcon fontSize="small" color="action" />, text: 'Delivered' };
+    }
+    if (message.is_sent) {
+      return { icon: <CheckCircleIcon fontSize="small" color="action" />, text: 'Sent' };
+    }
+    return { icon: <CheckIcon fontSize="small" color="disabled" />, text: 'Pending' };
+  };
+
+  // ==================== MESSAGE ACTIONS ====================
+  const sendMessage = async () => {
+    const text = newMessage.trim();
+    if (!text && !attachment) {
+      showNotification('Please enter a message or attach a file', 'warning');
+      return;
     }
 
-    // Set new timeout
-    typingTimeoutRef.current[data.user_id] = setTimeout(() => {
-      setTypingUsers(prev => {
-        const newTyping = { ...prev };
-        delete newTyping[data.user_id];
-        return newTyping;
-      });
-      setTypingAnimation(false);
-    }, 3000);
-  }
-};
-const TypingIndicator = ({ users }) => {
-  if (users.length === 0) return null;
+    try {
+      // HANDLE GROUP MESSAGE
+      if (activeTab === 'groups' && selectedGroup) {
+        await sendGroupMessage(selectedGroup.id, text, attachment);
+        setNewMessage('');
+        setAttachment(null);
+        return;
+      }
 
-  return (
-    <Box sx={{ 
-      display: 'flex', 
-      alignItems: 'center', 
-      gap: 1, 
-      mt: 1, 
-      ml: 1,
-      animation: typingAnimation ? 'fadeIn 0.3s ease' : 'none'
-    }}>
-      <Avatar sx={{ 
-        width: 24, 
-        height: 24, 
-        bgcolor: 'primary.light',
-        animation: 'pulse 1.5s infinite'
-      }}>
-        {users[0]?.charAt(0) || 'T'}
-      </Avatar>
-      <Box sx={{ 
-        backgroundColor: 'white',
-        borderRadius: 2,
-        p: 1.5,
-        maxWidth: 200,
-        boxShadow: 1
-      }}>
-        <Box sx={{ display: 'flex', gap: 0.5, alignItems: 'center' }}>
-          <Box sx={{ 
-            width: 6, 
-            height: 6, 
-            borderRadius: '50%', 
-            backgroundColor: 'grey.500',
-            animation: 'bounce 1.4s infinite'
-          }} />
-          <Box sx={{ 
-            width: 6, 
-            height: 6, 
-            borderRadius: '50%', 
-            backgroundColor: 'grey.500',
-            animation: 'bounce 1.4s infinite 0.2s'
-          }} />
-          <Box sx={{ 
-            width: 6, 
-            height: 6, 
-            borderRadius: '50%', 
-            backgroundColor: 'grey.500',
-            animation: 'bounce 1.4s infinite 0.4s'
-          }} />
+      // HANDLE DIRECT MESSAGE
+      if (!selectedConversation || (!selectedConversation.other_participant?.id && !selectedConversation.id?.startsWith('new_'))) {
+        showNotification('Please select a conversation first', 'error');
+        return;
+      }
+
+      const isNewConversation = !selectedConversation.id || selectedConversation.id.startsWith('new_');
+      let messageType = 'text';
+      let attachmentType = null;
+
+      if (attachment) {
+        if (attachment.message_type) {
+          messageType = attachment.message_type;
+          attachmentType = attachment.message_type;
+        } else if (attachment.type?.startsWith('image/')) {
+          messageType = 'image';
+          attachmentType = 'image';
+        } else if (attachment.type?.startsWith('video/')) {
+          messageType = 'video';
+          attachmentType = 'video';
+        } else if (attachment.type?.startsWith('audio/')) {
+          messageType = 'audio';
+          attachmentType = 'audio';
+        } else {
+          messageType = 'file';
+          attachmentType = 'file';
+        }
+      }
+
+      const messageData = {
+        receiver_id: selectedConversation.other_participant?.id,
+        content: text,
+        message_type: messageType,
+        conversation_id: isNewConversation ? null : selectedConversation.id,
+        ...(attachment && {
+          attachment_url: attachment.url,
+          attachment_type: attachmentType,
+          attachment_name: attachment.name,
+          attachment_size: attachment.size
+        })
+      };
+
+      const optimisticMessage = {
+        id: `temp_${Date.now()}`,
+        content: text,
+        message_type: messageType,
+        sender: user,
+        sender_id: user.id,
+        receiver_id: selectedConversation?.other_participant?.id,
+        conversation_id: selectedConversation?.id,
+        created_at: new Date().toISOString(),
+        status: 'sending'
+      };
+
+      setMessages(prev => [...prev, optimisticMessage]);
+
+      const response = await api.post('/messages/send', messageData);
+
+      if (isNewConversation && response.conversation_id) {
+        const newConvId = response.conversation_id;
+        setSelectedConversation(prev => ({ ...prev, id: newConvId }));
+        loadConversations(); // Refresh list to get actual ID
+      }
+
+      const normalizeMessage = (msg) => ({
+        id: msg.id || msg._id || `msg_${Date.now()}`,
+        content: msg.content || '',
+        sender: msg.sender || user,
+        sender_id: msg.sender_id || user.id,
+        receiver_id: msg.receiver_id,
+        conversation_id: msg.conversation_id || selectedConversation.id,
+        created_at: msg.created_at || new Date().toISOString(),
+        message_type: msg.message_type || 'text',
+        attachment_url: msg.attachment_url || null
+      });
+
+      setMessages(prev => {
+        const filtered = prev.filter(msg => msg.id !== optimisticMessage.id);
+        return [...filtered, normalizeMessage(response.data || response)];
+      });
+
+      if (socket) {
+        socket.emit('send_message', {
+          conversation_id: response.conversation_id || selectedConversation?.id,
+          sender_id: user.id,
+          receiver_id: selectedConversation?.other_participant?.id,
+          content: text,
+          message_type: messageType
+        });
+      }
+
+      setNewMessage('');
+      setAttachment(null);
+      shouldAutoScrollRef.current = true;
+    } catch (err) {
+      console.error('Error sending message:', err);
+      showNotification('Failed to send message', 'error');
+      setMessages(prev => prev.filter(msg => !msg.id.startsWith('temp_')));
+    }
+  };
+
+
+
+  const TypingIndicator = ({ users }) => {
+    if (!users || users.length === 0) return null;
+    return (
+      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1, mb: 1, ml: 1 }}>
+        <Avatar sx={{ width: 24, height: 24, bgcolor: 'primary.light', animation: 'pulse 1.5s infinite' }}>T</Avatar>
+        <Box sx={{ backgroundColor: 'white', borderRadius: 2, p: 1, display: 'flex', gap: 0.5, alignItems: 'center', boxShadow: 1 }}>
+          <Box className="typing-dot" sx={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: 'grey.500' }} />
+          <Box className="typing-dot" sx={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: 'grey.500' }} />
+          <Box className="typing-dot" sx={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: 'grey.500' }} />
           <Typography variant="caption" sx={{ ml: 1, color: 'text.secondary' }}>
-            {users.length === 1 ? `${users[0]} is typing` : `${users.length} people typing`}
+            {users.length === 1 ? `${users[0]} is typing...` : `${users.length} people typing...`}
           </Typography>
         </Box>
       </Box>
-    </Box>
-  );
-};
-
-
-const renderGroupItem = (group) => {
-  if (!group) return null;
-  
-  const isSelected = selectedGroup?.id === group.id;
-  const lastMessageTime = group.last_message?.timestamp 
-    ? formatDistanceToNow(new Date(group.last_message.timestamp), { addSuffix: true })
-    : 'No messages';
-  const lastMessagePreview = group.last_message?.content || 'Start a conversation...';
-  const isSender = group.last_message?.sender_id === user.id;
-
-  return (
-    <ListItem
-      key={group.id}
-      button
-      selected={isSelected}
-      onClick={() => {
-        setSelectedGroup(group);
-        setSelectedConversation(null); // Clear direct conversation selection
-        shouldAutoScrollRef.current = true;
-        setShowInfo(false);
-        loadGroupMessages(group.id);
-      }}
-      sx={{
-        borderLeft: isSelected ? '4px solid' : 'none',
-        borderLeftColor: 'primary.main',
-        '&:hover': { backgroundColor: 'action.hover' }
-      }}
-    >
-      <ListItemAvatar>
-        <Badge
-          color="primary"
-          variant="dot"
-          invisible={!group.unread_count || group.unread_count === 0}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-        >
-          <Avatar
-            src={group.avatar_url}
-            sx={{ 
-              bgcolor: 'secondary.main',
-              width: 40,
-              height: 40
-            }}
-          >
-            {group.name?.charAt(0)?.toUpperCase() || 'G'}
-          </Avatar>
-        </Badge>
-      </ListItemAvatar>
-      
-      <ListItemText
-        primary={
-          <Box display="flex" alignItems="center" gap={1}>
-            <Typography variant="subtitle1" noWrap sx={{ flex: 1 }}>
-              {group.name}
-            </Typography>
-            {group.is_public && (
-              <Chip
-                label="Public"
-                size="small"
-                variant="outlined"
-                color="success"
-              />
-            )}
-          </Box>
-        }
-        secondary={
-          <Box>
-            <Typography
-              variant="body2"
-              color={group.unread_count > 0 ? 'primary' : 'text.secondary'}
-              noWrap
-              sx={{ fontWeight: group.unread_count > 0 ? 'bold' : 'normal' }}
-            >
-              {isSender && group.last_message && 'You: '}
-              {lastMessagePreview}
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              {group.participant_count} members • {lastMessageTime}
-              {group.unread_count > 0 && (
-                <Box component="span" sx={{ ml: 1 }}>
-                  • {group.unread_count} unread
-                </Box>
-              )}
-            </Typography>
-          </Box>
-        }
-      />
-      
-      <ListItemSecondaryAction>
-        <IconButton
-          edge="end"
-          size="small"
-          onClick={(e) => {
-            e.stopPropagation();
-            setMenuAnchorEl(e.currentTarget);
-            setSelectedForMenu(group);
-          }}
-        >
-          <MoreVertIcon />
-        </IconButton>
-      </ListItemSecondaryAction>
-    </ListItem>
-  );
-};
-
-  const updateConversationList = (data, isNewNotification) => {
-  // Add safety check
-  if (!data || !data.message) {
-    console.error('Invalid data in updateConversationList:', data);
-    return;
-  }
-  
-  const message = data.message;
-  const conversationId = data.conversation_id;
-  
-  if (!conversationId) {
-    console.error('No conversation ID in updateConversationList:', data);
-    return;
-  }
-
-  setConversations(prev => {
-    const existingConv = prev.find(c => c.id === conversationId);
-    
-    if (existingConv) {
-      const updated = prev.map(conv => {
-        if (conv.id === conversationId) {
-          const newConv = {
-            ...conv,
-            last_message: {
-              content: (message.content || '').substring(0, 100),
-              timestamp: message.created_at || new Date().toISOString(),
-              sender_id: message.sender?.id || user?.id || message.sender_id
-            },
-            updated_at: message.created_at || new Date().toISOString(),
-            unread_count: conv.id === selectedConversation?.id ? 0 : conv.unread_count + (isNewNotification ? 1 : 0),
-            has_unread: conv.id !== selectedConversation?.id
-          };
-          return newConv;
-        }
-        return conv;
-      });
-      
-      // Move conversation to top
-      const convIndex = updated.findIndex(c => c.id === conversationId);
-      if (convIndex > 0) {
-        const [conv] = updated.splice(convIndex, 1);
-        updated.unshift(conv);
-      }
-      
-      return updated;
-    } else {
-      // New conversation - ensure we have required data
-      const senderUsername = message.sender?.username || 'Unknown User';
-      const senderId = message.sender?.id || message.sender_id;
-      
-      if (!senderId) {
-        console.error('Missing sender ID for new conversation:', data);
-        return prev; // Don't add invalid conversation
-      }
-      
-      const newConv = {
-        id: conversationId,
-        title: senderUsername,
-        other_participant: message.sender || {
-          id: senderId,
-          username: senderUsername,
-          role: userRole === 'brand' ? 'influencer' : 'brand'
-        },
-        last_message: {
-          content: (message.content || '').substring(0, 100),
-          timestamp: message.created_at || new Date().toISOString(),
-          sender_id: senderId
-        },
-        updated_at: message.created_at || new Date().toISOString(),
-        unread_count: 1,
-        message_count: 1,
-        type: 'direct',
-        has_unread: true
-      };
-      return [newConv, ...prev];
-    }
-  });
-};
-
-  const updateUserOnlineStatus = (userId, isOnline) => {
-    setConversations(prev => prev.map(conv => 
-      conv.other_participant?.id === userId 
-        ? { 
-            ...conv, 
-            other_participant: { 
-              ...conv.other_participant, 
-              is_online: isOnline 
-            } 
-          }
-        : conv
-    ));
+    );
   };
 
-  // Update message status logic
-const getMessageStatus = (message) => {
-  if (message.is_sending) {
-    return { icon: <ScheduleIcon fontSize="small" color="disabled" />, text: 'Sending' };
-  }
-  if (message.is_deleted) {
-    return { icon: <ErrorIcon fontSize="small" color="error" />, text: 'Failed' };
-  }
-  if (message.is_read) {
-    return { icon: <DoubleCheckIcon fontSize="small" color="primary" />, text: 'Read' };
-  }
-  if (message.is_delivered) {
-    return { icon: <DoubleCheckIcon fontSize="small" color="action" />, text: 'Delivered' };
-  }
-  if (message.is_sent) {
-    return { icon: <CheckCircleIcon fontSize="small" color="action" />, text: 'Sent' };
-  }
-  return { icon: <CheckIcon fontSize="small" color="disabled" />, text: 'Pending' };
-};
+  // Add new group dialog component
+  // Add new group dialog component
+  const NewGroupDialog = ({ open, onClose, user, api, initialSelectedUsers = [] }) => {
+    const [groupName, setGroupName] = useState('');
+    const [groupDescription, setGroupDescription] = useState('');
+    const [searchUsers, setSearchUsers] = useState('');
+    const [selectedUsers, setSelectedUsers] = useState(initialSelectedUsers);
+    const [availableUsers, setAvailableUsers] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [isLoadingUsers, setIsLoadingUsers] = useState(false);
 
-  // ==================== MESSAGE ACTIONS ====================
-const sendMessage = async () => {
-  // keep trimmed text safe BEFORE clearing state
-  const text = newMessage.trim();
-
-  // 1) block if no text and no attachment
-  if (!text && !attachment) {
-    showNotification('Please enter a message or attach a file', 'warning');
-    return;
-  }
-
-  try {
-    if (!selectedConversation || !selectedConversation.other_participant?.id) {
-      showNotification('Please select a conversation first', 'error');
-      return;
-    }
-
-    const isNewConversation =
-      !selectedConversation.id ||
-      selectedConversation.id.startsWith('new_');
-
-    // Determine message type based on attachment
-    let messageType = 'text';
-    let attachmentType = null;
-    
-    if (attachment) {
-      if (attachment.type.startsWith('image/')) {
-        messageType = 'image';
-        attachmentType = 'image';
-      } else if (attachment.type.startsWith('video/')) {
-        messageType = 'video';
-        attachmentType = 'video';
-      } else if (attachment.type.startsWith('audio/')) {
-        messageType = 'audio';
-        attachmentType = 'audio';
-      } else {
-        messageType = 'file';
-        attachmentType = 'file';
-      }
-    }
-
-    // 2) build payload safely
-    const messageData = {
-      receiver_id: selectedConversation.other_participant.id,
-      content: text,
-      message_type: messageType,
-      conversation_id: isNewConversation ? null : selectedConversation.id,
-      ...(attachment && { 
-        attachment_url: attachment.url,
-        attachment_type: attachmentType,
-        attachment_name: attachment.name,
-        attachment_size: attachment.size
-      })
-    };
-
-    console.log('Sending message with data:', messageData);
-
-    // Create optimistic message for immediate UI update
-    const optimisticMessage = {
-      id: `temp_${Date.now()}`,
-      content: text,
-      message_type: messageType,
-      sender: user,
-      receiver_id: selectedConversation.other_participant.id,
-      conversation_id: selectedConversation.id,
-      created_at: new Date().toISOString(),
-      status: 'sending',
-      ...(attachment && {
-        attachment_url: attachment.url,
-        metadata: {
-          attachment_type: attachmentType,
-          attachment_name: attachment.name,
-          attachment_size: attachment.size
+    // Load all users when dialog opens
+    useEffect(() => {
+      if (open) {
+        loadAvailableUsers();
+        if (initialSelectedUsers.length > 0) {
+          setSelectedUsers(initialSelectedUsers);
         }
-      })
-    };
+      }
+    }, [open, initialSelectedUsers]);
 
-    // 3) call API
-    const response = await api.post('/messages/send', messageData);
-    console.log('Send message response:', response);
+    const loadAvailableUsers = async () => {
+      const targetRole = userRole === 'brand' ? 'influencer' : 'brand';
+      try {
+        setIsLoadingUsers(true);
+        // Load ALL users (both brands and influencers)
+        const response = await api.get('/auth/users', { role: targetRole });
 
-    if (!response) {
-      throw new Error('No response from server');
-    }
+        if (response && (response.users || response.data)) {
+          const usersData = response.users || response.data?.users || [];
 
-    // Handle error response
-    if (response.detail) {
-      throw new Error(response.detail);
-    }
+          // Filter out current user and already selected users
+          const filteredUsers = usersData.filter(u =>
+            u.id !== user.id &&
+            !selectedUsers.some(su => su.id === u.id)
+          );
 
-    // 4) handle new conversation id
-    if (isNewConversation && (response.conversation_id || response.data?.conversation_id)) {
-      const newConvId = response.conversation_id || response.data.conversation_id;
-      const updatedConversation = {
-        ...selectedConversation,
-        id: newConvId
-      };
-      setSelectedConversation(updatedConversation);
-      
-      // Update conversation in list
-      setConversations(prev => prev.map(conv => 
-        conv.id === selectedConversation.id ? updatedConversation : conv
-      ));
-    }
-
-    // 5) normalize message response
-    const normalizeMessage = (msg) => ({
-      id: msg.id || msg._id || `msg_${Date.now()}`,
-      content: msg.content || msg.text || '',
-      sender: msg.sender || { 
-        id: msg.sender_id || user.id,
-        username: user.username,
-        profile_picture: user.profile_picture
-      },
-      sender_id: msg.sender_id || user.id,
-      receiver_id: msg.receiver_id || selectedConversation.other_participant.id,
-      conversation_id: msg.conversation_id || selectedConversation.id,
-      created_at: msg.created_at || new Date().toISOString(),
-      message_type: msg.message_type || 'text',
-      attachment_url: msg.attachment_url || null,
-      metadata: msg.metadata || {},
-      is_read: false,
-      is_delivered: true,
-      is_edited: false
-    });
-
-    // Remove optimistic message and add the real one
-    setMessages(prev => {
-      const filtered = prev.filter(msg => msg.id !== optimisticMessage.id);
-      const responseMessage = response.data || response.message || response;
-      return [...filtered, normalizeMessage(responseMessage)];
-    });
-
-    // 6) SOCKET EMIT
-    if (socket) {
-      socket.emit('send_message', {
-        conversation_id: selectedConversation.id,
-        sender_id: user.id,
-        receiver_id: selectedConversation.other_participant.id,
-        content: text,
-        message_type: messageType,
-        attachment_url: attachment?.url || null,
-        metadata: attachment ? {
-          attachment_type: attachmentType,
-          attachment_name: attachment.name,
-          attachment_size: attachment.size
-        } : null
-      });
-    }
-
-    // 7) clear input AFTER everything succeeds
-    setNewMessage('');
-    setAttachment(null);
-    setReplyingTo(null);
-    setIsTyping(false);
-
-    // 8) update conversation preview text
-    const previewContent = attachment 
-      ? `[${attachmentType === 'image' ? 'Image' : attachmentType === 'video' ? 'Video' : 'File'}]`
-      : text;
-    updateConversationAfterSend(previewContent);
-
-    showNotification('Message sent successfully', 'success');
-
-  } catch (err) {
-    console.error('Error sending message:', err);
-    
-    // Remove optimistic message if it failed
-    setMessages(prev => prev.filter(msg => !msg.id.startsWith('temp_')));
-    
-    const errorMessage = err.message || 'Failed to send message. Please try again.';
-    showNotification(errorMessage, 'error');
-  }
-};
-
-
-
-      // Add new group dialog component
-// Add new group dialog component
-const NewGroupDialog = ({ open, onClose, user, api }) => {
-  const [groupName, setGroupName] = useState('');
-  const [groupDescription, setGroupDescription] = useState('');
-  const [searchUsers, setSearchUsers] = useState('');
-  const [selectedUsers, setSelectedUsers] = useState([]);
-  const [availableUsers, setAvailableUsers] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isLoadingUsers, setIsLoadingUsers] = useState(false);
-
-  // Load all users when dialog opens
-  useEffect(() => {
-    if (open) {
-      loadAvailableUsers();
-    }
-  }, [open]);
-
-  const loadAvailableUsers = async () => {
-    const targetRole = userRole === 'brand' ? 'influencer' : 'brand';
-    try {
-      setIsLoadingUsers(true);
-      // Load ALL users (both brands and influencers)
-      const response = await api.get('/auth/users', { role: targetRole });
-      
-      if (response && (response.users || response.data)) {
-        const usersData = response.users || response.data?.users || [];
-        
-        // Filter out current user and already selected users
-        const filteredUsers = usersData.filter(u => 
-          u.id !== user.id && 
-          !selectedUsers.some(su => su.id === u.id)
-        );
-        
-        // Enhance users with profile data
-        const enhancedUsers = await Promise.all(
-          filteredUsers.map(async (userData) => {
-            try {
-              const userDetails = await getUserDetails(userData.id);
-              if (userDetails) {
-                return {
-                  ...userData,
-                  ...userDetails.profile,
-                  display_name: getProfileDisplayName(userDetails.profile)
-                };
+          // Enhance users with profile data
+          const enhancedUsers = await Promise.all(
+            filteredUsers.map(async (userData) => {
+              try {
+                const userDetails = await getUserDetails(userData.id);
+                if (userDetails) {
+                  return {
+                    ...userData,
+                    ...userDetails.profile,
+                    display_name: getProfileDisplayName(userDetails.profile)
+                  };
+                }
+              } catch (err) {
+                console.error('Error fetching user details:', err);
               }
-            } catch (err) {
-              console.error('Error fetching user details:', err);
-            }
-            return userData;
-          })
-        );
-        
-        setAvailableUsers(enhancedUsers);
+              return userData;
+            })
+          );
+
+          setAvailableUsers(enhancedUsers);
+        }
+      } catch (err) {
+        console.error('Error loading users:', err);
+        showNotification('Failed to load users', 'error');
+      } finally {
+        setIsLoadingUsers(false);
       }
-    } catch (err) {
-      console.error('Error loading users:', err);
-      showNotification('Failed to load users', 'error');
-    } finally {
-      setIsLoadingUsers(false);
-    }
-  };
+    };
 
-  const handleCreateGroup = async () => {
-    if (!groupName.trim() || selectedUsers.length === 0) {
-      showNotification('Please enter group name and select members', 'warning');
-      return;
-    }
+    const handleCreateGroup = async () => {
+      if (!groupName.trim() || selectedUsers.length === 0) {
+        showNotification('Please enter group name and select members', 'warning');
+        return;
+      }
 
-    try {
-      setIsLoading(true);
-      const groupData = {
-        name: groupName,
-        description: groupDescription,
-        participant_ids: selectedUsers.map(u => u.id),
-        is_public: false
-      };
+      try {
+        setIsLoading(true);
+        const groupData = {
+          name: groupName,
+          description: groupDescription,
+          participant_ids: selectedUsers.map(u => u.id),
+          is_public: false
+        };
 
-      await createGroup(groupData);
-      onClose();
-      
-      // Reset form
-      setGroupName('');
-      setGroupDescription('');
-      setSelectedUsers([]);
-      setSearchUsers('');
-      
-    } catch (err) {
-      // Error handled in createGroup function
-    } finally {
-      setIsLoading(false);
-    }
-  };
+        await createGroup(groupData);
+        onClose();
 
-  // Helper function to get user role chip
-  const getUserRoleChip = (user) => {
-    const role = user.role || user.user?.role;
-    if (!role) return null;
-    
+        // Reset form
+        setGroupName('');
+        setGroupDescription('');
+        setSelectedUsers([]);
+        setSearchUsers('');
+
+      } catch (err) {
+        // Error handled in createGroup function
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    // Helper function to get user role chip
+    const getUserRoleChip = (user) => {
+      const role = user.role || user.user?.role;
+      if (!role) return null;
+
+      return (
+        <Chip
+          label={role === 'brand' ? 'Brand' : 'Influencer'}
+          size="small"
+          color={role === 'brand' ? 'primary' : 'secondary'}
+          variant="outlined"
+          sx={{ ml: 1 }}
+        />
+      );
+    };
+
+    // Helper function to get user avatar
+    const getUserAvatar = (user) => {
+      const profilePic = getProfileImage(user) || user.profile_picture;
+      const displayName = getProfileDisplayName(user) || user.username || user.name;
+
+      return (
+        <Avatar src={profilePic} sx={{
+          bgcolor: user.role === 'brand' ? 'primary.main' : 'secondary.main'
+        }}>
+          {displayName?.charAt(0)?.toUpperCase() || 'U'}
+        </Avatar>
+      );
+    };
+
     return (
-      <Chip
-        label={role === 'brand' ? 'Brand' : 'Influencer'}
-        size="small"
-        color={role === 'brand' ? 'primary' : 'secondary'}
-        variant="outlined"
-        sx={{ ml: 1 }}
-      />
-    );
-  };
+      <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
+        <DialogTitle>
+          <Box display="flex" justifyContent="space-between" alignItems="center">
+            <Typography variant="h6">Create New Group</Typography>
+            <IconButton onClick={onClose} size="small">
+              <CloseIcon />
+            </IconButton>
+          </Box>
+        </DialogTitle>
 
-  // Helper function to get user avatar
-  const getUserAvatar = (user) => {
-    const profilePic = getProfileImage(user) || user.profile_picture;
-    const displayName = getProfileDisplayName(user) || user.username || user.name;
-    
-    return (
-      <Avatar src={profilePic} sx={{ 
-        bgcolor: user.role === 'brand' ? 'primary.main' : 'secondary.main'
-      }}>
-        {displayName?.charAt(0)?.toUpperCase() || 'U'}
-      </Avatar>
-    );
-  };
+        <DialogContent>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
+            <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <TextField
+                  label="Group Name *"
+                  value={groupName}
+                  onChange={(e) => setGroupName(e.target.value)}
+                  required
+                  fullWidth
+                  helperText="Choose a name for your group"
+                />
+              </Grid>
 
-  return (
-    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-      <DialogTitle>
-        <Box display="flex" justifyContent="space-between" alignItems="center">
-          <Typography variant="h6">Create New Group</Typography>
-          <IconButton onClick={onClose} size="small">
-            <CloseIcon />
-          </IconButton>
-        </Box>
-      </DialogTitle>
-      
-      <DialogContent>
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <TextField
-                label="Group Name *"
-                value={groupName}
-                onChange={(e) => setGroupName(e.target.value)}
-                required
-                fullWidth
-                helperText="Choose a name for your group"
-              />
+              <Grid item xs={12}>
+                <TextField
+                  label="Description (Optional)"
+                  value={groupDescription}
+                  onChange={(e) => setGroupDescription(e.target.value)}
+                  multiline
+                  rows={2}
+                  fullWidth
+                  helperText="Describe what this group is about"
+                />
+              </Grid>
             </Grid>
-            
-            <Grid item xs={12}>
-              <TextField
-                label="Description (Optional)"
-                value={groupDescription}
-                onChange={(e) => setGroupDescription(e.target.value)}
-                multiline
-                rows={2}
-                fullWidth
-                helperText="Describe what this group is about"
-              />
-            </Grid>
-          </Grid>
-          
-          {selectedUsers.length > 0 && (
+
+            {selectedUsers.length > 0 && (
+              <Box>
+                <Typography variant="subtitle2" gutterBottom>
+                  Selected Members ({selectedUsers.length})
+                </Typography>
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2, p: 1, backgroundColor: 'grey.50', borderRadius: 1 }}>
+                  {selectedUsers.map(u => (
+                    <Chip
+                      key={u.id}
+                      avatar={getUserAvatar(u)}
+                      label={getProfileDisplayName(u) || u.username || u.name}
+                      onDelete={() => setSelectedUsers(prev => prev.filter(su => su.id !== u.id))}
+                      color="primary"
+                      variant="outlined"
+                      size="medium"
+                    />
+                  ))}
+                </Box>
+              </Box>
+            )}
+
             <Box>
               <Typography variant="subtitle2" gutterBottom>
-                Selected Members ({selectedUsers.length})
+                Add Members
+                <Typography variant="caption" color="text.secondary" sx={{ ml: 1 }}>
+                  (Select from all users)
+                </Typography>
               </Typography>
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2, p: 1, backgroundColor: 'grey.50', borderRadius: 1 }}>
-                {selectedUsers.map(u => (
-                  <Chip
-                    key={u.id}
-                    avatar={getUserAvatar(u)}
-                    label={getProfileDisplayName(u) || u.username || u.name}
-                    onDelete={() => setSelectedUsers(prev => prev.filter(su => su.id !== u.id))}
-                    color="primary"
-                    variant="outlined"
-                    size="medium"
-                  />
-                ))}
+
+              <TextField
+                fullWidth
+                placeholder="Search users by name, username, or role..."
+                value={searchUsers}
+                onChange={(e) => setSearchUsers(e.target.value)}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon />
+                    </InputAdornment>
+                  ),
+                  endAdornment: searchUsers && (
+                    <InputAdornment position="end">
+                      <IconButton size="small" onClick={() => setSearchUsers('')}>
+                        <CloseIcon fontSize="small" />
+                      </IconButton>
+                    </InputAdornment>
+                  )
+                }}
+                sx={{ mb: 2 }}
+              />
+
+              <Box sx={{ maxHeight: 300, overflow: 'auto', border: 1, borderColor: 'divider', borderRadius: 1 }}>
+                {isLoadingUsers ? (
+                  <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
+                    <CircularProgress size={30} />
+                    <Typography variant="body2" sx={{ ml: 2 }}>
+                      Loading users...
+                    </Typography>
+                  </Box>
+                ) : availableUsers.length === 0 ? (
+                  <Box sx={{ p: 3, textAlign: 'center' }}>
+                    <PeopleIcon sx={{ fontSize: 40, color: 'text.secondary', mb: 1 }} />
+                    <Typography color="text.secondary">
+                      No users found
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Try a different search term
+                    </Typography>
+                  </Box>
+                ) : (
+                  <List sx={{ py: 0 }}>
+                    {availableUsers
+                      .filter(u => {
+                        if (!searchUsers.trim()) return true;
+
+                        const query = searchUsers.toLowerCase();
+                        const displayName = getProfileDisplayName(u) || '';
+                        const username = u.username || '';
+                        const name = u.name || '';
+                        const role = u.role || '';
+                        const company = u.company_name || '';
+                        const niche = u.niche || '';
+
+                        return (
+                          displayName.toLowerCase().includes(query) ||
+                          username.toLowerCase().includes(query) ||
+                          name.toLowerCase().includes(query) ||
+                          role.toLowerCase().includes(query) ||
+                          company.toLowerCase().includes(query) ||
+                          niche.toLowerCase().includes(query)
+                        );
+                      })
+                      .map(u => {
+                        const isSelected = selectedUsers.some(su => su.id === u.id);
+                        const displayName = getProfileDisplayName(u) || u.username || u.name;
+                        const role = u.role || u.user?.role;
+
+                        return (
+                          <ListItem
+                            key={u.id}
+                            button
+                            selected={isSelected}
+                            onClick={() => {
+                              if (isSelected) {
+                                setSelectedUsers(prev => prev.filter(su => su.id !== u.id));
+                              } else {
+                                setSelectedUsers(prev => [...prev, u]);
+                              }
+                            }}
+                            sx={{
+                              borderBottom: 1,
+                              borderColor: 'divider',
+                              '&.Mui-selected': {
+                                backgroundColor: 'primary.light',
+                                '&:hover': { backgroundColor: 'primary.light' }
+                              }
+                            }}
+                          >
+                            <ListItemAvatar>
+                              {getUserAvatar(u)}
+                            </ListItemAvatar>
+                            <ListItemText
+                              primary={
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                  <Typography variant="subtitle1">
+                                    {displayName}
+                                  </Typography>
+                                  {getUserRoleChip(u)}
+                                </Box>
+                              }
+                              secondary={
+                                role === 'influencer'
+                                  ? `${u.niche || 'No niche specified'} • ${u.full_name || u.username}`
+                                  : `${u.company_name || 'No company name'} • ${u.industry || u.username}`
+                              }
+                            />
+                            {isSelected ? (
+                              <CheckIcon color="primary" />
+                            ) : (
+                              <AddIcon color="action" />
+                            )}
+                          </ListItem>
+                        );
+                      })}
+                  </List>
+                )}
+              </Box>
+
+              <Box sx={{ mt: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Typography variant="caption" color="text.secondary">
+                  Found {availableUsers.length} users
+                </Typography>
+                <Button
+                  size="small"
+                  onClick={loadAvailableUsers}
+                  startIcon={<RefreshIcon />}
+                  disabled={isLoadingUsers}
+                >
+                  Refresh
+                </Button>
               </Box>
             </Box>
-          )}
-          
-          <Box>
-            <Typography variant="subtitle2" gutterBottom>
-              Add Members
-              <Typography variant="caption" color="text.secondary" sx={{ ml: 1 }}>
-                (Select from all users)
-              </Typography>
-            </Typography>
-            
-            <TextField
-              fullWidth
-              placeholder="Search users by name, username, or role..."
-              value={searchUsers}
-              onChange={(e) => setSearchUsers(e.target.value)}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon />
-                  </InputAdornment>
-                ),
-                endAdornment: searchUsers && (
-                  <InputAdornment position="end">
-                    <IconButton size="small" onClick={() => setSearchUsers('')}>
-                      <CloseIcon fontSize="small" />
-                    </IconButton>
-                  </InputAdornment>
-                )
-              }}
-              sx={{ mb: 2 }}
-            />
-            
-            <Box sx={{ maxHeight: 300, overflow: 'auto', border: 1, borderColor: 'divider', borderRadius: 1 }}>
-              {isLoadingUsers ? (
-                <Box sx={{ display: 'flex', justifyContent: 'center', p: 3 }}>
-                  <CircularProgress size={30} />
-                  <Typography variant="body2" sx={{ ml: 2 }}>
-                    Loading users...
-                  </Typography>
-                </Box>
-              ) : availableUsers.length === 0 ? (
-                <Box sx={{ p: 3, textAlign: 'center' }}>
-                  <PeopleIcon sx={{ fontSize: 40, color: 'text.secondary', mb: 1 }} />
-                  <Typography color="text.secondary">
-                    No users found
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Try a different search term
-                  </Typography>
-                </Box>
-              ) : (
-                <List sx={{ py: 0 }}>
-                  {availableUsers
-                    .filter(u => {
-                      if (!searchUsers.trim()) return true;
-                      
-                      const query = searchUsers.toLowerCase();
-                      const displayName = getProfileDisplayName(u) || '';
-                      const username = u.username || '';
-                      const name = u.name || '';
-                      const role = u.role || '';
-                      const company = u.company_name || '';
-                      const niche = u.niche || '';
-                      
-                      return (
-                        displayName.toLowerCase().includes(query) ||
-                        username.toLowerCase().includes(query) ||
-                        name.toLowerCase().includes(query) ||
-                        role.toLowerCase().includes(query) ||
-                        company.toLowerCase().includes(query) ||
-                        niche.toLowerCase().includes(query)
-                      );
-                    })
-                    .map(u => {
-                      const isSelected = selectedUsers.some(su => su.id === u.id);
-                      const displayName = getProfileDisplayName(u) || u.username || u.name;
-                      const role = u.role || u.user?.role;
-                      
-                      return (
-                        <ListItem
-                          key={u.id}
-                          button
-                          selected={isSelected}
-                          onClick={() => {
-                            if (isSelected) {
-                              setSelectedUsers(prev => prev.filter(su => su.id !== u.id));
-                            } else {
-                              setSelectedUsers(prev => [...prev, u]);
-                            }
-                          }}
-                          sx={{
-                            borderBottom: 1,
-                            borderColor: 'divider',
-                            '&.Mui-selected': {
-                              backgroundColor: 'primary.light',
-                              '&:hover': { backgroundColor: 'primary.light' }
-                            }
-                          }}
-                        >
-                          <ListItemAvatar>
-                            {getUserAvatar(u)}
-                          </ListItemAvatar>
-                          <ListItemText
-                            primary={
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                <Typography variant="subtitle1">
-                                  {displayName}
-                                </Typography>
-                                {getUserRoleChip(u)}
-                              </Box>
-                            }
-                            secondary={
-                              <Box>
-                                <Typography variant="body2" color="text.secondary">
-                                  {role === 'brand' 
-                                    ? u.company_name || u.industry || 'Brand'
-                                    : u.niche || u.full_name || 'Influencer'}
-                                </Typography>
-                                <Typography variant="caption" color="text.secondary">
-                                  {u.email || 'No email'}
-                                </Typography>
-                              </Box>
-                            }
-                          />
-                          {isSelected ? (
-                            <CheckIcon color="primary" />
-                          ) : (
-                            <AddIcon color="action" />
-                          )}
-                        </ListItem>
-                      );
-                    })}
-                </List>
-              )}
-            </Box>
-            
-            <Box sx={{ mt: 1, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Typography variant="caption" color="text.secondary">
-                Found {availableUsers.length} users
-              </Typography>
-              <Button
-                size="small"
-                onClick={loadAvailableUsers}
-                startIcon={<RefreshIcon />}
-                disabled={isLoadingUsers}
-              >
-                Refresh
-              </Button>
-            </Box>
           </Box>
-        </Box>
-      </DialogContent>
-      
-      <DialogActions sx={{ p: 2, borderTop: 1, borderColor: 'divider' }}>
-        <Button onClick={onClose} variant="outlined">
-          Cancel
-        </Button>
-        <Button
-          variant="contained"
-          onClick={handleCreateGroup}
-          disabled={isLoading || !groupName.trim() || selectedUsers.length === 0}
-          startIcon={isLoading ? <CircularProgress size={20} /> : <PeopleIcon />}
-        >
-          {isLoading ? 'Creating...' : `Create Group (${selectedUsers.length} members)`}
-        </Button>
-      </DialogActions>
-    </Dialog>
-  );
-};
+        </DialogContent>
+
+        <DialogActions sx={{ p: 2, borderTop: 1, borderColor: 'divider' }}>
+          <Button onClick={onClose} variant="outlined">
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            onClick={handleCreateGroup}
+            disabled={isLoading || !groupName.trim() || selectedUsers.length === 0}
+            startIcon={isLoading ? <CircularProgress size={20} /> : <PeopleIcon />}
+          >
+            {isLoading ? 'Creating...' : `Create Group (${selectedUsers.length} members)`}
+          </Button>
+        </DialogActions>
+      </Dialog>
+    );
+  };
 
   const updateConversationAfterSend = (content) => {
     if (!selectedConversation) return;
@@ -1814,20 +1286,20 @@ const NewGroupDialog = ({ open, onClose, user, api }) => {
         }
         return conv;
       });
-      
+
       // Move to top
       const convIndex = updated.findIndex(c => c.id === selectedConversation.id);
       if (convIndex > 0) {
         const [conv] = updated.splice(convIndex, 1);
         updated.unshift(conv);
       }
-      
+
       return updated;
     });
   };
 
   const sendTypingIndicator = useCallback((isTyping) => {
-    if (socket && selectedConversation && selectedConversation.id) {
+    if (socket && selectedConversation && selectedConversation.id && selectedConversation.other_participant) {
       socket.emit('typing', {
         conversation_id: selectedConversation.id,
         receiver_id: selectedConversation.other_participant.id,
@@ -1856,18 +1328,18 @@ const NewGroupDialog = ({ open, onClose, user, api }) => {
     if (!editingMessage?.content.trim()) return;
 
     try {
-      const response = await api.put(`/messages/messages/${editingMessage.id}`, { 
-        content: editingMessage.content 
+      const response = await api.put(`/messages/messages/${editingMessage.id}`, {
+        content: editingMessage.content
       });
-      
+
       if (response && (response.success || response.data)) {
         const updatedMessage = response.data || response;
-        setMessages(prev => prev.map(msg => 
+        setMessages(prev => prev.map(msg =>
           msg.id === editingMessage.id ? { ...msg, ...updatedMessage, is_edited: true } : msg
         ));
         setEditingMessage(null);
         setMenuAnchorEl(null);
-        
+
         if (socket) {
           socket.emit('update_message', {
             conversation_id: selectedConversation.id,
@@ -1875,7 +1347,7 @@ const NewGroupDialog = ({ open, onClose, user, api }) => {
             updates: updatedMessage
           });
         }
-        
+
         showNotification('Message updated', 'success');
       }
     } catch (err) {
@@ -1889,20 +1361,20 @@ const NewGroupDialog = ({ open, onClose, user, api }) => {
 
     try {
       const response = await api.delete(`/messages/messages/${selectedForMenu.id}`);
-      
+
       if (response && (response.success || response.data)) {
-        setMessages(prev => prev.map(msg => 
+        setMessages(prev => prev.map(msg =>
           msg.id === selectedForMenu.id ? { ...msg, content: '[Message deleted]', is_deleted: true } : msg
         ));
         setMenuAnchorEl(null);
-        
+
         if (socket) {
           socket.emit('delete_message', {
             conversation_id: selectedConversation.id,
             message_id: selectedForMenu.id
           });
         }
-        
+
         showNotification('Message deleted', 'success');
       }
     } catch (err) {
@@ -1911,26 +1383,7 @@ const NewGroupDialog = ({ open, onClose, user, api }) => {
     }
   };
 
-  const markConversationAsRead = async (conversationId) => {
-    try {
-      await api.put(`/messages/conversations/${conversationId}/read`);
-      setConversations(prev => prev.map(conv => 
-        conv.id === conversationId ? { ...conv, unread_count: 0, has_unread: false } : conv
-      ));
-      setUnreadCount(prev => Math.max(0, prev - 1));
-    } catch (err) {
-      console.error('Error marking conversation as read:', err);
-    }
-  };
 
-  // ==================== CONVERSATION ACTIONS ====================
-  const handleConversationSelect = async (conversation) => {
-    console.log('Selecting conversation:', conversation);
-    setSelectedConversation(conversation);
-    shouldAutoScrollRef.current = true;
-    setShowInfo(false);
-    await loadMessages(conversation.id);
-  };
 
   const startNewConversation = async () => {
     if (selectedUsers.length === 0) {
@@ -1939,25 +1392,31 @@ const NewGroupDialog = ({ open, onClose, user, api }) => {
     }
 
     try {
+      if (selectedUsers.length > 1) {
+        setShowNewChat(false);
+        setShowNewGroup(true);
+        return;
+      }
       const participant = selectedUsers[0];
-      
+
       // Check if conversation already exists
-      const existingConv = conversations.find(conv => 
+      const existingConv = conversations.find(conv =>
         conv.other_participant?.id === participant.id
       );
-      
+
       if (existingConv) {
         handleConversationSelect(existingConv);
       } else {
         // Create new conversation object
         const newConv = {
           id: `new_${Date.now()}`,
-          title: participant.username || participant.name || 'New User',
+          title: getProfileDisplayName(participant),
           other_participant: {
+            ...participant,
             id: participant.id,
-            username: participant.username || participant.name || 'New User',
+            display_name: getProfileDisplayName(participant),
             role: participant.role || (userRole === 'brand' ? 'influencer' : 'brand'),
-            profile_picture: participant.profile_picture
+            profile_picture: getProfileImage(participant)
           },
           last_message: null,
           updated_at: new Date().toISOString(),
@@ -1966,18 +1425,18 @@ const NewGroupDialog = ({ open, onClose, user, api }) => {
           type: 'direct',
           has_unread: false
         };
-        
+
         setSelectedConversation(newConv);
         setMessages([]);
-        
+
         // Add to conversations list
         setConversations(prev => [newConv, ...prev]);
       }
-      
+
       setShowNewChat(false);
       setSelectedUsers([]);
       setSearchQuery('');
-      
+
       showNotification('New conversation started', 'success');
     } catch (err) {
       console.error('Error starting conversation:', err);
@@ -1999,16 +1458,16 @@ const NewGroupDialog = ({ open, onClose, user, api }) => {
 
   const updateConversationSettings = async (settings) => {
     if (!selectedConversation) return;
-    
+
     try {
       const response = await api.put(
-        `/messages/conversations/${selectedConversation.id}/settings`, 
+        `/messages/conversations/${selectedConversation.id}/settings`,
         settings
       );
-      
+
       if (response && (response.success || response.data)) {
         setSelectedConversation(prev => ({ ...prev, ...settings }));
-        setConversations(prev => prev.map(conv => 
+        setConversations(prev => prev.map(conv =>
           conv.id === selectedConversation.id ? { ...conv, ...settings } : conv
         ));
         showNotification('Settings updated', 'success');
@@ -2020,116 +1479,116 @@ const NewGroupDialog = ({ open, onClose, user, api }) => {
   };
 
   // Preview Modal Component
-const AttachmentPreview = () => {
-  if (!currentPreview) return null;
+  const AttachmentPreview = () => {
+    if (!currentPreview) return null;
 
-  const isImage = previewType === 'image';
-  const isVideo = previewType === 'video';
-  const fileName = currentPreview.name || currentPreview.split('/').pop();
+    const isImage = previewType === 'image';
+    const isVideo = previewType === 'video';
+    const fileName = currentPreview.name || currentPreview.split('/').pop();
 
-  return (
-    <Dialog
-      open={previewOpen}
-      onClose={() => setPreviewOpen(false)}
-      maxWidth="lg"
-      fullWidth
-      PaperProps={{
-        sx: {
-          maxHeight: '90vh',
+    return (
+      <Dialog
+        open={previewOpen}
+        onClose={() => setPreviewOpen(false)}
+        maxWidth="lg"
+        fullWidth
+        PaperProps={{
+          sx: {
+            maxHeight: '90vh',
+            overflow: 'hidden'
+          }
+        }}
+      >
+        <DialogTitle sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          borderBottom: 1,
+          borderColor: 'divider'
+        }}>
+          <Typography variant="h6">
+            {isImage ? 'Image Preview' : isVideo ? 'Video Preview' : 'File Preview'}
+          </Typography>
+          <IconButton onClick={() => setPreviewOpen(false)}>
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+
+        <DialogContent sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          p: 0,
           overflow: 'hidden'
-        }
-      }}
-    >
-      <DialogTitle sx={{ 
-        display: 'flex', 
-        justifyContent: 'space-between', 
-        alignItems: 'center',
-        borderBottom: 1,
-        borderColor: 'divider'
-      }}>
-        <Typography variant="h6">
-          {isImage ? 'Image Preview' : isVideo ? 'Video Preview' : 'File Preview'}
-        </Typography>
-        <IconButton onClick={() => setPreviewOpen(false)}>
-          <CloseIcon />
-        </IconButton>
-      </DialogTitle>
-      
-      <DialogContent sx={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center',
-        p: 0,
-        overflow: 'hidden'
-      }}>
-        {isImage ? (
-          <img
-            src={currentPreview.url || currentPreview}
-            alt="Preview"
-            style={{ 
-              maxWidth: '100%', 
-              maxHeight: '70vh',
-              objectFit: 'contain'
-            }}
-            onError={(e) => {
-              e.target.onerror = null;
-              e.target.src = 'https://via.placeholder.com/600x400?text=Image+Not+Available';
-            }}
-          />
-        ) : isVideo ? (
-          <video
-            controls
-            style={{ maxWidth: '100%', maxHeight: '70vh' }}
-          >
-            <source src={currentPreview.url || currentPreview} type="video/mp4" />
-            Your browser does not support the video tag.
-          </video>
-        ) : (
-          <Box sx={{ 
-            p: 4, 
-            textAlign: 'center',
-            width: '100%'
-          }}>
-            <FileIcon sx={{ fontSize: 60, color: 'primary.main', mb: 2 }} />
-            <Typography variant="h6" gutterBottom>
-              {fileName}
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-              This file cannot be previewed in the browser
-            </Typography>
-            <Button
-              variant="contained"
-              startIcon={<FileIcon />}
-              onClick={() => window.open(currentPreview.url || currentPreview, '_blank')}
+        }}>
+          {isImage ? (
+            <img
+              src={currentPreview.url || currentPreview}
+              alt="Preview"
+              style={{
+                maxWidth: '100%',
+                maxHeight: '70vh',
+                objectFit: 'contain'
+              }}
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = 'https://via.placeholder.com/600x400?text=Image+Not+Available';
+              }}
+            />
+          ) : isVideo ? (
+            <video
+              controls
+              style={{ maxWidth: '100%', maxHeight: '70vh' }}
             >
-              Download File
-            </Button>
-          </Box>
-        )}
-      </DialogContent>
-      
-      <DialogActions sx={{ borderTop: 1, borderColor: 'divider' }}>
-        <Button
-          startIcon={<AttachIcon />}
-          onClick={() => {
-            const link = document.createElement('a');
-            link.href = currentPreview.url || currentPreview;
-            link.download = fileName;
-            link.click();
-          }}
-        >
-          Download
-        </Button>
-        <Button
-          variant="contained"
-          onClick={() => setPreviewOpen(false)}
-        >
-          Close
-        </Button>
-      </DialogActions>
-    </Dialog>
-  );
-};
+              <source src={currentPreview.url || currentPreview} type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          ) : (
+            <Box sx={{
+              p: 4,
+              textAlign: 'center',
+              width: '100%'
+            }}>
+              <FileIcon sx={{ fontSize: 60, color: 'primary.main', mb: 2 }} />
+              <Typography variant="h6" gutterBottom>
+                {fileName}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                This file cannot be previewed in the browser
+              </Typography>
+              <Button
+                variant="contained"
+                startIcon={<FileIcon />}
+                onClick={() => window.open(currentPreview.url || currentPreview, '_blank')}
+              >
+                Download File
+              </Button>
+            </Box>
+          )}
+        </DialogContent>
+
+        <DialogActions sx={{ borderTop: 1, borderColor: 'divider' }}>
+          <Button
+            startIcon={<AttachIcon />}
+            onClick={() => {
+              const link = document.createElement('a');
+              link.href = currentPreview.url || currentPreview;
+              link.download = fileName;
+              link.click();
+            }}
+          >
+            Download
+          </Button>
+          <Button
+            variant="contained"
+            onClick={() => setPreviewOpen(false)}
+          >
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+    );
+  };
 
 
 
@@ -2137,7 +1596,7 @@ const AttachmentPreview = () => {
   const filteredConversations = conversations
     .filter(conv => {
       if (!conv) return false;
-      
+
       if (filter === 'unread') return conv.unread_count > 0;
       if (filter === 'archived') return conv.is_archived;
       if (filter === 'favorites') return favorites.has(conv.id);
@@ -2147,9 +1606,9 @@ const AttachmentPreview = () => {
 
   const filteredUsers = users.filter(u => {
     if (!u) return false;
-    
+
     if (!searchQuery.trim()) return true;
-    
+
     const query = searchQuery.toLowerCase();
     return (
       (u.username?.toLowerCase().includes(query)) ||
@@ -2160,7 +1619,7 @@ const AttachmentPreview = () => {
   });
 
   const typingUsersList = Object.values(typingUsers).map(u => u.username).filter(Boolean);
-  const typingIndicator = typingUsersList.length > 0 
+  const typingIndicator = typingUsersList.length > 0
     ? `${typingUsersList.join(', ')} ${typingUsersList.length === 1 ? 'is' : 'are'} typing...`
     : null;
 
@@ -2168,10 +1627,56 @@ const AttachmentPreview = () => {
   const getRoleColor = (role) => role === 'brand' ? 'primary' : 'secondary';
   const getRoleLabel = (role) => role === 'brand' ? 'Brand' : 'Influencer';
 
+  const updateUserStatus = (userId, isOnline) => {
+    const statusData = { is_online: isOnline, last_seen: new Date().toISOString() };
+
+    setConversations(prev => prev.map(conv => {
+      if (conv.other_participant?.id === userId) {
+        return { ...conv, other_participant: { ...conv.other_participant, ...statusData } };
+      }
+      return conv;
+    }));
+
+    if (selectedConversation?.other_participant?.id === userId) {
+      setSelectedConversation(prev => ({
+        ...prev,
+        other_participant: { ...prev.other_participant, ...statusData }
+      }));
+    }
+  };
+
+  const formatLastSeen = (timestamp) => {
+    if (!timestamp) return 'Last seen recently';
+    try {
+      const date = parseDate(timestamp);
+      if (isNaN(date.getTime())) return 'Last seen recently';
+
+      const now = new Date();
+      const diffInMinutes = Math.floor((now - date) / (1000 * 60));
+
+      if (diffInMinutes < 1) return 'Just now';
+      if (diffInMinutes < 60) return `Last seen ${diffInMinutes}m ago`;
+
+      return `Last seen ${formatDistanceToNow(date, { addSuffix: true })}`;
+    } catch (err) {
+      return 'Last seen recently';
+    }
+  };
+
+  const parseDate = (timestamp) => {
+    if (!timestamp) return new Date();
+    if (typeof timestamp !== 'string') return new Date(timestamp);
+    // If it doesn't have timezone info (no Z, +, or - after the time part), assume UTC
+    // Direct matches for ISO strings like '2024-04-14T09:27:00'
+    const hasTimeZone = timestamp.includes('Z') || (timestamp.includes('+') && timestamp.indexOf('+') > 10) || (timestamp.includes('-') && timestamp.lastIndexOf('-') > 10);
+    const utcTimestamp = hasTimeZone ? timestamp : timestamp + 'Z';
+    return new Date(utcTimestamp);
+  };
+
   const formatMessageTime = (timestamp) => {
     try {
       if (!timestamp) return 'Just now';
-      const date = new Date(timestamp);
+      const date = parseDate(timestamp);
       if (isNaN(date.getTime())) return 'Just now';
       if (isToday(date)) return format(date, 'HH:mm');
       if (isYesterday(date)) return 'Yesterday ' + format(date, 'HH:mm');
@@ -2187,66 +1692,80 @@ const AttachmentPreview = () => {
     }, 100);
   };
 
-  const showNotification = (message, severity = 'info') => {
-    setNotification({ open: true, message, severity });
-  };
 
- const handleAttachment = (type) => {
-  const input = document.createElement('input');
-  input.type = 'file';
-  
-  // Set accept based on type
-  if (type === 'image') {
-    input.accept = 'image/*';
-  } else if (type === 'video') {
-    input.accept = 'video/*';
-  } else if (type === 'audio') {
-    input.accept = 'audio/*';
-  } else {
-    input.accept = '*/*';  // All files
-  }
-  
-  input.multiple = false;
-  
-  input.onchange = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    
-    // Validate file size (max 10MB)
-    const maxSize = 10 * 1024 * 1024; // 10MB
-    if (file.size > maxSize) {
-      showNotification(`File size should be less than ${maxSize / (1024 * 1024)}MB`, 'error');
-      return;
+
+  const handleAttachment = (type) => {
+    const input = document.createElement('input');
+    input.type = 'file';
+
+    // Set accept based on type
+    if (type === 'image') {
+      input.accept = 'image/*';
+    } else if (type === 'video') {
+      input.accept = 'video/*';
+    } else if (type === 'audio') {
+      input.accept = 'audio/*';
+    } else {
+      input.accept = '*/*';  // All files
     }
-    
-    try {
-      // Create a local URL for preview
-      const fileUrl = URL.createObjectURL(file);
-      
-      // Prepare attachment data
-      const attachmentData = {
-        file,
-        url: fileUrl,
-        name: file.name,
-        type: file.type,
-        size: file.size
-      };
-      
-      setAttachment(attachmentData);
-      showNotification(`Attached: ${file.name}`, 'success');
-      
-    } catch (err) {
-      console.error('Error handling attachment:', err);
-      showNotification('Failed to attach file', 'error');
-    }
+
+    input.multiple = false;
+
+    input.onchange = async (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      // Validate file size (max 50MB) 
+      const maxSize = 50 * 1024 * 1024;
+      if (file.size > maxSize) {
+        showNotification(`File size should be less than 50MB`, 'error');
+        return;
+      }
+
+      try {
+        setIsUploading(true);
+        setUploadProgress(0);
+
+        // Show immediate optimistic feeling
+        setAttachment({
+          name: file.name,
+          size: file.size,
+          type: file.type,
+          isUploading: true
+        });
+
+        const response = await api.upload('/attachments/upload', file, (progress) => {
+          setUploadProgress(progress);
+        });
+
+        if (response && response.success) {
+          setAttachment({
+            url: response.url,
+            name: response.filename,
+            type: file.type,
+            size: response.file_size,
+            storage_id: response.storage_id,
+            isUploaded: true,
+            message_type: response.file_type
+          });
+          showNotification(`File uploaded: ${response.filename}`, 'success');
+        }
+      } catch (err) {
+        console.error('Error handling attachment:', err);
+        setAttachment(null);
+        showNotification('Failed to upload file. Please try again.', 'error');
+      } finally {
+        setIsUploading(false);
+        setUploadProgress(0);
+      }
+    };
+
+    input.click();
   };
-  
-  input.click();
-};
 
   const clearNotifications = () => {
     setUnreadCount(0);
-    setConversations(prev => prev.map(conv => 
+    setConversations(prev => prev.map(conv =>
       conv ? { ...conv, unread_count: 0, has_unread: false } : conv
     ));
     showNotification('All notifications cleared', 'success');
@@ -2255,32 +1774,32 @@ const AttachmentPreview = () => {
   // ==================== RENDER FUNCTIONS ====================
   const renderMessageBubble = (message) => {
     if (!message) return null;
-    
+
     const isOwnMessage = message.sender?.id === user.id || message.sender_id === user.id;
-    const senderUsername = message.sender?.username || 'Unknown User';
-    const senderProfilePic = message.sender?.profile_picture;
-    
-    const getStatusIcon = () => {
-      if (message.is_sending) return <ScheduleIcon fontSize="small" color="disabled" />;
-      if (message.is_deleted) return <ErrorIcon fontSize="small" color="error" />;
-      if (message.is_read) return <CheckCircleIcon fontSize="small" color="primary" />;
-      if (message.is_delivered) return <CheckCircleIcon fontSize="small" color="action" />;
-      return <CheckIcon fontSize="small" color="action" />;
+    const displayName = getProfileDisplayName(message.sender);
+    const profilePic = getProfileImage(message.sender);
+    const myProfilePic = getProfileImage(user);
+    const myDisplayName = getProfileDisplayName(user);
+
+    const getMessageStatus = (msg) => {
+      if (msg.is_sending) return { icon: <ScheduleIcon sx={{ fontSize: 14, opacity: 0.7 }} />, text: 'Sending...' };
+      if (msg.is_deleted) return { icon: <ErrorIcon sx={{ fontSize: 14 }} color="error" />, text: 'Deleted' };
+      if (msg.is_read) return { icon: <DoubleCheckIcon sx={{ fontSize: 16, color: '#4caf50' }} />, text: 'Read' }; // WhatsApp-style Green
+      if (msg.is_delivered) return { icon: <DoubleCheckIcon sx={{ fontSize: 16, opacity: 0.6 }} />, text: 'Delivered' };
+      return { icon: <CheckIcon sx={{ fontSize: 16, opacity: 0.6 }} />, text: 'Sent' };
     };
-      const displayContent = 
-    message.content || 
-    message.text || 
-    message.body || 
-    '[Empty message]';
 
-    
-// Update attachment handling in message bubble
-const handleAttachmentClick = (attachment, type) => {
-  setCurrentPreview(attachment);
-  setPreviewType(type);
-  setPreviewOpen(true);
-};
+    const displayContent =
+      message.content ||
+      message.text ||
+      message.body ||
+      '[Empty message]';
 
+    const handleAttachmentClick = (attachment, type) => {
+      setCurrentPreview(attachment);
+      setPreviewType(type);
+      setPreviewOpen(true);
+    };
 
     return (
       <Box
@@ -2295,19 +1814,17 @@ const handleAttachmentClick = (attachment, type) => {
       >
         {!isOwnMessage && (
           <Avatar
-            src={senderProfilePic}
-            sx={{ width: 32, height: 32, mt: 'auto', mr: 1 }}
+            src={getProfileImage(message.sender)}
+            sx={{ width: 36, height: 36, mt: 'auto', mr: 1, boxShadow: 1 }}
           >
-            {senderUsername?.charAt(0)?.toUpperCase() || 'U'}
+            {getProfileDisplayName(message.sender)?.charAt(0)?.toUpperCase()}
           </Avatar>
         )}
 
-        <Box sx={{ maxWidth: '70%' }}>
-          {!isOwnMessage && (
-            <Typography variant="caption" color="text.secondary" sx={{ ml: 1, mb: 0.5, display: 'block' }}>
-              {senderUsername}
-            </Typography>
-          )}
+        <Box sx={{ maxWidth: '75%', display: 'flex', flexDirection: 'column', alignItems: isOwnMessage ? 'flex-end' : 'flex-start' }}>
+          <Typography variant="caption" color="text.secondary" sx={{ [isOwnMessage ? 'mr' : 'ml']: 1, mb: 0.5, fontWeight: 500 }}>
+            {getProfileDisplayName(isOwnMessage ? user : message.sender)}
+          </Typography>
 
           <Paper
             elevation={0}
@@ -2325,237 +1842,261 @@ const handleAttachmentClick = (attachment, type) => {
                 [Message deleted]
               </Typography>
             ) : message.attachment_url ? (
-  message.message_type === 'image' || message.attachment_url.match(/\.(jpg|jpeg|png|gif|webp|bmp)$/i) ? (
-    <Box sx={{ maxWidth: 300, cursor: 'pointer' }}>
-      <Paper
-        elevation={0}
-        sx={{
-          p: 1,
-          backgroundColor: 'background.paper',
-          borderRadius: 1,
-          border: 1,
-          borderColor: 'divider',
-          '&:hover': {
-            // backgroundColor: 'action.hover'
-          }
-        }}
-        onClick={() => handleAttachmentClick(message.attachment_url, 'image')}
-      >
-        <img
-          src={message.attachment_url}
-          alt="Attachment"
-          style={{ 
-            width: '100%', 
-            borderRadius: 4,
-            maxHeight: 200,
-            objectFit: 'cover'
-          }}
-          onError={(e) => {
-            e.target.onerror = null;
-            e.target.src = 'https://via.placeholder.com/300x200?text=Image+Not+Available';
-          }}
-        />
-        <Box sx={{ display: 'flex', alignItems: 'center', mt: 0.5 }}>
-          <ImageIcon fontSize="small" sx={{ mr: 0.5, color: 'primary.main' }} />
-          <Typography variant="caption" color="text.secondary">
-            Click to preview
-          </Typography>
-        </Box>
-      </Paper>
-    </Box>
-  ) : message.message_type === 'video' || message.attachment_url.match(/\.(mp4|webm|ogg|mov)$/i) ? (
-    <Paper
-      variant="outlined"
-      sx={{ 
-        p: 2, 
-        maxWidth: 300, 
-        cursor: 'pointer',
-        '&:hover': { backgroundColor: 'action.hover' }
-      }}
-      onClick={() => handleAttachmentClick(message.attachment_url, 'video')}
-    >
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-        <VideocamIcon color="primary" sx={{ mr: 1 }} />
-        <Typography variant="body2" fontWeight="bold">
-          Video Attachment
-        </Typography>
-      </Box>
-      <Typography variant="caption" color="text.secondary">
-        Click to preview video
-      </Typography>
-    </Paper>
-  ) : (
-    <Paper
-      variant="outlined"
-      sx={{ 
-        p: 2, 
-        maxWidth: 300, 
-        cursor: 'pointer',
-        '&:hover': { backgroundColor: 'action.hover' }
-      }}
-      onClick={() => handleAttachmentClick(message.attachment_url, 'file')}
-    >
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-        <FileIcon color="primary" sx={{ mr: 1 }} />
-        <Typography variant="body2" fontWeight="bold" noWrap>
-          {message.attachment_url.split('/').pop() || 'File Attachment'}
-        </Typography>
-      </Box>
-      <Typography variant="caption" color="text.secondary">
-        Click to download
-      </Typography>
-    </Paper>
-  )
-) : (
+              <>
+                {message.message_type === 'image' || message.attachment_url.match(/\.(jpg|jpeg|png|gif|webp|bmp)$/i) ? (
+                  <Box sx={{ maxWidth: 300, cursor: 'pointer' }}>
+                    <Paper
+                      elevation={0}
+                      sx={{
+                        p: 0.5,
+                        backgroundColor: 'white',
+                        borderRadius: 2,
+                        border: 1,
+                        borderColor: isOwnMessage ? 'primary.light' : 'divider',
+                        overflow: 'hidden'
+                      }}
+                      onClick={() => handleAttachmentClick(message.attachment_url, 'image')}
+                    >
+                      <img
+                        src={message.attachment_url}
+                        alt="Attachment"
+                        style={{
+                          width: '100%',
+                          borderRadius: 4,
+                          maxHeight: 250,
+                          objectFit: 'cover',
+                          display: 'block'
+                        }}
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = 'https://via.placeholder.com/300x200?text=Image+Not+Available';
+                        }}
+                      />
+                      {message.content && (
+                        <Typography variant="body2" sx={{ p: 1, color: 'text.primary' }}>
+                          {message.content}
+                        </Typography>
+                      )}
+                    </Paper>
+                  </Box>
+                ) : message.message_type === 'video' || message.attachment_url.match(/\.(mp4|webm|ogg|mov)$/i) ? (
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      p: 1.5,
+                      width: 260,
+                      borderRadius: 2,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 1,
+                      backgroundColor: isOwnMessage ? 'rgba(255,255,255,0.1)' : 'white',
+                      border: '1px solid',
+                      borderColor: isOwnMessage ? 'rgba(255,255,255,0.2)' : 'divider',
+                      cursor: 'pointer',
+                      '&:hover': { backgroundColor: isOwnMessage ? 'rgba(255,255,255,0.2)' : 'grey.50' }
+                    }}
+                    onClick={() => handleAttachmentClick(message.attachment_url, 'video')}
+                  >
+                    <Box sx={{ position: 'relative', width: '100%', pt: '56.25%', bgcolor: 'black', borderRadius: 1, overflow: 'hidden' }}>
+                      <Box sx={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                        <VideocamIcon sx={{ fontSize: 40, color: 'rgba(255,255,255,0.8)' }} />
+                      </Box>
+                    </Box>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Typography variant="body2" sx={{ fontWeight: 700, color: isOwnMessage ? 'white' : 'text.primary', flex: 1 }} noWrap>
+                        {message.attachment_name || 'Video Attachment'}
+                      </Typography>
+                      <Typography variant="caption" sx={{ color: isOwnMessage ? 'rgba(255,255,255,0.7)' : 'text.secondary' }}>
+                        {message.attachment_size ? `${Math.round(message.attachment_size / (1024 * 1024) * 10) / 10} MB` : ''}
+                      </Typography>
+                    </Box>
+                  </Paper>
+                ) : (
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      p: 1.5,
+                      width: 260,
+                      borderRadius: 2,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 1.5,
+                      backgroundColor: isOwnMessage ? 'rgba(255,255,255,0.1)' : 'white',
+                      border: '1px solid',
+                      borderColor: isOwnMessage ? 'rgba(255,255,255,0.2)' : 'divider',
+                      cursor: 'pointer',
+                      '&:hover': { backgroundColor: isOwnMessage ? 'rgba(255,255,255,0.2)' : 'grey.50' }
+                    }}
+                    onClick={() => window.open(message.attachment_url, '_blank')}
+                  >
+                    <Avatar sx={{ bgcolor: isOwnMessage ? 'white' : 'primary.main', width: 40, height: 40, boxShadow: 1 }}>
+                      <FileIcon color={isOwnMessage ? 'primary' : 'inherit'} />
+                    </Avatar>
+                    <Box sx={{ flex: 1, overflow: 'hidden' }}>
+                      <Typography variant="body2" sx={{ fontWeight: 700, color: isOwnMessage ? 'white' : 'text.primary' }} noWrap>
+                        {message.attachment_name || (typeof message.attachment_url === 'string' ? message.attachment_url.split('/').pop() : 'Attachment')}
+                      </Typography>
+                      <Typography variant="caption" sx={{ color: isOwnMessage ? 'rgba(255,255,255,0.8)' : 'text.secondary', display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                        {message.attachment_size ? `${Math.round(message.attachment_size / 1024)} KB` : 'Download File'}
+                      </Typography>
+                    </Box>
+                  </Paper>
+                )}
+                {message.content && message.message_type !== 'image' && (
+                  <Typography variant="body2" sx={{ mt: 1, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                    {message.content}
+                  </Typography>
+                )}
+              </>
+            ) : (
               <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
-                { displayContent ||  '[Empty message]'}
+                {displayContent || '[Empty message]'}
               </Typography>
             )}
-            
+
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', mt: 0.5, gap: 0.5 }}>
-  {message.is_edited && (
-    <Typography variant="caption" sx={{ opacity: 0.7, mr: 0.5 }}>
-      (edited)
-    </Typography>
-  )}
-  <Typography variant="caption" sx={{ opacity: 0.7 }}>
-    {formatMessageTime(message.created_at)}
-  </Typography>
-  {isOwnMessage && (
-    <Tooltip title={getMessageStatus(message).text}>
-      <Box sx={{ display: 'flex', alignItems: 'center' }}>
-        {getMessageStatus(message).icon}
-      </Box>
-    </Tooltip>
-  )}
-</Box>
+              {message.is_edited && (
+                <Typography variant="caption" sx={{ opacity: 0.7, mr: 0.5 }}>
+                  (edited)
+                </Typography>
+              )}
+              <Typography variant="caption" sx={{ opacity: 0.7 }}>
+                {formatMessageTime(message.created_at)}
+              </Typography>
+              {isOwnMessage && (
+                <Tooltip title={getMessageStatus(message).text}>
+                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    {getMessageStatus(message).icon}
+                  </Box>
+                </Tooltip>
+              )}
+            </Box>
           </Paper>
         </Box>
 
         {isOwnMessage && (
           <Avatar
-            src={user.profile_picture}
-            sx={{ width: 32, height: 32, mt: 'auto', ml: 1 }}
+            src={getProfileImage(user)}
+            sx={{ width: 36, height: 36, mt: 'auto', ml: 1, boxShadow: 1 }}
           >
-            {user.username?.charAt(0)?.toUpperCase() || 'Y'}
+            {getProfileDisplayName(user)?.charAt(0)?.toUpperCase()}
           </Avatar>
         )}
       </Box>
     );
   };
-
   const renderConversationItem = (conversation) => {
-  if (!conversation) return null;
-  
-  const isSelected = selectedConversation?.id === conversation.id;
-  const lastMessageTime = conversation.last_message?.timestamp 
-    ? formatDistanceToNow(new Date(conversation.last_message.timestamp), { addSuffix: true })
-    : 'No messages';
-  const lastMessagePreview = conversation.last_message?.content || 'Start a conversation...';
-  const isSender = conversation.last_message?.sender_id === user.id;
-  
-  // Use profile data
-  const otherParticipant = conversation.other_participant || {};
-  const displayName = getProfileDisplayName(otherParticipant);
-  const profileImage = getProfileImage(otherParticipant);
-  const role = otherParticipant.role || (userRole === 'brand' ? 'influencer' : 'brand');
-  const profileDetails = getProfileDetails(otherParticipant);
-  
-  // Additional info for subtitle
-  const subtitleInfo = role === 'brand' 
-    ? profileDetails.company_name || profileDetails.contact_person || profileDetails.industry
-    : profileDetails.nickname || profileDetails.niche || profileDetails.full_name;
+    if (!conversation) return null;
 
-  return (
-    <ListItem
-      key={conversation.id}
-      button
-      selected={isSelected}
-      onClick={() => handleConversationSelect(conversation)}
-      sx={{
-        borderLeft: isSelected ? '4px solid' : 'none',
-        borderLeftColor: 'primary.main',
-        '&:hover': { backgroundColor: 'action.hover' }
-      }}
-    >
-      <ListItemAvatar>
-        <Badge
-          color="primary"
-          variant="dot"
-          invisible={!conversation.has_unread}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-        >
-          <Avatar
-            src={profileImage}
-            sx={{ 
-              bgcolor: role === 'brand' ? 'primary.main' : 'secondary.main',
-              width: 40,
-              height: 40
-            }}
+    const isSelected = selectedConversation?.id === conversation.id;
+    const lastMessageTime = conversation.last_message?.timestamp
+      ? formatDistanceToNow(parseDate(conversation.last_message.timestamp), { addSuffix: true })
+      : 'No messages';
+    const lastMessagePreview = conversation.last_message?.content || 'Start a conversation...';
+    const isSender = conversation.last_message?.sender_id === user.id;
+
+    // Use profile data
+    const otherParticipant = conversation.other_participant || {};
+    const displayName = getProfileDisplayName(otherParticipant);
+    const profileImage = getProfileImage(otherParticipant);
+    const role = otherParticipant.role || (userRole === 'brand' ? 'influencer' : 'brand');
+    const profileDetails = getProfileDetails(otherParticipant);
+
+    // Additional info for subtitle
+    const subtitleInfo = role === 'brand'
+      ? profileDetails.company_name || profileDetails.contact_person || profileDetails.industry
+      : profileDetails.nickname || profileDetails.niche || profileDetails.full_name;
+
+    return (
+      <ListItem
+        key={conversation.id}
+        button
+        selected={isSelected}
+        onClick={() => handleConversationSelect(conversation)}
+        sx={{
+          borderLeft: isSelected ? '4px solid' : 'none',
+          borderLeftColor: 'primary.main',
+          '&:hover': { backgroundColor: 'action.hover' }
+        }}
+      >
+        <ListItemAvatar>
+          <Badge
+            color="primary"
+            variant="dot"
+            invisible={!conversation.has_unread}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
           >
-            {displayName?.charAt(0)?.toUpperCase() || 'U'}
-          </Avatar>
-        </Badge>
-      </ListItemAvatar>
-      
-      <ListItemText
-        primary={
-          <Box display="flex" alignItems="center" gap={1}>
-            <Typography variant="subtitle1" noWrap sx={{ flex: 1 }}>
-              {displayName}
-            </Typography>
-            {/* <Chip
+            <Avatar
+              src={profileImage}
+              sx={{
+                bgcolor: role === 'brand' ? 'primary.main' : 'secondary.main',
+                width: 40,
+                height: 40
+              }}
+            >
+              {displayName?.charAt(0)?.toUpperCase() || 'U'}
+            </Avatar>
+          </Badge>
+        </ListItemAvatar>
+
+        <ListItemText
+          primary={
+            <Box display="flex" alignItems="center" gap={1}>
+              <Typography variant="subtitle1" noWrap sx={{ flex: 1 }}>
+                {displayName}
+              </Typography>
+              {/* <Chip
               icon={getRoleIcon(role)}
               label={getRoleLabel(role)}
               size="small"
               variant="outlined"
               color={getRoleColor(role)}
             /> */}
-            {favorites.has(conversation.id) && (
-              <StarIcon fontSize="small" color="warning" />
-            )}
-          </Box>
-        }
-        secondary={
-          <Box>
-            <Typography
-              variant="body2"
-              color={conversation.has_unread ? 'primary' : 'text.secondary'}
-              noWrap
-              sx={{ fontWeight: conversation.has_unread ? 'bold' : 'normal' }}
-            >
-              {isSender && conversation.last_message && 'You: '}
-              {lastMessagePreview}
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              {subtitleInfo && `${subtitleInfo} • `}
-              {lastMessageTime}
-              {conversation.unread_count > 0 && (
-                <Box component="span" sx={{ ml: 1 }}>
-                  • {conversation.unread_count} unread
-                </Box>
+              {favorites.has(conversation.id) && (
+                <StarIcon fontSize="small" color="warning" />
               )}
-            </Typography>
-          </Box>
-        }
-      />
-      
-      <ListItemSecondaryAction>
-        <IconButton
-          edge="end"
-          size="small"
-          onClick={(e) => {
-            e.stopPropagation();
-            setMenuAnchorEl(e.currentTarget);
-            setSelectedForMenu(conversation);
-          }}
-        >
-          <MoreVertIcon />
-        </IconButton>
-      </ListItemSecondaryAction>
-    </ListItem>
-  );
-};
+            </Box>
+          }
+          secondary={
+            <Box>
+              <Typography
+                variant="body2"
+                color={conversation.has_unread ? 'primary' : 'text.secondary'}
+                noWrap
+                sx={{ fontWeight: conversation.has_unread ? 'bold' : 'normal' }}
+              >
+                {isSender && conversation.last_message && 'You: '}
+                {lastMessagePreview}
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                {subtitleInfo && `${subtitleInfo} • `}
+                {lastMessageTime}
+                {conversation.unread_count > 0 && (
+                  <Box component="span" sx={{ ml: 1 }}>
+                    • {conversation.unread_count} unread
+                  </Box>
+                )}
+              </Typography>
+            </Box>
+          }
+        />
+
+        <ListItemSecondaryAction>
+          <IconButton
+            edge="end"
+            size="small"
+            onClick={(e) => {
+              e.stopPropagation();
+              setMenuAnchorEl(e.currentTarget);
+              setSelectedForMenu(conversation);
+            }}
+          >
+            <MoreVertIcon />
+          </IconButton>
+        </ListItemSecondaryAction>
+      </ListItem>
+    );
+  };
 
   // ==================== MAIN RENDER ====================
   if (loading.conversations && conversations.length === 0) {
@@ -2568,96 +2109,99 @@ const handleAttachmentClick = (attachment, type) => {
   }
 
   return (
-    <Container maxWidth="xl" sx={{ height: 'calc(100vh - 100px)',  overflow: 'hidden' }}>
+    <Container maxWidth="xl" sx={{ height: 'calc(100vh - 100px)', overflow: 'hidden' }}>
       {error && (
         <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>
           {error}
         </Alert>
       )}
-      
-      <Grid container spacing={2} sx={{ 
-  height: '100%', 
-  margin: 0,
-  flexWrap: 'nowrap' // Prevent wrapping
-}}>
-  {/* Left Sidebar - Conversation List */}
-  <Grid item sx={{ 
-    width: { xs: '100%', md: 320 }, // Fixed width on desktop
-    height: '100%', 
-    display: { xs: selectedConversation ? 'none' : 'block', md: 'block' },
-    flexShrink: 0 // Prevent shrinking
-  }}>
+
+      <Grid container spacing={2} sx={{
+        height: '100%',
+        margin: 0,
+        flexWrap: 'nowrap' // Prevent wrapping
+      }}>
+        {/* Left Sidebar - Conversation List */}
+        <Grid item sx={{
+          width: { xs: '100%', md: 320 }, // Fixed width on desktop
+          height: '100%',
+          display: { xs: selectedConversation ? 'none' : 'block', md: 'block' },
+          flexShrink: 0 // Prevent shrinking
+        }}>
           <Paper elevation={3} sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-            <Box sx={{ 
-  p: 2, 
-  borderBottom: 1, 
-  borderColor: 'divider',
-  display: 'flex', 
-  justifyContent: 'space-between', 
-  alignItems: 'center' 
-}}>
-  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-    <Tabs 
-      value={activeTab} 
-      onChange={(e, newValue) => setActiveTab(newValue)}
-      sx={{ minHeight: 'auto' }}
-    >
-      <Tab 
-        label={
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <ChatIcon fontSize="small" />
-            <Typography variant="body2">Direct</Typography>
-            {conversations.some(c => c.unread_count > 0) && (
-              <Badge 
-                badgeContent={conversations.reduce((acc, c) => acc + (c.unread_count || 0), 0)} 
-                color="error" 
-                size="small"
-              />
-            )}
-          </Box>
-        } 
-        value="direct" 
-      />
-      {/* <Tab 
-        label={
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <PeopleIcon fontSize="small" />
-            <Typography variant="body2">Groups</Typography>
-            {groups.some(g => g.unread_count > 0) && (
-              <Badge 
-                badgeContent={groups.reduce((acc, g) => acc + (g.unread_count || 0), 0)} 
-                color="error" 
-                size="small"
-              />
-            )}
-          </Box>
-        } 
-        value="groups" 
-      /> */}
-    </Tabs>
-  </Box>
-  <Box>
-    {activeTab === 'direct' ? (
-      <Tooltip title="New Conversation">
-        <IconButton onClick={() => setShowNewChat(true)} size="small">
-          <ChatIcon />
-        </IconButton>
-      </Tooltip>
-    ) : (
-      <Tooltip title="New Group">
-        <IconButton onClick={() => setShowNewGroup(true)} size="small">
-          <PeopleIcon />
-        </IconButton>
-      </Tooltip>
-    )}
-    <Tooltip title="Clear Notifications">
-      <IconButton onClick={clearNotifications} size="small">
-        <NotificationsIcon />
-      </IconButton>
-    </Tooltip>
-  </Box>
-</Box>
-            
+            <Box sx={{
+              p: 2,
+              borderBottom: 1,
+              borderColor: 'divider',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Tabs
+                  value={activeTab}
+                  onChange={(e, newValue) => {
+                    setActiveTab(newValue);
+                    if (newValue === 'groups') loadGroups();
+                  }}
+                  sx={{ minHeight: 'auto' }}
+                >
+                  <Tab
+                    label={
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                        <ChatIcon fontSize="small" />
+                        <Typography variant="body2">Direct</Typography>
+                        {conversations.some(c => c.unread_count > 0) && (
+                          <Badge
+                            badgeContent={conversations.reduce((acc, c) => acc + (c.unread_count || 0), 0)}
+                            color="error"
+                            size="small"
+                          />
+                        )}
+                      </Box>
+                    }
+                    value="direct"
+                  />
+                  <Tab
+                    label={
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                        <PeopleIcon fontSize="small" />
+                        <Typography variant="body2">Groups</Typography>
+                        {groups.some(g => (g.unread_count || 0) > 0) && (
+                          <Badge
+                            badgeContent={groups.reduce((acc, g) => acc + (g.unread_count || 0), 0)}
+                            color="error"
+                            size="small"
+                          />
+                        )}
+                      </Box>
+                    }
+                    value="groups"
+                  />
+                </Tabs>
+              </Box>
+              <Box>
+                {activeTab === 'direct' ? (
+                  <Tooltip title="New Conversation">
+                    <IconButton onClick={() => setShowNewChat(true)} size="small">
+                      <ChatIcon />
+                    </IconButton>
+                  </Tooltip>
+                ) : (
+                  <Tooltip title="New Group">
+                    <IconButton onClick={() => setShowNewGroup(true)} size="small">
+                      <PeopleIcon />
+                    </IconButton>
+                  </Tooltip>
+                )}
+                <Tooltip title="Clear Notifications">
+                  <IconButton onClick={clearNotifications} size="small">
+                    <NotificationsIcon />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+            </Box>
+
             {/* Search and Filter */}
             <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
               <TextField
@@ -2682,83 +2226,83 @@ const handleAttachmentClick = (attachment, type) => {
                 }}
               />
               <Box sx={{ mt: 1, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                <Chip 
-                  label="All" 
-                  size="small" 
-                  color={filter === 'all' ? 'primary' : 'default'} 
-                  onClick={() => setFilter('all')} 
+                <Chip
+                  label="All"
+                  size="small"
+                  color={filter === 'all' ? 'primary' : 'default'}
+                  onClick={() => setFilter('all')}
                 />
-                <Chip 
-                  label="Unread" 
-                  size="small" 
-                  color={filter === 'unread' ? 'primary' : 'default'} 
-                  onClick={() => setFilter('unread')} 
+                <Chip
+                  label="Unread"
+                  size="small"
+                  color={filter === 'unread' ? 'primary' : 'default'}
+                  onClick={() => setFilter('unread')}
                 />
-                <Chip 
-                  label="Favorites" 
-                  size="small" 
-                  color={filter === 'favorites' ? 'primary' : 'default'} 
-                  onClick={() => setFilter('favorites')} 
-                  icon={<StarIcon fontSize="small" />} 
+                <Chip
+                  label="Favorites"
+                  size="small"
+                  color={filter === 'favorites' ? 'primary' : 'default'}
+                  onClick={() => setFilter('favorites')}
+                  icon={<StarIcon fontSize="small" />}
                 />
               </Box>
             </Box>
 
             {/* Conversation List */}
             <Box sx={{ flex: 1, overflow: 'auto' }}>
-               {activeTab === 'direct' ? (
-              filteredConversations.length === 0 ? (
-                <Box sx={{ p: 3, textAlign: 'center' }}>
-                  <ChatIcon sx={{ fontSize: 60, color: 'text.secondary', mb: 2 }} />
-                  <Typography color="text.secondary" gutterBottom>
-                    {searchQuery ? 'No conversations found' : 'No conversations yet'}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                    {searchQuery ? 'Try a different search term' : 'Start a new conversation to begin'}
-                  </Typography>
-                  <Button 
-                    startIcon={<AddIcon />}
-                    onClick={() => setShowNewChat(true)}
-                    variant="outlined"
-                    size="small"
-                  >
-                    Start New Conversation
-                  </Button>
-                </Box>
-              ) : (
-                <List sx={{ py: 0 }}>
-                  {filteredConversations.map(renderConversationItem)}
-                </List>
-              )
+              {activeTab === 'direct' ? (
+                filteredConversations.length === 0 ? (
+                  <Box sx={{ p: 3, textAlign: 'center' }}>
+                    <ChatIcon sx={{ fontSize: 60, color: 'text.secondary', mb: 2 }} />
+                    <Typography color="text.secondary" gutterBottom>
+                      {searchQuery ? 'No conversations found' : 'No conversations yet'}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                      {searchQuery ? 'Try a different search term' : 'Start a new conversation to begin'}
+                    </Typography>
+                    <Button
+                      startIcon={<AddIcon />}
+                      onClick={() => setShowNewChat(true)}
+                      variant="outlined"
+                      size="small"
+                    >
+                      Start New Conversation
+                    </Button>
+                  </Box>
                 ) : (
-  /* Group list */
-  
-    groups.length === 0 ? (
-      <Box sx={{ p: 3, textAlign: 'center' }}>
-        <PeopleIcon sx={{ fontSize: 60, color: 'text.secondary', mb: 2 }} />
-        <Typography color="text.secondary" gutterBottom>
-          No groups yet
-        </Typography>
-        <Button 
-          startIcon={<AddIcon />}
-          onClick={() => setShowNewGroup(true)}
-          variant="outlined"
-          size="small"
-          sx={{ mt: 2 }}
-        >
-          Create New Group
-        </Button>
-      </Box>
-    ) : (
-      <List sx={{ py: 0 }}>
-        {groups.map(renderGroupItem)}
-      </List>
-    )
-    )}
-  </Box>
+                  <List sx={{ py: 0 }}>
+                    {filteredConversations.map(renderConversationItem)}
+                  </List>
+                )
+              ) : (
+                /* Group list */
 
-      
-            
+                groups.length === 0 ? (
+                  <Box sx={{ p: 3, textAlign: 'center' }}>
+                    <PeopleIcon sx={{ fontSize: 60, color: 'text.secondary', mb: 2 }} />
+                    <Typography color="text.secondary" gutterBottom>
+                      No groups yet
+                    </Typography>
+                    <Button
+                      startIcon={<AddIcon />}
+                      onClick={() => setShowNewGroup(true)}
+                      variant="outlined"
+                      size="small"
+                      sx={{ mt: 2 }}
+                    >
+                      Create New Group
+                    </Button>
+                  </Box>
+                ) : (
+                  <List sx={{ py: 0 }}>
+                    {groups.map(renderGroupItem)}
+                  </List>
+                )
+              )}
+            </Box>
+
+
+
             {/* Refresh Button */}
             <Box sx={{ p: 2, borderTop: 1, borderColor: 'divider' }}>
               <Button
@@ -2775,236 +2319,303 @@ const handleAttachmentClick = (attachment, type) => {
         </Grid>
 
         {/* Main Chat Area */}
-     <Grid item sx={{ 
-    flex: 1, // Take remaining space
-    height: '100%',
-    display: { xs: selectedConversation ? 'block' : 'none', md: 'block' },
-    minWidth: 0, // Allow shrinking below content size
-  }}>
+        <Grid item sx={{
+          flex: 1, // Take remaining space
+          height: '100%',
+          display: { xs: selectedConversation ? 'block' : 'none', md: 'block' },
+          minWidth: 0, // Allow shrinking below content size
+        }}>
 
           <Paper elevation={3} sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
             {selectedConversation || selectedGroup ? (
               <>
                 {/* Chat Header */}
-            
-{/* Chat Header */}
-<Box sx={{ 
-  p: 2, 
-  borderBottom: 1, 
-  borderColor: 'divider',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  backgroundColor: 'background.paper'
-}}>
-  {selectedConversation ? (
-    <>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-        {isMobile && (
-          <IconButton onClick={() => setSelectedConversation(null)} sx={{ mr: 1 }}>
-            <ArrowBackIcon />
-          </IconButton>
-        )}
-        
-        {/* Add null check for other_participant */}
-        {selectedConversation.other_participant && (
-          <>
-            <Badge
-              color={selectedConversation.other_participant.role === 'influencer' ? 'success' : 'primary'}
-              variant="dot"
-              overlap="circular"
-              anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-            >
-              <Avatar
-                src={getProfileImage(selectedConversation.other_participant)}
-                sx={{ 
-                  width: 40, 
-                  height: 40,
-                  bgcolor: selectedConversation.other_participant.role === 'brand' ? 'primary.main' : 'secondary.main'
-                }}
-              >
-                {getProfileDisplayName(selectedConversation.other_participant)?.charAt(0)?.toUpperCase() || 'U'}
-              </Avatar>
-            </Badge>
 
-            <Box>
-              <Typography
-                variant="h6"
-                onClick={() => handleViewProfile(selectedConversation.other_participant)}
-                role="button"
-                aria-label="View profile"
-                sx={{
-                  cursor: 'pointer',
-                  display: 'inline-flex',
+                {/* Chat Header */}
+                <Box sx={{
+                  p: 2,
+                  borderBottom: 1,
+                  borderColor: 'divider',
+                  display: 'flex',
                   alignItems: 'center',
-                  gap: 1,
-                  '&:hover': {
-                    textDecoration: 'none',
-                    color: 'primary.main'
-                  }
-                }}
-              >
-                {getProfileDisplayName(selectedConversation.other_participant)}
-                <Chip
-                  label={getRoleLabel(selectedConversation.other_participant.role || 'user')}
-                  size="small"
-                  color={getRoleColor(selectedConversation.other_participant.role || 'user')}
-                  variant="outlined"
-                  clickable={false}
-                />
-              </Typography>
+                  justifyContent: 'space-between',
+                  backgroundColor: 'background.paper'
+                }}>
+                  {selectedConversation ? (
+                    <>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        {isMobile && (
+                          <IconButton onClick={() => setSelectedConversation(null)} sx={{ mr: 1 }}>
+                            <ArrowBackIcon />
+                          </IconButton>
+                        )}
 
-              <Typography variant="body2" color="text.secondary">
-                {selectedConversation.other_participant.role === 'brand'
-                  ? selectedConversation.other_participant.company_name || selectedConversation.other_participant.industry
-                  : selectedConversation.other_participant.nickname || selectedConversation.other_participant.niche}
-              </Typography>
+                        {/* Add null check for other_participant */}
+                        {selectedConversation.other_participant ? (
+                          <>
+                            <Badge
+                              color={selectedConversation.other_participant.is_online ? 'success' : 'default'}
+                              variant="dot"
+                              overlap="circular"
+                              anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                              sx={{
+                                '& .MuiBadge-badge': {
+                                  backgroundColor: selectedConversation.other_participant.is_online ? '#44b700' : '#bdbdbd',
+                                  color: selectedConversation.other_participant.is_online ? '#44b700' : '#bdbdbd',
+                                  boxShadow: `0 0 0 2px #fff`,
+                                  '&::after': selectedConversation.other_participant.is_online ? {
+                                    position: 'absolute',
+                                    top: 0,
+                                    left: 0,
+                                    width: '100%',
+                                    height: '100%',
+                                    borderRadius: '50%',
+                                    animation: 'ripple 1.2s infinite ease-in-out',
+                                    border: '1px solid currentColor',
+                                    content: '""',
+                                  } : {}
+                                }
+                              }}
+                            >
+                              <Avatar
+                                src={getProfileImage(selectedConversation.other_participant)}
+                                sx={{
+                                  width: 44,
+                                  height: 44,
+                                  bgcolor: selectedConversation.other_participant.role === 'brand' ? 'primary.main' : 'secondary.main',
+                                  border: '2px solid #fff',
+                                  boxShadow: 1
+                                }}
+                              >
+                                {getProfileDisplayName(selectedConversation.other_participant)?.charAt(0)?.toUpperCase() || 'U'}
+                              </Avatar>
+                            </Badge>
 
-              <Typography variant="caption" color="text.secondary">
-                {typingIndicator || (selectedConversation.other_participant.is_online ? '🟢 Online' : 'Last seen recently')}
-              </Typography>
-            </Box>
-          </>
-        )}
-      </Box>
+                            <Box>
+                              <Typography
+                                variant="subtitle1"
+                                onClick={() => handleViewProfile(selectedConversation.other_participant)}
+                                role="button"
+                                sx={{
+                                  cursor: 'pointer',
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: 1,
+                                  fontWeight: 700,
+                                  '&:hover': { color: 'primary.main' }
+                                }}
+                              >
+                                {getProfileDisplayName(selectedConversation.other_participant)}
+                                <Chip
+                                  label={getRoleLabel(selectedConversation.other_participant.role || 'user')}
+                                  size="small"
+                                  color={getRoleColor(selectedConversation.other_participant.role || 'user')}
+                                  variant="outlined"
+                                  sx={{ height: 20, fontSize: '0.65rem' }}
+                                />
+                              </Typography>
 
-      <Box sx={{ display: 'flex', gap: 1 }}>
-        {selectedConversation.other_participant && (
-          <Tooltip title="View Profile">
-            <IconButton
-              onClick={() => handleViewProfile(selectedConversation.other_participant)}
-              color="primary"
-            >
-              <AccountCircleIcon />
-            </IconButton>
-          </Tooltip>
-        )}
+                              <Typography variant="body2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, opacity: 0.8 }}>
+                                {typingIndicator ? (
+                                  <Typography variant="caption" color="primary.main" className="pulse-text">
+                                    {typingIndicator}
+                                  </Typography>
+                                ) : (
+                                  <>
+                                    {selectedConversation.other_participant.is_online ? (
+                                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                        <Box sx={{ width: 8, height: 8, bgcolor: '#44b700', borderRadius: '50%' }} />
+                                        <Typography variant="caption" sx={{ color: '#44b700', fontWeight: 600 }}>Active Now</Typography>
+                                      </Box>
+                                    ) : (
+                                      <Typography variant="caption" color="text.secondary">
+                                        {formatLastSeen(selectedConversation.other_participant.last_seen)}
+                                      </Typography>
+                                    )}
+                                  </>
+                                )}
+                              </Typography>
+                            </Box>
+                          </>
+                        ) : (
+                          <Typography variant="h6">Direct Conversation</Typography>
+                        )}
+                      </Box>
 
-        <IconButton onClick={() => setShowInfo(!showInfo)} title="Conversation Info">
-          <InfoIcon />
-        </IconButton>
+                      <Box sx={{ display: 'flex', gap: 1 }}>
+                        {selectedConversation.other_participant && (
+                          <Tooltip title="View Profile">
+                            <IconButton
+                              onClick={() => handleViewProfile(selectedConversation.other_participant)}
+                              color="primary"
+                            >
+                              <AccountCircleIcon />
+                            </IconButton>
+                          </Tooltip>
+                        )}
 
-        <Tooltip title="Refresh Messages">
-          <IconButton 
-            onClick={() => loadMessages(selectedConversation.id)} 
-            disabled={loading.messages}
-          >
-            {loading.messages ? <CircularProgress size={20} /> : <ChatIcon />}
-          </IconButton>
-        </Tooltip>
-      </Box>
-    </>
-  ) : (
-    // Show something when no conversation is selected
-    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-      <Typography variant="h6">Select a conversation</Typography>
-    </Box>
-  )}
-</Box>
+                        <IconButton onClick={() => setShowInfo(!showInfo)} title="Conversation Info">
+                          <InfoIcon />
+                        </IconButton>
+
+                        <Tooltip title="Refresh Messages">
+                          <IconButton
+                            onClick={() => loadMessages(selectedConversation.id)}
+                            disabled={loading.messages}
+                          >
+                            {loading.messages ? <CircularProgress size={20} /> : <ChatIcon />}
+                          </IconButton>
+                        </Tooltip>
+                      </Box>
+                    </>
+                  ) : selectedGroup ? (
+                    <>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        {isMobile && (
+                          <IconButton onClick={() => setSelectedGroup(null)} sx={{ mr: 1 }}>
+                            <ArrowBackIcon />
+                          </IconButton>
+                        )}
+
+                        <Badge
+                          color="primary"
+                          variant="dot"
+                          overlap="circular"
+                          anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                        >
+                          <Avatar
+                            src={selectedGroup.avatar_url}
+                            sx={{ width: 40, height: 40, bgcolor: 'secondary.main' }}
+                          >
+                            {selectedGroup.name?.charAt(0)?.toUpperCase() || 'G'}
+                          </Avatar>
+                        </Badge>
+
+                        <Box>
+                          <Typography variant="h6">{selectedGroup.name}</Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            {selectedGroup.participant_count || 0} participants
+                          </Typography>
+                        </Box>
+                      </Box>
+
+                      <Box sx={{ display: 'flex', gap: 1 }}>
+                        <IconButton onClick={() => setShowInfo(!showInfo)} title="Group Info">
+                          <InfoIcon />
+                        </IconButton>
+
+                        <Tooltip title="Refresh Messages">
+                          <IconButton
+                            onClick={() => loadGroupMessages(selectedGroup.id)}
+                            disabled={loading.messages}
+                          >
+                            {loading.messages ? <CircularProgress size={20} /> : <ChatIcon />}
+                          </IconButton>
+                        </Tooltip>
+                      </Box>
+                    </>
+                  ) : (
+                    // Show something when no conversation is selected
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                      <Typography variant="h6">Select a conversation or group</Typography>
+                    </Box>
+                  )}
+                </Box>
 
                 {previewOpen && <AttachmentPreview />}
 
                 {/* Messages Area */}
                 <Box
-  ref={messagesContainerRef}
-  sx={{ 
-    flex: 1, 
-    overflow: 'auto', 
-    p: 2,
-    backgroundColor: 'grey.50',
-    display: 'flex',
-    flexDirection: 'column',
-    position: 'relative'
-  }}
->
-  {isLoadingMore && (
-    <Box sx={{ 
-      position: 'absolute', 
-      top: 10, 
-      left: '50%', 
-      transform: 'translateX(-50%)',
-      zIndex: 1 
-    }}>
-      <CircularProgress size={24} />
-    </Box>
-  )}
-  
-  {!isLoadingMore && hasMoreMessages && (
-    <Box sx={{ textAlign: 'center', mb: 2 }}>
-      <Button
-        variant="outlined"
-        size="small"
-        startIcon={<ArrowBackIcon />}
-        onClick={() => loadMessages(selectedConversation.id, true)}
-        sx={{ borderRadius: 20 }}
-      >
-        Load More Messages
-      </Button>
-    </Box>
-  )}
-  
-  {/* Your messages list here */}
-  {/* {messages.map(renderMessageBubble)} */}
-  {activeTab === 'direct'
-  ? messages.map(renderMessageBubble)
-  : groupMessages.map(renderMessageBubble)
-}
+                  ref={messagesContainerRef}
+                  sx={{
+                    flex: 1,
+                    overflow: 'auto',
+                    p: 2,
+                    backgroundColor: 'grey.50',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    position: 'relative'
+                  }}
+                >
+                  {/* Prepend loading indicator / Manual load trigger */}
+                  {(hasMoreMessages || isLoadingMore) && (
+                    <Box sx={{ textAlign: 'center', py: 2 }}>
+                      {isLoadingMore ? (
+                        <CircularProgress size={24} />
+                      ) : (
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
+                          sx={{ cursor: 'pointer', '&:hover': { color: 'primary.main' } }}
+                          onClick={() => activeTab === 'direct' ? loadMessages(selectedConversation.id, true) : loadGroupMessages(selectedGroup.id, true)}
+                        >
+                          Scroll up or click to load previous messages
+                        </Typography>
+                      )}
+                    </Box>
+                  )}
 
-   {/* Typing indicator */}
-  {typingUsersList.length > 0 && <TypingIndicator users={typingUsersList} />}
-  
-  {/* Scroll to bottom anchor */}
-  <div ref={messagesEndRef} />
-  
-  {/* View more indicator at top */}
-  {hasMoreMessages && !isLoadingMore && (
-    <Box sx={{ 
-      display: 'flex', 
-      justifyContent: 'center', 
-      alignItems: 'center',
-      mt: 1,
-      mb: 2
-    }}>
-      <Typography variant="caption" color="text.secondary">
-        Scroll up to load more messages
-      </Typography>
-    </Box>
-  )}
+                  {/* Your messages list here */}
+                  {activeTab === 'direct'
+                    ? messages.map(renderMessageBubble)
+                    : groupMessages.map(renderMessageBubble)
+                  }
+
+                  {/* Typing indicator */}
+                  {typingUsersList.length > 0 && <TypingIndicator users={typingUsersList} />}
+
+                  {/* Scroll to bottom anchor */}
+                  <div ref={messagesEndRef} />
+
+
 
                   {loading.messages ? (
                     <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
                       <CircularProgress />
                     </Box>
-                  ) : messages.length === 0 ? (
-                    <Box sx={{ 
-                      flex: 1, 
-                      display: 'flex', 
-                      flexDirection: 'column', 
-                      justifyContent: 'center', 
+                  ) : (activeTab === 'direct' ? messages.length === 0 && selectedConversation : groupMessages.length === 0 && selectedGroup) ? (
+                    <Box sx={{
+                      flex: 1,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'center',
                       alignItems: 'center',
                       color: 'text.secondary',
                       textAlign: 'center'
                     }}>
                       <Avatar
-                        src={selectedConversation.other_participant?.profile_picture}
-                        sx={{ 
-                          width: 100, 
+                        src={activeTab === 'direct' ? selectedConversation?.other_participant?.profile_picture : selectedGroup?.avatar_url}
+                        sx={{
+                          width: 100,
                           height: 100,
                           mb: 3,
-                          bgcolor: selectedConversation.other_participant?.role === 'brand' ? 'primary.main' : 'secondary.main'
+                          bgcolor: activeTab === 'direct'
+                            ? (selectedConversation?.other_participant?.role === 'brand' ? 'primary.main' : 'secondary.main')
+                            : 'secondary.main'
                         }}
                       >
-                        {selectedConversation.other_participant?.username?.charAt(0)?.toUpperCase() || 'U'}
+                        {activeTab === 'direct'
+                          ? (selectedConversation?.other_participant?.username?.charAt(0)?.toUpperCase() || 'U')
+                          : (selectedGroup?.name?.charAt(0)?.toUpperCase() || 'G')
+                        }
                       </Avatar>
                       <Typography variant="h5" gutterBottom>
-                        {selectedConversation.other_participant?.username || 'Unknown User'}
+                        {activeTab === 'direct'
+                          ? getProfileDisplayName(selectedConversation?.other_participant)
+                          : selectedGroup?.name
+                        }
                       </Typography>
                       <Typography variant="body1" gutterBottom>
-                        {getRoleLabel(selectedConversation.other_participant?.role || 'user')}
+                        {activeTab === 'direct'
+                          ? getRoleLabel(selectedConversation?.other_participant?.role || 'user')
+                          : `${selectedGroup?.participant_count || 0} participants`
+                        }
                       </Typography>
                       <Typography variant="body2" sx={{ mt: 2, maxWidth: 400 }}>
-                        This is the beginning of your conversation with {selectedConversation.other_participant?.username || 'this user'}.
-                        Send a message to start the conversation!
+                        {activeTab === 'direct'
+                          ? `This is the beginning of your conversation with ${getProfileDisplayName(selectedConversation?.other_participant)}. Send a message to start the conversation!`
+                          : `Welcome to ${selectedGroup?.name}. Start chatting with the group members!`
+                        }
                       </Typography>
                     </Box>
                   ) : (
@@ -3016,37 +2627,13 @@ const handleAttachmentClick = (attachment, type) => {
                           variant="outlined"
                         />
                       </Box>
-                      {/* {messages?.filter(Boolean).map((m, index) => {
-  const base = m?.message || m;
-  
-  // Ensure base is not null/undefined
-  if (!base) return null;
-  
-  return renderMessageBubble({
-    id: base?.id || base?._id || `msg_${Date.now()}_${index}`,
-    content: base?.content ?? base?.text ?? base?.body ?? '',
-    sender: base?.sender || { 
-      id: base?.sender_id,
-      username: 'Unknown User',
-      profile_picture: null 
-    },
-    sender_id: base?.sender_id || base?.sender?.id,
-    receiver_id: base?.receiver_id,
-    created_at: base?.created_at || base?.timestamp || new Date().toISOString(),
-    message_type: base?.message_type || 'text',
-    attachment_url: base?.attachment_url || null,
-    is_deleted: base?.is_deleted || false,
-    is_read: base?.is_read || false,
-    is_delivered: base?.is_delivered || false
-  });
-}).filter(Boolean)} */}
 
                       {typingIndicator && (
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1, ml: 1 }}>
                           <Avatar sx={{ width: 24, height: 24, bgcolor: 'primary.light' }}>
                             {typingUsersList[0]?.charAt(0) || 'T'}
                           </Avatar>
-                          <Box sx={{ 
+                          <Box sx={{
                             backgroundColor: 'white',
                             borderRadius: 2,
                             p: 1.5,
@@ -3054,24 +2641,24 @@ const handleAttachmentClick = (attachment, type) => {
                             animation: 'pulse 1.5s infinite'
                           }}>
                             <Box sx={{ display: 'flex', gap: 0.5 }}>
-                              <Box sx={{ 
-                                width: 6, 
-                                height: 6, 
-                                borderRadius: '50%', 
+                              <Box sx={{
+                                width: 6,
+                                height: 6,
+                                borderRadius: '50%',
                                 backgroundColor: 'grey.500',
                                 animation: 'bounce 1.4s infinite'
                               }} />
-                              <Box sx={{ 
-                                width: 6, 
-                                height: 6, 
-                                borderRadius: '50%', 
+                              <Box sx={{
+                                width: 6,
+                                height: 6,
+                                borderRadius: '50%',
                                 backgroundColor: 'grey.500',
                                 animation: 'bounce 1.4s infinite 0.2s'
                               }} />
-                              <Box sx={{ 
-                                width: 6, 
-                                height: 6, 
-                                borderRadius: '50%', 
+                              <Box sx={{
+                                width: 6,
+                                height: 6,
+                                borderRadius: '50%',
                                 backgroundColor: 'grey.500',
                                 animation: 'bounce 1.4s infinite 0.4s'
                               }} />
@@ -3085,34 +2672,58 @@ const handleAttachmentClick = (attachment, type) => {
                 </Box>
 
                 {/* Message Input */}
-                <Box sx={{ 
-                  p: 2, 
-                  borderTop: 1, 
+                <Box sx={{
+                  p: 2,
+                  borderTop: 1,
                   borderColor: 'divider',
                   backgroundColor: 'background.paper'
                 }}>
                   {attachment && (
-                    <Box sx={{ 
-                      mb: 1, 
-                      p: 1, 
-                      backgroundColor: 'grey.100', 
-                      borderRadius: 1,
+                    <Box sx={{
+                      mb: 1.5,
+                      p: 1.5,
+                      backgroundColor: attachment.isUploading ? 'primary.50' : 'grey.100',
+                      border: '1px solid',
+                      borderColor: attachment.isUploading ? 'primary.100' : 'grey.200',
+                      borderRadius: 2,
                       display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between'
+                      flexDirection: 'column',
+                      gap: 1
                     }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <FileIcon />
-                        <Typography variant="body2" noWrap>
-                          {attachment.name} ({Math.round(attachment.size / 1024)} KB)
-                        </Typography>
+                      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flex: 1, overflow: 'hidden' }}>
+                          <Avatar sx={{ bgcolor: 'white', border: '1px solid', borderColor: 'divider', width: 32, height: 32 }}>
+                            <FileIcon color="primary" sx={{ fontSize: 20 }} />
+                          </Avatar>
+                          <Box sx={{ overflow: 'hidden' }}>
+                            <Typography variant="body2" sx={{ fontWeight: 600 }} noWrap>
+                              {attachment.name}
+                            </Typography>
+                            <Typography variant="caption" color="text.secondary">
+                              {Math.round(attachment.size / 1024)} KB • {attachment.isUploading ? 'Uploading...' : 'Done'}
+                            </Typography>
+                          </Box>
+                        </Box>
+                        <IconButton
+                          size="small"
+                          onClick={() => setAttachment(null)}
+                          disabled={isUploading}
+                          sx={{ ml: 1 }}
+                        >
+                          <CloseIcon fontSize="small" />
+                        </IconButton>
                       </Box>
-                      <IconButton size="small" onClick={() => setAttachment(null)}>
-                        <CloseIcon fontSize="small" />
-                      </IconButton>
+                      {attachment.isUploading && (
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <Box sx={{ flex: 1 }}>
+                            <LinearProgress variant="determinate" value={uploadProgress} sx={{ height: 6, borderRadius: 3 }} />
+                          </Box>
+                          <Typography variant="caption" sx={{ minWidth: 35, fontWeight: 700 }}>{uploadProgress}%</Typography>
+                        </Box>
+                      )}
                     </Box>
                   )}
-                  
+
                   <Box sx={{ display: 'flex', alignItems: 'flex-end', gap: 1 }}>
                     <IconButton onClick={() => handleAttachment('image')} title="Attach Image">
                       <ImageIcon />
@@ -3120,82 +2731,82 @@ const handleAttachmentClick = (attachment, type) => {
                     <IconButton onClick={() => handleAttachment('file')} title="Attach File">
                       <AttachIcon />
                     </IconButton>
-                    
+
                     <TextField
-  multiline
-  minRows={1}
-  maxRows={4}
-  fullWidth
-  placeholder="Type a message..."
-  value={newMessage}
-  onChange={(e) => {
-    setNewMessage(e.target.value);
-    handleLocalTyping();
-  }}
-  onKeyDown={(e) => {
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();
-    activeTab === 'groups'
-      ? sendGroupMessage(selectedGroup.id, newMessage, attachment)
-      : sendMessage();
-  }
-}}
-  variant="outlined"
-  size="small"
-  disabled={activeTab === 'direct' && !selectedConversation}
-  sx={{
-    '& .MuiOutlinedInput-root': {
-      padding: 0,
-      alignItems: 'flex-start', // Align items to top for multiline
-      // borderRadius: 20,
-      backgroundColor: '#f5f7fb',
-      '&:hover': {
-        backgroundColor: '#f0f2f5',
-      },
-      '&.Mui-focused': {
-        backgroundColor: '#ffffff',
-        boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.2)',
-      }
-    },
-    '& .MuiOutlinedInput-input': {
-      padding: '8px 14px',
-      lineHeight: '20px',
-      fontSize: '14px',
-      overflowY: 'auto',
-      maxHeight: '80px', // Increased max height
-      minHeight: '20px', // Minimum height for one line
-    },
-    '& textarea': {
-      resize: 'none',
-      '&::-webkit-scrollbar': {
-        width: '6px',
-      },
-      '&::-webkit-scrollbar-track': {
-        background: '#f1f1f1',
-        borderRadius: '3px',
-      },
-      '&::-webkit-scrollbar-thumb': {
-        background: '#c1c1c1',
-        borderRadius: '3px',
-      },
-    }
-  }}
-/>
+                      multiline
+                      minRows={1}
+                      maxRows={4}
+                      fullWidth
+                      placeholder="Type a message..."
+                      value={newMessage}
+                      onChange={(e) => {
+                        setNewMessage(e.target.value);
+                        handleLocalTyping();
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                          e.preventDefault();
+                          activeTab === 'groups'
+                            ? sendGroupMessage(selectedGroup.id, newMessage, attachment)
+                            : sendMessage();
+                        }
+                      }}
+                      variant="outlined"
+                      size="small"
+                      disabled={activeTab === 'direct' && !selectedConversation}
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          padding: 0,
+                          alignItems: 'flex-start', // Align items to top for multiline
+                          // borderRadius: 20,
+                          backgroundColor: '#f5f7fb',
+                          '&:hover': {
+                            backgroundColor: '#f0f2f5',
+                          },
+                          '&.Mui-focused': {
+                            backgroundColor: '#ffffff',
+                            boxShadow: '0 0 0 2px rgba(25, 118, 210, 0.2)',
+                          }
+                        },
+                        '& .MuiOutlinedInput-input': {
+                          padding: '8px 14px',
+                          lineHeight: '20px',
+                          fontSize: '14px',
+                          overflowY: 'auto',
+                          maxHeight: '80px', // Increased max height
+                          minHeight: '20px', // Minimum height for one line
+                        },
+                        '& textarea': {
+                          resize: 'none',
+                          '&::-webkit-scrollbar': {
+                            width: '6px',
+                          },
+                          '&::-webkit-scrollbar-track': {
+                            background: '#f1f1f1',
+                            borderRadius: '3px',
+                          },
+                          '&::-webkit-scrollbar-thumb': {
+                            background: '#c1c1c1',
+                            borderRadius: '3px',
+                          },
+                        }
+                      }}
+                    />
 
                     <Tooltip title={!selectedConversation ? "Select a conversation first" : "Send message"}>
                       <span>
-                        <IconButton 
+                        <IconButton
                           color="primary"
                           onClick={sendMessage}
-                          disabled={(!newMessage.trim() && !attachment) || !selectedConversation}
-                          sx={{ 
+                          disabled={(!newMessage.trim() && !attachment) || !selectedConversation || isUploading}
+                          sx={{
                             backgroundColor: 'primary.main',
                             color: 'white',
-                            '&:hover': { 
+                            '&:hover': {
                               backgroundColor: 'primary.dark',
                               transform: 'scale(1.05)'
                             },
-                            '&.Mui-disabled': { 
+                            '&.Mui-disabled': {
                               backgroundColor: 'grey.300',
                               color: 'grey.500'
                             },
@@ -3210,12 +2821,12 @@ const handleAttachmentClick = (attachment, type) => {
                 </Box>
               </>
             ) : (
-              <Box sx={{ 
-                flex: 1, 
-                display: 'flex', 
-                flexDirection: 'column', 
-                justifyContent: 'center', 
-                alignItems: 'center', 
+              <Box sx={{
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
                 p: 3,
                 textAlign: 'center'
               }}>
@@ -3251,204 +2862,213 @@ const handleAttachmentClick = (attachment, type) => {
         </Grid>
 
         {/* Right Sidebar - Conversation Info */}
-    {showInfo && selectedConversation && selectedConversation.other_participant && (
-    <Grid item sx={{ 
-      width: { md: 280, lg: 320 }, // Fixed width
-      height: '100%',
-      display: { xs: 'none', md: 'block' },
-      flexShrink: 0
-    }}>
-    <Paper
-      elevation={3}
-      sx={{
-        height: '100%',
-        p: 2,
-        overflowY: 'auto'
-      }}
-    >
-
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                <Typography variant="h6">Conversation Info</Typography>
+        {showInfo && (selectedConversation || selectedGroup) && (
+          <Grid item sx={{
+            width: { md: 280, lg: 320 }, // Fixed width
+            height: '100%',
+            display: { xs: 'none', md: 'block' },
+            flexShrink: 0
+          }}>
+            <Paper elevation={0} sx={{ height: '100%', display: 'flex', flexDirection: 'column', p: 3, bgcolor: 'grey.50' }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+                <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                  {selectedGroup ? 'Group Information' : 'Conversation Details'}
+                </Typography>
                 <IconButton onClick={() => setShowInfo(false)} size="small">
                   <CloseIcon />
                 </IconButton>
-               
-              </Box>
-              
- {/* Define participant here, safely */}
-      {(() => {
-        const participant = selectedConversation.other_participant;
-        return (
-              
-<Box sx={{ textAlign: 'center', mb: 3 }}>
- 
-
-<Avatar
-  src={getProfileImage(participant)}
-  onClick={() => participant && handleViewProfile(participant)}
-  role="button"
-  aria-label="View profile"
-  sx={{ 
-    width: 80,
-    height: 80,
-    mx: 'auto',
-    mb: 2,
-    cursor: 'pointer',
-    transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-    bgcolor: participant?.role === 'brand' ? 'primary.main' : 'secondary.main',
-    '&:hover': {
-      transform: 'scale(1.05)',
-      boxShadow: 3
-    }
-  }}
->
-  {getProfileDisplayName(participant)?.charAt(0)?.toUpperCase() || 'U'}
-</Avatar>
-
-<Typography
-  variant="h6"
-  gutterBottom
-  role="button"
-  aria-label="View profile"
-  onClick={() => participant && handleViewProfile(participant)}
-  sx={{
-    cursor: 'pointer',
-    display: 'inline-block',
-    '&:hover': {
-      textDecoration: 'underline',
-      color: 'primary.main'
-    }
-  }}
->
-  {getProfileDisplayName(participant)}
-</Typography>
-
-  
-  {selectedConversation.other_participant?.role === 'brand' ? (
-    <Box>
-      <Typography variant="body2" color="text.secondary">
-        {selectedConversation.other_participant?.company_name}
-      </Typography>
-      <Typography variant="body2" color="text.secondary">
-        Contact: {selectedConversation.other_participant?.contact_person}
-      </Typography>
-    </Box>
-  ) : (
-    <Box>
-      <Typography variant="body2" color="text.secondary">
-        {selectedConversation.other_participant?.nickname || selectedConversation.other_participant?.full_name}
-      </Typography>
-      <Typography variant="body2" color="text.secondary">
-        {selectedConversation.other_participant?.niche}
-      </Typography>
-    </Box>
-  )}
-  
-  <Chip
-    label={getRoleLabel(selectedConversation.other_participant?.role || 'user')}
-    color={getRoleColor(selectedConversation.other_participant?.role || 'user')}
-    sx={{ mt: 1, mb: 1 }}
-  />
-  
-  {selectedConversation.other_participant?.categories?.length > 0 && (
-    <Box sx={{ mt: 1 }}>
-      <Typography variant="caption" color="text.secondary">
-        Categories: {selectedConversation.other_participant.categories.join(', ')}
-      </Typography>
-    </Box>
-  )}
-  
-  <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-    {selectedConversation.other_participant?.is_online ? '🟢 Online' : '⚫ Last seen recently'}
-  </Typography>
-</Box>
- );
-      })()}
-              <Divider sx={{ my: 2 }} />
-
-              <Box>
-                <Typography variant="subtitle2" gutterBottom>Actions</Typography>
-                <Button
-                  fullWidth
-                  startIcon={favorites.has(selectedConversation.id) ? <StarIcon /> : <StarBorderIcon />}
-                  onClick={() => handleToggleFavorite(selectedConversation.id)}
-                  sx={{ mb: 1 }}
-                  variant="outlined"
-                >
-                  {favorites.has(selectedConversation.id) ? 'Remove Favorite' : 'Add to Favorites'}
-                </Button>
-                <Button
-                  fullWidth
-                  startIcon={selectedConversation.is_muted ? <VolumeUpIcon /> : <MuteIcon />}
-                  onClick={() => updateConversationSettings({ is_muted: !selectedConversation.is_muted })}
-                  sx={{ mb: 1 }}
-                  variant="outlined"
-                >
-                  {selectedConversation.is_muted ? 'Unmute' : 'Mute'}
-                </Button>
-                <Button
-                  fullWidth
-                  startIcon={<ArchiveIcon />}
-                  onClick={() => updateConversationSettings({ is_archived: !selectedConversation.is_archived })}
-                  variant="outlined"
-                  color="secondary"
-                  sx={{ mb: 1 }}
-                >
-                  {selectedConversation.is_archived ? 'Unarchive' : 'Archive'}
-                </Button>
-                
-                 <Button
-  fullWidth
-  startIcon={<AccountCircleIcon />}
-  variant="outlined"
-  sx={{ mb: 1 }}
-  onClick={() => handleViewProfile(selectedConversation.other_participant)}
->
-  View Profile
-</Button>
               </Box>
 
-              <Divider sx={{ my: 2 }} />
+              <Box sx={{ flex: 1, overflow: 'auto' }}>
+                {selectedConversation ? (
+                  <>
+                    {(() => {
+                      const participant = selectedConversation.other_participant;
+                      if (!participant) return null;
 
-              <Box>
-                <Typography variant="subtitle2" gutterBottom>Statistics</Typography>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                  <Typography variant="body2">Total Messages</Typography>
-                  <Typography variant="body2" fontWeight="bold">
-                    {selectedConversation.message_count || messages.length || 0}
-                  </Typography>
-                </Box>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                  <Typography variant="body2">Unread Messages</Typography>
-                  <Typography variant="body2" fontWeight="bold" color="primary">
-                    {selectedConversation.unread_count || 0}
-                  </Typography>
-                </Box>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <Typography variant="body2">Last Active</Typography>
-                  <Typography variant="body2">
-                    {formatDistanceToNow(new Date(selectedConversation.updated_at), { addSuffix: true })}
-                  </Typography>
-                </Box>
-              </Box>
+                      return (
+                        <Box sx={{ textAlign: 'center', mb: 4 }}>
+                          <Box sx={{ position: 'relative', display: 'inline-block', mb: 2 }}>
+                            <Avatar
+                              src={getProfileImage(participant)}
+                              onClick={() => handleViewProfile(participant)}
+                              sx={{
+                                width: 100,
+                                height: 100,
+                                mx: 'auto',
+                                border: 4,
+                                borderColor: 'white',
+                                boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+                                cursor: 'pointer',
+                                backgroundColor: participant.role === 'brand' ? 'primary.main' : 'secondary.main'
+                              }}
+                            >
+                              {getProfileDisplayName(participant)?.charAt(0)?.toUpperCase()}
+                            </Avatar>
+                            <Box sx={{
+                              position: 'absolute',
+                              bottom: 5,
+                              right: 5,
+                              width: 16,
+                              height: 16,
+                              bgcolor: participant.is_online ? '#4caf50' : '#bdbdbd',
+                              border: 2,
+                              borderColor: 'white',
+                              borderRadius: '50%'
+                            }} />
+                          </Box>
 
-              <Divider sx={{ my: 2 }} />
+                          <Typography
+                            variant="h6"
+                            sx={{ fontWeight: 700, mb: 0.5, cursor: 'pointer', '&:hover': { color: 'primary.main' } }}
+                            onClick={() => handleViewProfile(participant)}
+                          >
+                            {getProfileDisplayName(participant)}
+                          </Typography>
 
-              <Box>
-                <Typography variant="subtitle2" gutterBottom>Conversation ID</Typography>
-                <Typography 
-                  variant="caption" 
-                  sx={{ 
-                    display: 'block', 
-                    wordBreak: 'break-all',
-                    backgroundColor: 'grey.100',
-                    p: 1,
-                    borderRadius: 1,
-                    fontFamily: 'monospace'
-                  }}
-                >
-                  {selectedConversation.id}
-                </Typography>
+                          <Chip
+                            label={getRoleLabel(participant.role || 'user')}
+                            color={getRoleColor(participant.role || 'user')}
+                            size="small"
+                            sx={{ mb: 2, fontWeight: 600 }}
+                          />
+                        </Box>
+                      );
+                    })()}
+
+                    <Divider sx={{ mb: 2 }} />
+
+                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1, fontWeight: 600, textTransform: 'uppercase' }}>
+                      Quick Actions
+                    </Typography>
+
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mb: 3 }}>
+                      <Button
+                        fullWidth
+                        variant="outlined"
+                        size="small"
+                        startIcon={favorites.has(selectedConversation.id) ? <StarIcon /> : <StarBorderIcon />}
+                        onClick={() => handleToggleFavorite(selectedConversation.id)}
+                        sx={{ justifyContent: 'flex-start', borderRadius: 2 }}
+                      >
+                        {favorites.has(selectedConversation.id) ? 'Remove from Favorites' : 'Add to Favorites'}
+                      </Button>
+
+                      <Button
+                        fullWidth
+                        variant="outlined"
+                        size="small"
+                        startIcon={selectedConversation.is_muted ? <VolumeUpIcon /> : <MuteIcon />}
+                        onClick={() => updateConversationSettings({ is_muted: !selectedConversation.is_muted })}
+                        sx={{ justifyContent: 'flex-start', borderRadius: 2 }}
+                      >
+                        {selectedConversation.is_muted ? 'Unmute' : 'Mute Notifications'}
+                      </Button>
+
+                      <Button
+                        fullWidth
+                        variant="outlined"
+                        size="small"
+                        color="secondary"
+                        startIcon={<ArchiveIcon />}
+                        onClick={() => updateConversationSettings({ is_archived: !selectedConversation.is_archived })}
+                        sx={{ justifyContent: 'flex-start', borderRadius: 2 }}
+                      >
+                        {selectedConversation.is_archived ? 'Unarchive' : 'Archive Conversation'}
+                      </Button>
+                    </Box>
+
+                    <Divider sx={{ mb: 2 }} />
+
+                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1, fontWeight: 600, textTransform: 'uppercase' }}>
+                      Conversation Insights
+                    </Typography>
+
+                    <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, bgcolor: 'transparent' }}>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.5 }}>
+                        <Typography variant="body2" color="text.secondary">Total Messages</Typography>
+                        <Typography variant="body2" sx={{ fontWeight: 700 }}>
+                          {selectedConversation.message_count || messages.length || 0}
+                        </Typography>
+                      </Box>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.5 }}>
+                        <Typography variant="body2" color="text.secondary">Unread</Typography>
+                        <Chip label={selectedConversation.unread_count || 0} size="small" color="primary" sx={{ height: 20, fontSize: '0.65rem' }} />
+                      </Box>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <Typography variant="body2" color="text.secondary">Last Interaction</Typography>
+                        <Typography variant="caption" sx={{ fontStyle: 'italic' }}>
+                          {selectedConversation.updated_at ? formatDistanceToNow(new Date(selectedConversation.updated_at), { addSuffix: true }) : 'Never'}
+                        </Typography>
+                      </Box>
+                    </Paper>
+
+                    <Box sx={{ mt: 3, pt: 2, borderTop: 1, borderColor: 'divider' }}>
+                      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', textAlign: 'center' }}>
+                        Conversation ID: {selectedConversation.id.substring(0, 8)}...
+                      </Typography>
+                    </Box>
+                  </>
+                ) : selectedGroup ? (
+                  <>
+                    <Box sx={{ textAlign: 'center', mb: 4 }}>
+                      <Avatar
+                        src={selectedGroup.avatar_url}
+                        sx={{
+                          width: 100,
+                          height: 100,
+                          mx: 'auto',
+                          mb: 2,
+                          border: 4,
+                          borderColor: 'white',
+                          boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+                          backgroundColor: 'secondary.main'
+                        }}
+                      >
+                        {selectedGroup.name?.charAt(0)?.toUpperCase()}
+                      </Avatar>
+                      <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5 }}>
+                        {selectedGroup.name}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                        {selectedGroup.description || 'No description provided'}
+                      </Typography>
+                      <Chip
+                        label={`${selectedGroup.participant_count || 0} Members`}
+                        color="primary"
+                        variant="outlined"
+                        size="small"
+                      />
+                    </Box>
+
+                    <Divider sx={{ mb: 2 }} />
+
+                    <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1, fontWeight: 600, textTransform: 'uppercase' }}>
+                      Stats
+                    </Typography>
+
+                    <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, bgcolor: 'transparent' }}>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1.5 }}>
+                        <Typography variant="body2" color="text.secondary">Total Messages</Typography>
+                        <Typography variant="body2" sx={{ fontWeight: 700 }}>
+                          {selectedGroup.message_count || groupMessages.length || 0}
+                        </Typography>
+                      </Box>
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <Typography variant="body2" color="text.secondary">Created On</Typography>
+                        <Typography variant="caption" sx={{ fontStyle: 'italic' }}>
+                          {selectedGroup.created_at ? format(new Date(selectedGroup.created_at), 'PP') : 'Unknown'}
+                        </Typography>
+                      </Box>
+                    </Paper>
+
+                    <Box sx={{ mt: 3, pt: 2, borderTop: 1, borderColor: 'divider' }}>
+                      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', textAlign: 'center' }}>
+                        Group ID: {selectedGroup.id.substring(0, 8)}...
+                      </Typography>
+                    </Box>
+                  </>
+                ) : null}
               </Box>
             </Paper>
           </Grid>
@@ -3456,10 +3076,10 @@ const handleAttachmentClick = (attachment, type) => {
       </Grid>
 
       {/* New Conversation Dialog */}
-      <Dialog 
-        open={showNewChat} 
-        onClose={() => setShowNewChat(false)} 
-        maxWidth="sm" 
+      <Dialog
+        open={showNewChat}
+        onClose={() => setShowNewChat(false)}
+        maxWidth="sm"
         fullWidth
         PaperProps={{ sx: { maxHeight: '80vh' } }}
       >
@@ -3471,17 +3091,17 @@ const handleAttachmentClick = (attachment, type) => {
             </IconButton>
           </Box>
         </DialogTitle>
-        
+
         <DialogContent>
           {selectedUsers.length > 0 && (
             <Box sx={{ mb: 2, display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-              {selectedUsers.map(user => (
+              {selectedUsers.map(u => (
                 <Chip
-                  key={user.id}
-                  avatar={<Avatar src={user.profile_picture}>{user.username?.charAt(0) || user.name?.charAt(0) || 'U'}</Avatar>}
-                  label={user.username || user.name || 'User'}
-                  onDelete={() => setSelectedUsers(prev => prev.filter(u => u.id !== user.id))}
-                  color={getRoleColor(user.role)}
+                  key={u.id}
+                  avatar={<Avatar src={getProfileImage(u)}>{getProfileDisplayName(u).charAt(0)}</Avatar>}
+                  label={getProfileDisplayName(u)}
+                  onDelete={() => setSelectedUsers(prev => prev.filter(user => user.id !== u.id))}
+                  color={getRoleColor(u.role)}
                   sx={{ mb: 1 }}
                 />
               ))}
@@ -3531,15 +3151,14 @@ const handleAttachmentClick = (attachment, type) => {
                     button
                     selected={selectedUsers.some(u => u.id === user.id)}
                     // onClick={() => {
-                    //   if (selectedUsers.some(u => u.id === user.id)) {
-                    //     setSelectedUsers(prev => prev.filter(u => u.id !== user.id));
-                    //   } else {
-                    //     setSelectedUsers(prev => [...prev, user]);
-                    //   }
-                    // }}
                     onClick={() => {
-  setSelectedUsers([user]); // ALWAYS one user
-}}
+                      const isSelected = selectedUsers.some(u => u.id === user.id);
+                      if (isSelected) {
+                        setSelectedUsers(prev => prev.filter(u => u.id !== user.id));
+                      } else {
+                        setSelectedUsers(prev => [...prev, user]);
+                      }
+                    }}
                     sx={{
                       borderRadius: 1,
                       mb: 1,
@@ -3550,15 +3169,15 @@ const handleAttachmentClick = (attachment, type) => {
                     }}
                   >
                     <ListItemAvatar>
-                      <Avatar src={user.profile_picture} sx={{ bgcolor: `${getRoleColor(user.role)}.main` }}>
-                        {user.username?.charAt(0) || user.name?.charAt(0) || 'U'}
+                      <Avatar src={getProfileImage(user)} sx={{ bgcolor: `${getRoleColor(user.role)}.main` }}>
+                        {getProfileDisplayName(user).charAt(0).toUpperCase()}
                       </Avatar>
                     </ListItemAvatar>
                     <ListItemText
                       primary={
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                           <Typography variant="subtitle1">
-                            {user.username || user.name || 'Unknown User'}
+                            {getProfileDisplayName(user)}
                           </Typography>
                           <Chip
                             icon={getRoleIcon(user.role)}
@@ -3570,9 +3189,9 @@ const handleAttachmentClick = (attachment, type) => {
                         </Box>
                       }
                       secondary={
-                        userRole === 'brand' 
-                          ? `${user.niche || 'No niche specified'} • ${user.follower_count ? `${user.follower_count.toLocaleString()} followers` : 'No follower data'}`
-                          : `${user.company_name || 'No company name'} • ${user.industry || 'No industry specified'}`
+                        user.role === 'influencer'
+                          ? `${user.niche || 'No niche specified'} • ${user.full_name || user.username}`
+                          : `${user.company_name || 'No company name'} • ${user.industry || user.username}`
                       }
                     />
                     {selectedUsers.some(u => u.id === user.id) ? (
@@ -3586,7 +3205,7 @@ const handleAttachmentClick = (attachment, type) => {
             )}
           </Box>
         </DialogContent>
-        
+
         <DialogActions sx={{ p: 2, borderTop: 1, borderColor: 'divider' }}>
           <Button onClick={() => setShowNewChat(false)} variant="outlined">
             Cancel
@@ -3611,20 +3230,28 @@ const handleAttachmentClick = (attachment, type) => {
       >
         {selectedForMenu && selectedForMenu.id && (
           <>
-          <Button
-  fullWidth
-  startIcon={<AccountCircleIcon />}
-  variant="outlined"
-  sx={{ mb: 1 }}
-  onClick={() => handleViewProfile(selectedConversation.other_participant)}
->
-  View Profile
-</Button>
+            <Button
+              fullWidth
+              startIcon={<AccountCircleIcon />}
+              variant="outlined"
+              sx={{ mb: 1 }}
+              onClick={() => {
+                const participant = selectedForMenu?.other_participant;
+                if (participant) {
+                  handleViewProfile(participant);
+                } else if (selectedForMenu?.type === 'group') {
+                  showNotification('Group profile viewing not yet available', 'info');
+                }
+                setMenuAnchorEl(null);
+              }}
+            >
+              View {selectedForMenu?.type === 'group' ? 'Group Info' : 'Profile'}
+            </Button>
             <MenuItem onClick={() => {
-              handleToggleFavorite(selectedForMenu.id);
+              if (selectedForMenu?.id) handleToggleFavorite(selectedForMenu.id);
               setMenuAnchorEl(null);
             }}>
-              {favorites.has(selectedForMenu.id) ? (
+              {favorites.has(selectedForMenu?.id) ? (
                 <>
                   <StarBorderIcon fontSize="small" sx={{ mr: 1 }} />
                   Remove from Favorites
@@ -3637,10 +3264,10 @@ const handleAttachmentClick = (attachment, type) => {
               )}
             </MenuItem>
             <MenuItem onClick={() => {
-              updateConversationSettings({ is_muted: !selectedForMenu.is_muted });
+              if (selectedForMenu) updateConversationSettings({ is_muted: !selectedForMenu.is_muted });
               setMenuAnchorEl(null);
             }}>
-              {selectedForMenu.is_muted ? (
+              {selectedForMenu?.is_muted ? (
                 <>
                   <VolumeUpIcon fontSize="small" sx={{ mr: 1 }} />
                   Unmute
@@ -3653,15 +3280,15 @@ const handleAttachmentClick = (attachment, type) => {
               )}
             </MenuItem>
             <MenuItem onClick={() => {
-              updateConversationSettings({ is_archived: !selectedForMenu.is_archived });
+              if (selectedForMenu) updateConversationSettings({ is_archived: !selectedForMenu.is_archived });
               setMenuAnchorEl(null);
             }}>
               <ArchiveIcon fontSize="small" sx={{ mr: 1 }} />
-              {selectedForMenu.is_archived ? 'Unarchive' : 'Archive'}
+              {selectedForMenu?.is_archived ? 'Unarchive' : 'Archive'}
             </MenuItem>
-            
+
             <Divider />
-            <MenuItem 
+            <MenuItem
               sx={{ color: 'error.main' }}
               onClick={() => {
                 setMenuAnchorEl(null);
@@ -3684,8 +3311,8 @@ const handleAttachmentClick = (attachment, type) => {
         onClose={() => setNotification(prev => ({ ...prev, open: false }))}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       >
-        <Alert 
-          severity={notification.severity} 
+        <Alert
+          severity={notification.severity}
           onClose={() => setNotification(prev => ({ ...prev, open: false }))}
           sx={{ width: '100%' }}
         >
@@ -3694,12 +3321,16 @@ const handleAttachmentClick = (attachment, type) => {
       </Snackbar>
 
 
-<NewGroupDialog 
-  open={showNewGroup}
-  onClose={() => setShowNewGroup(false)}
-  user={user}
-  api={api}
-/>
+      <NewGroupDialog
+        open={showNewGroup}
+        onClose={() => {
+          setShowNewGroup(false);
+          setSelectedUsers([]);
+        }}
+        user={user}
+        api={api}
+        initialSelectedUsers={selectedUsers}
+      />
 
 
       {/* Global Styles */}
@@ -3789,11 +3420,30 @@ const handleAttachmentClick = (attachment, type) => {
   .status-icon {
     transition: color 0.3s ease;
   }
+        @keyframes ripple {
+          0% { transform: scale(.8); opacity: 1; }
+          100% { transform: scale(2.4); opacity: 0; }
+        }
+
         @keyframes fadeIn {
           from { opacity: 0; transform: translateY(10px); }
           to { opacity: 1; transform: translateY(0); }
         }
         
+        .pulse-text {
+          animation: pulse 1.5s infinite ease-in-out;
+        }
+
+        .online-pulse {
+          animation: online-pulse 2s infinite;
+        }
+
+        @keyframes online-pulse {
+          0% { box-shadow: 0 0 0 0 rgba(68, 183, 0, 0.4); }
+          70% { box-shadow: 0 0 0 10px rgba(68, 183, 0, 0); }
+          100% { box-shadow: 0 0 0 0 rgba(68, 183, 0, 0); }
+        }
+
         @keyframes bounce {
           0%, 60%, 100% { transform: translateY(0); }
           30% { transform: translateY(-4px); }

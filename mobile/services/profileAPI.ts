@@ -4,7 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'expo-image-picker';
 import { Platform } from 'react-native';
 
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || (Platform.OS === 'android' ? 'http://10.0.2.2:8000' : 'http://localhost:8000');
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || (Platform.OS === 'android' ? 'https://quickbox-backend-docker-b9cbaye9a3bvhad5.southindia-01.azurewebsites.net' : 'https://quickbox-backend-docker-b9cbaye9a3bvhad5.southindia-01.azurewebsites.net');
 
 const BASE_URL = `${API_BASE_URL}/profiles`;
 

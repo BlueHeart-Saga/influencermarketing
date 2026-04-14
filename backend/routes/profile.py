@@ -781,21 +781,22 @@ async def get_following(user_id: str):
 
 
 # ---------------- GET IMAGE ----------------
-@router.get("/image/{file_id}")
+@router.get("/image/{file_id:path}")
 async def get_image(file_id: str):
     try:
-        content = storage_provider.download(file_id)
+        clean_id = file_id.replace("\\", "/")
+        content = storage_provider.download(clean_id)
         # Simplified media type detection
         media_type = "image/jpeg"
-        if file_id.lower().endswith(".png"):
+        if clean_id.lower().endswith(".png"):
             media_type = "image/png"
-        elif file_id.lower().endswith(".webp"):
+        elif clean_id.lower().endswith(".webp"):
             media_type = "image/webp"
             
         return StreamingResponse(
             BytesIO(content),
             media_type=media_type,
-            headers={"Content-Disposition": f"inline; filename={file_id}"}
+            headers={"Content-Disposition": f"inline; filename={clean_id.split('/')[-1]}"}
         )
     except Exception:
         raise HTTPException(status_code=404, detail="Image not found")

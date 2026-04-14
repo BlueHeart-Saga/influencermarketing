@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import API_BASE_URL from '../../config/api';
 import {
@@ -6,26 +6,27 @@ import {
   Button, Chip, Alert, CircularProgress,
   Dialog, DialogTitle, DialogContent, DialogActions,
   TextField, Grid, Avatar, styled, Paper,
-  IconButton, useTheme, 
-  Tabs, Tab, Badge, 
+  IconButton, useTheme,
+  Tabs, Tab, Badge,
   Drawer, FormControl, InputLabel, Select, MenuItem,
   Checkbox, Collapse, useMediaQuery, Container, InputBase,
   Stepper, Step, StepLabel,
   List, ListItem, ListItemIcon, ListItemText,
-  Divider, Tooltip, Fade, Zoom
+  Divider, Tooltip, Fade, Zoom, Slider,
+  AppBar, Toolbar, OutlinedInput, InputAdornment
 } from '@mui/material';
 import { TabContext, TabPanel } from "@mui/lab";
 
 import {
   Person, CalendarToday, Campaign,
-  CheckCircle, Cancel, Visibility,
+  CheckCircle, Cancel, Visibility, VisibilityOff,
   FilterList, Search, Close, TrendingUp, ArrowBack, Instagram, YouTube, Payment, Description, Chat, Image as ImageIcon,
   ExpandMore, ClearAll, VideoLibrary,
   Check, Clear, AccessTime, Work, Refresh, Email, Audiotrack, InsertDriveFile, Download, PictureAsPdf, WorkOutline,
   Assignment, AssignmentTurnedIn, MonetizationOn, ThumbUp, ThumbDown,
   Category, AttachMoney, Flag, Schedule, Star, Language,
   Group, TrendingFlat, Receipt, Security, VerifiedUser,
-  LocalOffer, Business, ContactMail, Public, Analytics
+  LocalOffer, Business, ContactMail, Public, Analytics, Send
 } from '@mui/icons-material';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -35,12 +36,12 @@ import {
   faChartBar,
   faMoneyBillWave,
   faCalendarDays,
-  faFileContract, 
+  faFileContract,
   faUsers,
   faChartLine,
   faStar, faChartPie,
   faArrowsRotate,
- 
+
   faFolderOpen
 } from '@fortawesome/free-solid-svg-icons';
 import { campaignAPI } from '../../services/api';
@@ -55,33 +56,31 @@ import { FaRocket } from 'react-icons/fa';
 
 const ProfessionalCard = styled(Card)(({ theme }) => ({
   height: '100%',
-  width: '380px',
-  maxWidth: '380px',
-  minWidth: '320px',
+  width: '100%',
   display: 'flex',
   flexDirection: 'column',
   borderRadius: '20px',
   boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)',
   transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
   border: '1px solid rgba(0, 0, 0, 0.06)',
-  background: 'linear-gradient(135deg, #ffffff 0%, #f8faff 100%)',
+  background: '#ffffff',
   overflow: 'visible',
   '&:hover': {
     transform: 'translateY(-8px) scale(1.02)',
-    boxShadow: '0 20px 60px rgba(102, 126, 234, 0.15)',
+    boxShadow: `0 20px 60px ${theme.palette.primary.main}25`,
     borderColor: theme.palette.primary.light
   }
 }));
 
-const FixedImageContainer = styled(Box)({
+const FixedImageContainer = styled(Box)(({ theme }) => ({
   height: '220px',
   width: '100%',
   overflow: 'hidden',
   position: 'relative',
   flexShrink: 0,
   borderRadius: '20px 20px 0 0',
-  background: 'linear-gradient(135deg, #667eea 0%, #3b82f6 100%)'
-});
+  backgroundColor: theme.palette.primary.main
+}));
 
 const StatsBadge = styled(Box)(({ theme, type }) => ({
   display: 'flex',
@@ -90,9 +89,9 @@ const StatsBadge = styled(Box)(({ theme, type }) => ({
   borderRadius: '20px',
   fontSize: '0.75rem',
   fontWeight: 600,
-  background: type === 'premium' 
+  background: type === 'premium'
     ? 'linear-gradient(135deg, #FFD700, #FFA000)'
-    : 'linear-gradient(135deg, #667eea, #3b82f6)',
+    : theme.palette.primary.main,
   color: 'white',
   boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
 }));
@@ -102,7 +101,7 @@ const FilterSection = styled(Paper)(({ theme }) => ({
   marginBottom: theme.spacing(2),
   borderRadius: '16px',
   border: `1px solid ${theme.palette.divider}`,
-  background: 'linear-gradient(135deg, #ffffff 0%, #f8faff 100%)',
+  backgroundColor: '#ffffff',
   boxShadow: '0 4px 20px rgba(0, 0, 0, 0.05)',
   transition: 'all 0.3s ease'
 }));
@@ -112,13 +111,13 @@ const SearchBar = styled(Paper)(({ theme }) => ({
   alignItems: 'center',
   padding: '8px 24px',
   borderRadius: '50px',
-  boxShadow: '0 6px 24px rgba(102, 126, 234, 0.1)',
+  boxShadow: `0 6px 24px ${theme.palette.primary.main}15`,
   border: `2px solid ${theme.palette.primary.light}20`,
-  background: 'linear-gradient(135deg, #ffffff 0%, #f8faff 100%)',
+  backgroundColor: '#ffffff',
   marginBottom: theme.spacing(3),
   transition: 'all 0.3s ease',
   '&:focus-within': {
-    boxShadow: '0 8px 32px rgba(102, 126, 234, 0.2)',
+    boxShadow: `0 8px 32px ${theme.palette.primary.main}25`,
     borderColor: theme.palette.primary.light,
     transform: 'translateY(-2px)'
   }
@@ -130,32 +129,32 @@ const StatusChip = styled(Chip)(({ theme, status }) => ({
   height: '26px',
   borderRadius: '8px',
   ...(status === 'approved' && {
-    background: 'linear-gradient(135deg, #4CAF50, #66BB6A)',
+    backgroundColor: '#4CAF50',
     color: 'white',
     boxShadow: '0 4px 12px rgba(76, 175, 80, 0.3)'
   }),
   ...(status === 'pending' && {
-    background: 'linear-gradient(135deg, #FF9800, #FFB74D)',
+    backgroundColor: '#FF9800',
     color: 'white',
     boxShadow: '0 4px 12px rgba(255, 152, 0, 0.3)'
   }),
   ...(status === 'rejected' && {
-    background: 'linear-gradient(135deg, #F44336, #EF5350)',
+    backgroundColor: '#F44336',
     color: 'white',
     boxShadow: '0 4px 12px rgba(244, 67, 54, 0.3)'
   }),
   ...(status === 'completed' && {
-    background: 'linear-gradient(135deg, #2196F3, #42A5F5)',
+    backgroundColor: theme.palette.primary.main,
     color: 'white',
-    boxShadow: '0 4px 12px rgba(33, 150, 243, 0.3)'
+    boxShadow: `0 4px 12px ${theme.palette.primary.main}30`
   }),
   ...(status === 'contracted' && {
-    background: 'linear-gradient(135deg, #9C27B0, #BA68C8)',
+    backgroundColor: theme.palette.secondary.main,
     color: 'white',
-    boxShadow: '0 4px 12px rgba(156, 39, 176, 0.3)'
+    boxShadow: `0 4px 12px ${theme.palette.secondary.main}30`
   }),
   ...(status === 'media_submitted' && {
-    background: 'linear-gradient(135deg, #FF9800, #FFB74D)',
+    backgroundColor: '#FF9800',
     color: 'white',
     boxShadow: '0 4px 12px rgba(255, 152, 0, 0.3)'
   })
@@ -163,7 +162,7 @@ const StatusChip = styled(Chip)(({ theme, status }) => ({
 
 const WorkflowStepper = styled(Box)(({ theme }) => ({
   padding: theme.spacing(3),
-  background: 'linear-gradient(135deg, #f8faff 0%, #f0f4ff 100%)',
+  backgroundColor: '#f8faff',
   borderRadius: '16px',
   border: `2px solid ${theme.palette.primary.light}20`,
   boxShadow: '0 4px 20px rgba(0, 0, 0, 0.05)'
@@ -174,7 +173,7 @@ const MediaPreviewCard = styled(Card)(({ theme }) => ({
   transition: 'all 0.3s ease',
   border: `2px solid transparent`,
   borderRadius: '12px',
-  background: 'linear-gradient(135deg, #ffffff 0%, #f8faff 100%)',
+  backgroundColor: '#ffffff',
   '&:hover': {
     transform: 'translateY(-4px)',
     boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)',
@@ -185,10 +184,10 @@ const MediaPreviewCard = styled(Card)(({ theme }) => ({
 const MetricCard = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(2),
   textAlign: 'center',
-  borderRadius: '16px',
-  background: 'linear-gradient(135deg, #667eea 0%, #3b82f6 100%)',
+  borderRadius: '18px',
+  backgroundColor: theme.palette.primary.main,
   color: 'white',
-  boxShadow: '0 6px 20px rgba(102, 126, 234, 0.3)'
+  boxShadow: `0 6px 20px ${theme.palette.primary.main}30`
 }));
 
 const AnimatedTab = styled(Tab)(({ theme }) => ({
@@ -201,9 +200,9 @@ const AnimatedTab = styled(Tab)(({ theme }) => ({
   borderRadius: '12px',
   margin: '0 4px',
   '&.Mui-selected': {
-    background: 'linear-gradient(135deg, #667eea 0%, #3b82f6 100%)',
+    backgroundColor: theme.palette.primary.main,
     color: 'white',
-    boxShadow: '0 4px 15px rgba(102, 126, 234, 0.3)',
+    boxShadow: `0 4px 15px ${theme.palette.primary.main}30`,
     transform: 'scale(1.05)'
   },
   '&:hover': {
@@ -216,16 +215,17 @@ const AnimatedTab = styled(Tab)(({ theme }) => ({
 // =============================================
 
 const CampaignImage = ({ fileId, alt, onClick, campaignData }) => {
+  const theme = useTheme();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
   const getImageUrl = () => {
     if (!fileId) return null;
-    
+
     if (fileId.startsWith('http') || fileId.startsWith('data:') || fileId.startsWith('blob:')) {
       return fileId;
     }
-    
+
     return `${process.env.REACT_APP_API_URL || API_BASE_URL}/api/campaigns/image/${fileId}`;
   };
 
@@ -234,11 +234,11 @@ const CampaignImage = ({ fileId, alt, onClick, campaignData }) => {
   if (!imageUrl || error) {
     return (
       <FixedImageContainer onClick={onClick}>
-        <Box 
-          sx={{ 
+        <Box
+          sx={{
             width: '100%',
             height: '100%',
-            background: 'linear-gradient(135deg, #667eea 0%, #3b82f6 100%)',
+            background: theme.palette.primary.main,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -297,7 +297,7 @@ const CampaignImage = ({ fileId, alt, onClick, campaignData }) => {
           setError(true);
         }}
       />
-      
+
       {/* Campaign Budget Overlay */}
       {campaignData?.budget && (
         <Box
@@ -305,7 +305,7 @@ const CampaignImage = ({ fileId, alt, onClick, campaignData }) => {
             position: 'absolute',
             top: 12,
             right: 12,
-            background: 'linear-gradient(135deg, rgba(255,215,0,0.95) 0%, rgba(255,160,0,0.95) 100%)',
+            background: 'linear-gradient(135deg, #FFD700 0%, #FFA000 100%)',
             color: 'white',
             padding: '6px 12px',
             borderRadius: '20px',
@@ -328,6 +328,7 @@ const CampaignImage = ({ fileId, alt, onClick, campaignData }) => {
 // =============================================
 
 const ProfileImage = ({ userId, profileType, alt, onClick, size = 40 }) => {
+  const theme = useTheme();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [imageUrl, setImageUrl] = useState(null);
@@ -338,10 +339,10 @@ const ProfileImage = ({ userId, profileType, alt, onClick, size = 40 }) => {
       try {
         setLoading(true);
         const response = await profileAPI.getProfileById(userId);
-        
+
         if (response?.profile) {
           setUserData(response.profile);
-          
+
           let imageId = null;
           if (profileType === 'influencer' && response.profile.profile_picture) {
             imageId = response.profile.profile_picture;
@@ -378,21 +379,21 @@ const ProfileImage = ({ userId, profileType, alt, onClick, size = 40 }) => {
         return userData.company_name || userData.contact_person_name || alt || 'Brand';
       }
     }
-    return alt || 'User';
+    return alt || 'Brio user';
   };
 
   const getDisplayInitial = () => {
     const name = getDisplayName();
-    return name?.charAt(0)?.toUpperCase() || 'U';
+    return name?.charAt(0)?.toUpperCase() || 'B';
   };
 
   if (error || !imageUrl) {
     return (
-      <Avatar 
-        sx={{ 
-          width: size, 
+      <Avatar
+        sx={{
+          width: size,
           height: size,
-          background: 'linear-gradient(135deg, #667eea 0%, #3b82f6 100%)',
+          background: theme.palette.primary.main,
           color: 'white',
           fontSize: size * 0.4,
           fontWeight: 700,
@@ -429,11 +430,11 @@ const ProfileImage = ({ userId, profileType, alt, onClick, size = 40 }) => {
           <CircularProgress size={size * 0.5} />
         </Box>
       )}
-      <Avatar 
+      <Avatar
         src={imageUrl}
         alt={getDisplayName()}
-        sx={{ 
-          width: size, 
+        sx={{
+          width: size,
           height: size,
           cursor: onClick ? 'pointer' : 'default',
           boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
@@ -485,8 +486,8 @@ const UserInfo = ({ userId, profileType, showEmail = true, size = 40, showStats 
   };
 
   const getDisplayName = () => {
-    if (!userData) return 'User';
-    
+    if (!userData) return 'Brio User';
+
     if (profileType === 'influencer') {
       return userData.nickname || userData.full_name || 'Unknown Influencer';
     } else {
@@ -496,7 +497,7 @@ const UserInfo = ({ userId, profileType, showEmail = true, size = 40, showStats 
 
   const getStats = () => {
     if (!userData || !showStats) return null;
-    
+
     return {
       followers: userData.followers || 'N/A',
       engagement: userData.engagement_rate || 'N/A',
@@ -511,7 +512,7 @@ const UserInfo = ({ userId, profileType, showEmail = true, size = 40, showStats 
       <Box display="flex" alignItems="center" gap={1.5}>
         <CircularProgress size={20} />
         <Typography variant="body2" color="text.secondary">
-          Loading...
+          Brio User
         </Typography>
       </Box>
     );
@@ -527,10 +528,10 @@ const UserInfo = ({ userId, profileType, showEmail = true, size = 40, showStats 
         size={size}
       />
       <Box flex={1}>
-        <Typography 
-          variant="subtitle2" 
+        <Typography
+          variant="subtitle2"
           fontWeight="700"
-          sx={{ 
+          sx={{
             cursor: 'pointer',
             '&:hover': { color: 'primary.main', textDecoration: 'underline' }
           }}
@@ -538,13 +539,13 @@ const UserInfo = ({ userId, profileType, showEmail = true, size = 40, showStats 
         >
           {getDisplayName()}
         </Typography>
-        
+
         {showStats && stats && (
           <Box display="flex" gap={1} mt={0.5} flexWrap="wrap">
             {stats.followers !== 'N/A' && (
               <Typography variant="caption" color="text.secondary">
-  <FontAwesomeIcon icon={faUsers} /> {stats.followers.toLocaleString()}
-</Typography>
+                <FontAwesomeIcon icon={faUsers} /> {stats.followers.toLocaleString()}
+              </Typography>
 
             )}
             {stats.engagement !== 'N/A' && (
@@ -559,7 +560,7 @@ const UserInfo = ({ userId, profileType, showEmail = true, size = 40, showStats 
             )}
           </Box>
         )}
-        
+
         {showEmail && userData?.email && (
           <Typography variant="caption" color="text.secondary" display="block">
             {userData.email}
@@ -593,11 +594,11 @@ const ApplicationWorkflow = ({ application }) => {
     {
       label: 'Approval Decision',
       status: ['approved', 'rejected', 'contracted', 'media_submitted', 'completed'].includes(application.status) ? 'completed' : 'pending',
-      description: application.status === 'approved' ? 'Application approved' : 
-                   application.status === 'rejected' ? 'Application rejected' : 'Pending decision',
+      description: application.status === 'approved' ? 'Application approved' :
+        application.status === 'rejected' ? 'Application rejected' : 'Pending decision',
       date: application.status !== 'pending' ? application.applied_at : null,
-      icon: application.status === 'approved' ? <ThumbUp /> : 
-            application.status === 'rejected' ? <ThumbDown /> : <WorkOutline />
+      icon: application.status === 'approved' ? <ThumbUp /> :
+        application.status === 'rejected' ? <ThumbDown /> : <WorkOutline />
     },
     {
       label: 'Contract Sent',
@@ -692,7 +693,7 @@ const ApplicationWorkflow = ({ application }) => {
 //         </MetricCard>
 //       </Grid>
 //       <Grid item xs={6} sm={4} md={2}>
-//         <MetricCard sx={{ background: 'linear-gradient(135deg, #FF9800 0%, #F57C00 100%)' }}>
+//         <MetricCard sx={{ backgroundColor: '#FF9800' }}>
 //           <Typography variant="h4" fontWeight="700">
 //             {metrics.pending}
 //           </Typography>
@@ -700,7 +701,7 @@ const ApplicationWorkflow = ({ application }) => {
 //         </MetricCard>
 //       </Grid>
 //       <Grid item xs={6} sm={4} md={2}>
-//         <MetricCard sx={{ background: 'linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%)' }}>
+//         <MetricCard sx={{ backgroundColor: '#4CAF50' }}>
 //           <Typography variant="h4" fontWeight="700">
 //             {metrics.approved}
 //           </Typography>
@@ -708,7 +709,7 @@ const ApplicationWorkflow = ({ application }) => {
 //         </MetricCard>
 //       </Grid>
 //       <Grid item xs={6} sm={4} md={2}>
-//         <MetricCard sx={{ background: 'linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%)' }}>
+//         <MetricCard sx={{ backgroundColor: 'secondary.main' }}>
 //           <Typography variant="h4" fontWeight="700">
 //             {metrics.contracted}
 //           </Typography>
@@ -716,7 +717,7 @@ const ApplicationWorkflow = ({ application }) => {
 //         </MetricCard>
 //       </Grid>
 //       <Grid item xs={6} sm={4} md={2}>
-//         <MetricCard sx={{ background: 'linear-gradient(135deg, #2196F3 0%, #0D47A1 100%)' }}>
+//         <MetricCard sx={{ backgroundColor: 'primary.main' }}>
 //           <Typography variant="h4" fontWeight="700">
 //             {metrics.completed}
 //           </Typography>
@@ -724,7 +725,7 @@ const ApplicationWorkflow = ({ application }) => {
 //         </MetricCard>
 //       </Grid>
 //       <Grid item xs={6} sm={4} md={2}>
-//         <MetricCard sx={{ background: 'linear-gradient(135deg, #FF5722 0%, #D84315 100%)' }}>
+//         <MetricCard sx={{ backgroundColor: '#FF5722' }}>
 //           <Typography variant="h4" fontWeight="700">
 //             ${metrics.totalBudget.toLocaleString()}
 //           </Typography>
@@ -740,13 +741,13 @@ const ApplicationWorkflow = ({ application }) => {
 // =============================================
 
 const DetailedFilterSection = ({ filters, onFilterChange, onClearFilters, applicationCounts }) => {
+  const theme = useTheme();
   const [expandedSections, setExpandedSections] = useState({
-    search: true,
     campaign: true,
     influencer: true,
+    performance: true,
     status: true,
-    budget: true,
-    dates: true
+    budget: true
   });
 
   const toggleSection = (section) => {
@@ -756,265 +757,342 @@ const DetailedFilterSection = ({ filters, onFilterChange, onClearFilters, applic
     }));
   };
 
+  const sliderStyle = {
+    mt: 2,
+    mb: 2,
+    '& .MuiSlider-valueLabel': {
+      fontSize: '0.8rem',
+      fontWeight: 700,
+      top: -6,
+      backgroundColor: theme.palette.primary.main,
+      color: '#fff',
+      borderRadius: '8px',
+      padding: '4px 10px',
+      minWidth: 'max-content',
+      width: 'auto',
+      whiteSpace: 'nowrap',
+      '&:before': { display: 'none' }
+    }
+  };
+
   const statusOptions = [
-    { value: 'pending', label: 'Under Review', count: applicationCounts.pending },
-    { value: 'approved', label: 'Approved', count: applicationCounts.approved },
-    { value: 'rejected', label: 'Rejected', count: applicationCounts.rejected },
-    { value: 'contracted', label: 'Contracted', count: applicationCounts.contracted },
-    { value: 'media_submitted', label: 'Media Submitted', count: applicationCounts.media_submitted },
-    { value: 'completed', label: 'Completed', count: applicationCounts.completed }
+    { value: 'pending', label: 'Under Review', count: applicationCounts?.pending || 0 },
+    { value: 'approved', label: 'Approved', count: applicationCounts?.approved || 0 },
+    { value: 'rejected', label: 'Rejected', count: applicationCounts?.rejected || 0 },
+    { value: 'contracted', label: 'Contracted', count: applicationCounts?.contracted || 0 },
+    { value: 'media_submitted', label: 'Media Submitted', count: applicationCounts?.media_submitted || 0 },
+    { value: 'completed', label: 'Completed', count: applicationCounts?.completed || 0 }
   ];
 
+  const StyledFilterGroup = styled(Box)(({ theme }) => ({
+    marginBottom: '20px',
+    '& .section-header': {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      cursor: 'pointer',
+      padding: '10px 0',
+      borderBottom: `1px solid ${theme.palette.divider}`,
+      marginBottom: '16px',
+      color: theme.palette.text.secondary,
+      transition: 'all 0.2s ease',
+      '&:hover': {
+        color: theme.palette.primary.main,
+        borderColor: theme.palette.primary.main
+      }
+    }
+  }));
+
   return (
-    <Box sx={{ width: '340px', flexShrink: 0, pr: 2 }}>
-      <Paper sx={{ p: 2.5, borderRadius: '20px', boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)' }}>
-        {/* Header */}
-        <Box display="flex" alignItems="center" justifyContent="space-between" mb={3}>
-          <Typography variant="h6" fontWeight="700" color="primary">
-            Advanced Filters
-          </Typography>
-          <Badge badgeContent={Object.values(filters).filter(v => v !== '' && !(Array.isArray(v) && v.length === 0)).length} color="primary">
-            <FilterList />
-          </Badge>
-        </Box>
+    <Box sx={{ p: 3 }}>
+      {/* Search Header */}
+      <TextField
+        fullWidth
+        variant="outlined"
+        placeholder="Global keyword search..."
+        value={filters.globalSearch || ''}
+        onChange={(e) => onFilterChange('globalSearch', e.target.value)}
+        sx={{
+          mb: 4,
+          '& .MuiOutlinedInput-root': {
+            borderRadius: '12px',
+            background: 'rgba(25, 118, 210, 0.05)'
+          }
+        }}
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <Search color="primary" />
+            </InputAdornment>
+          )
+        }}
+      />
 
-        {/* Clear All Button */}
-        <Button
-          fullWidth
-          variant="outlined"
-          startIcon={<ClearAll />}
-          onClick={onClearFilters}
-          sx={{ mb: 3, borderRadius: '12px', py: 1, fontWeight: 600 }}
-        >
-          Clear All Filters
-        </Button>
-
-        {/* Global Search */}
-        <FilterSection>
-          <Box display="flex" alignItems="center" justifyContent="space-between" sx={{ cursor: 'pointer' }} onClick={() => toggleSection('search')}>
-            <Search fontSize="small" />
-  <Typography variant="subtitle1" fontWeight="600">
-    Global Search
-  </Typography>
-            <ExpandMore sx={{ transform: expandedSections.search ? 'rotate(180deg)' : 'none', transition: '0.3s' }} />
-          </Box>
-          <Collapse in={expandedSections.search}>
-            <TextField
-              fullWidth
-              size="small"
-              placeholder="Search across all applications..."
-              value={filters.globalSearch}
-              onChange={(e) => onFilterChange('globalSearch', e.target.value)}
-              InputProps={{ 
-                startAdornment: <Search sx={{ color: 'text.secondary', mr: 1 }} />,
-                sx: { borderRadius: '10px' }
-              }}
-              sx={{ mt: 2 }}
-            />
-          </Collapse>
-        </FilterSection>
-
-        {/* Campaign Filters */}
-        <FilterSection>
-          <Box display="flex" alignItems="center" justifyContent="space-between" sx={{ cursor: 'pointer' }} onClick={() => toggleSection('campaign')}>
+      {/* Campaign Details */}
+      <StyledFilterGroup>
+        <Box className="section-header" onClick={() => toggleSection('campaign')}>
+          <Box display="flex" alignItems="center" gap={1.5}>
             <FontAwesomeIcon icon={faBullseye} />
-  <Typography variant="subtitle1" fontWeight="600">
-    Campaign Details
-  </Typography>
-            <ExpandMore sx={{ transform: expandedSections.campaign ? 'rotate(180deg)' : 'none', transition: '0.3s' }} />
+            <Typography variant="subtitle2" fontWeight="700">CAMPAIGN</Typography>
           </Box>
-          <Collapse in={expandedSections.campaign}>
-            <TextField
-              fullWidth
-              size="small"
-              label="Campaign Title"
-              value={filters.title}
-              onChange={(e) => onFilterChange('title', e.target.value)}
-              sx={{ mt: 2, mb: 2 }}
-            />
-            <FormControl fullWidth size="small" sx={{ mb: 2 }}>
-              <InputLabel>Category</InputLabel>
-              <Select
-                value={filters.category}
-                onChange={(e) => onFilterChange('category', e.target.value)}
-                label="Category"
-              >
-                <MenuItem value="">All Categories</MenuItem>
-                <MenuItem value="fashion">Fashion</MenuItem>
-                <MenuItem value="beauty">Beauty</MenuItem>
-                <MenuItem value="lifestyle">Lifestyle</MenuItem>
-                <MenuItem value="technology">Technology</MenuItem>
-                <MenuItem value="food">Food & Beverage</MenuItem>
-                <MenuItem value="travel">Travel</MenuItem>
-                <MenuItem value="fitness">Fitness</MenuItem>
-                <MenuItem value="gaming">Gaming</MenuItem>
-              </Select>
-            </FormControl>
-          </Collapse>
-        </FilterSection>
+          <ExpandMore sx={{ transform: expandedSections.campaign ? 'rotate(180deg)' : 'none', transition: '0.3s' }} />
+        </Box>
+        <Collapse in={expandedSections.campaign}>
+          <TextField
+            fullWidth
+            size="small"
+            label="Campaign Title"
+            value={filters.title || ''}
+            onChange={(e) => onFilterChange('title', e.target.value)}
+            sx={{ mb: 2 }}
+          />
+          <FormControl fullWidth size="small" sx={{ mb: 2 }}>
+            <InputLabel>Category</InputLabel>
+            <Select
+              value={filters.category || ''}
+              onChange={(e) => onFilterChange('category', e.target.value)}
+              input={<OutlinedInput label="Category" />}
+            >
+              <MenuItem value="">All Categories</MenuItem>
+              <MenuItem value="fashion">Fashion</MenuItem>
+              <MenuItem value="beauty">Beauty</MenuItem>
+              <MenuItem value="lifestyle">Lifestyle</MenuItem>
+              <MenuItem value="technology">Technology</MenuItem>
+              <MenuItem value="food">Food & Beverage</MenuItem>
+              <MenuItem value="travel">Travel</MenuItem>
+              <MenuItem value="fitness">Fitness</MenuItem>
+              <MenuItem value="gaming">Gaming</MenuItem>
+            </Select>
+          </FormControl>
+          <TextField
+            fullWidth
+            size="small"
+            label="Requirements Search"
+            value={filters.requirements || ''}
+            onChange={(e) => onFilterChange('requirements', e.target.value)}
+            sx={{ mb: 2 }}
+          />
+        </Collapse>
+      </StyledFilterGroup>
 
-        {/* Influencer Filters */}
-        <FilterSection>
-          <Box display="flex" alignItems="center" justifyContent="space-between" sx={{ cursor: 'pointer' }} onClick={() => toggleSection('influencer')}>
+      {/* Influencer Details */}
+      <StyledFilterGroup>
+        <Box className="section-header" onClick={() => toggleSection('influencer')}>
+          <Box display="flex" alignItems="center" gap={1.5}>
             <FontAwesomeIcon icon={faUser} />
-  <Typography variant="subtitle1" fontWeight="600">
-    Influencer Details
-  </Typography>
-            <ExpandMore sx={{ transform: expandedSections.influencer ? 'rotate(180deg)' : 'none', transition: '0.3s' }} />
+            <Typography variant="subtitle2" fontWeight="700">INFLUENCER</Typography>
           </Box>
-          <Collapse in={expandedSections.influencer}>
-            <TextField
-              fullWidth
-              size="small"
-              label="Influencer Name"
-              value={filters.influencerName}
-              onChange={(e) => onFilterChange('influencerName', e.target.value)}
-              sx={{ mt: 2, mb: 2 }}
-            />
-            <TextField
-              fullWidth
-              size="small"
-              label="Influencer Email"
-              value={filters.influencerEmail}
-              onChange={(e) => onFilterChange('influencerEmail', e.target.value)}
-              sx={{ mb: 2 }}
-            />
-            
-            
-          </Collapse>
-        </FilterSection>
+          <ExpandMore sx={{ transform: expandedSections.influencer ? 'rotate(180deg)' : 'none', transition: '0.3s' }} />
+        </Box>
+        <Collapse in={expandedSections.influencer}>
+          <TextField
+            fullWidth
+            size="small"
+            label="Full Name / Nickname"
+            value={filters.influencerName || ''}
+            onChange={(e) => onFilterChange('influencerName', e.target.value)}
+            sx={{ mb: 2 }}
+          />
+          <TextField
+            fullWidth
+            size="small"
+            label="Message Search"
+            value={filters.message || ''}
+            onChange={(e) => onFilterChange('message', e.target.value)}
+            sx={{ mb: 2 }}
+          />
+        </Collapse>
+      </StyledFilterGroup>
 
-        {/* Status Filters */}
-        <FilterSection>
-          <Box display="flex" alignItems="center" justifyContent="space-between" sx={{ cursor: 'pointer' }} onClick={() => toggleSection('status')}>
+      {/* Performance Slider Section */}
+      <StyledFilterGroup>
+        <Box className="section-header" onClick={() => toggleSection('performance')}>
+          <Box display="flex" alignItems="center" gap={1.5}>
+            <FontAwesomeIcon icon={faChartLine} />
+            <Typography variant="subtitle2" fontWeight="700">PERFORMANCE</Typography>
+          </Box>
+          <ExpandMore sx={{ transform: expandedSections.performance ? 'rotate(180deg)' : 'none', transition: '0.3s' }} />
+        </Box>
+        <Collapse in={expandedSections.performance}>
+          <Box sx={{ mb: 3 }}>
+            <Typography variant="caption" color="text.secondary" fontWeight="700">FOLLOWER RANGE</Typography>
+            <Box sx={{ px: 1 }}>
+              <Slider
+                size="small"
+                value={[filters.minFollowers || 0, filters.maxFollowers || 1000000]}
+                onChange={(e, val) => {
+                  onFilterChange('minFollowers', val[0]);
+                  onFilterChange('maxFollowers', val[1]);
+                }}
+                min={0}
+                max={1000000}
+                step={1000}
+                valueLabelDisplay="auto"
+                sx={sliderStyle}
+              />
+              <Box display="flex" justifyContent="space-between">
+                <Typography variant="caption" color="text.secondary">
+                  {(filters.minFollowers || 0).toLocaleString()}
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  {(filters.maxFollowers || 1000000).toLocaleString()}+
+                </Typography>
+              </Box>
+            </Box>
+          </Box>
+          <Box sx={{ mb: 2 }}>
+            <Typography variant="caption" color="text.secondary" fontWeight="700">ENGAGEMENT RATE (%)</Typography>
+            <Slider
+              size="small"
+              value={filters.minEngagement || 0}
+              onChange={(e, val) => onFilterChange('minEngagement', val)}
+              min={0}
+              max={20}
+              step={0.5}
+              valueLabelDisplay="auto"
+              sx={sliderStyle}
+            />
+          </Box>
+        </Collapse>
+      </StyledFilterGroup>
+
+      {/* Status & Timing */}
+      <StyledFilterGroup>
+        <Box className="section-header" onClick={() => toggleSection('status')}>
+          <Box display="flex" alignItems="center" gap={1.5}>
             <FontAwesomeIcon icon={faChartBar} />
-  <Typography variant="subtitle1" fontWeight="600">
-    Application Status
-  </Typography>
-            <ExpandMore sx={{ transform: expandedSections.status ? 'rotate(180deg)' : 'none', transition: '0.3s' }} />
+            <Typography variant="subtitle2" fontWeight="700">STATUS & DATE</Typography>
           </Box>
-          <Collapse in={expandedSections.status}>
-            <FormControl fullWidth size="small" sx={{ mt: 2, mb: 2 }}>
-              <InputLabel>Status Filters</InputLabel>
-              <Select
-                multiple
-                value={filters.status}
-                onChange={(e) => onFilterChange('status', e.target.value)}
-                label="Status Filters"
-                renderValue={(selected) => `${selected.length} statuses selected`}
-              >
-                {statusOptions.map((option) => (
-                  <MenuItem key={option.value} value={option.value}>
-                    <Checkbox checked={filters.status.includes(option.value)} />
-                    <Box display="flex" justifyContent="space-between" width="100%">
-                      <Typography variant="body2">{option.label}</Typography>
-                      <Chip label={option.count} size="small" />
-                    </Box>
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Collapse>
-        </FilterSection>
-
-        {/* Budget Filters */}
-        <FilterSection>
-          <Box display="flex" alignItems="center" justifyContent="space-between" sx={{ cursor: 'pointer' }} onClick={() => toggleSection('budget')}>
-            <FontAwesomeIcon icon={faMoneyBillWave} />
-  <Typography variant="subtitle1" fontWeight="600">
-    Budget Range
-  </Typography>
-            <ExpandMore sx={{ transform: expandedSections.budget ? 'rotate(180deg)' : 'none', transition: '0.3s' }} />
-          </Box>
-          <Collapse in={expandedSections.budget}>
-            <Grid container spacing={1} sx={{ mt: 2 }}>
+          <ExpandMore sx={{ transform: expandedSections.status ? 'rotate(180deg)' : 'none', transition: '0.3s' }} />
+        </Box>
+        <Collapse in={expandedSections.status}>
+          <FormControl fullWidth size="small" sx={{ mb: 2 }}>
+            <InputLabel>Application Status</InputLabel>
+            <Select
+              multiple
+              value={filters.status || []}
+              onChange={(e) => onFilterChange('status', e.target.value)}
+              input={<OutlinedInput label="Application Status" />}
+              renderValue={(selected) => `${selected.length} Selected`}
+            >
+              {statusOptions.map((option) => (
+                <MenuItem key={option.value} value={option.value}>
+                  <Checkbox checked={(filters.status || []).includes(option.value)} />
+                  <ListItemText primary={option.label} />
+                  <Chip label={option.count} size="small" sx={{ ml: 1 }} />
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <FormControl fullWidth size="small" sx={{ mb: 2 }}>
+            <InputLabel>Apply Date Range</InputLabel>
+            <Select
+              value={filters.dateRange || ''}
+              onChange={(e) => onFilterChange('dateRange', e.target.value)}
+              input={<OutlinedInput label="Apply Date Range" />}
+            >
+              <MenuItem value="">All Time</MenuItem>
+              <MenuItem value="today">Today</MenuItem>
+              <MenuItem value="week">Last 7 Days</MenuItem>
+              <MenuItem value="month">Last 30 Days</MenuItem>
+              <MenuItem value="custom">Custom Range</MenuItem>
+            </Select>
+          </FormControl>
+          {filters.dateRange === 'custom' && (
+            <Grid container spacing={1} sx={{ mb: 2 }}>
               <Grid item xs={6}>
                 <TextField
                   fullWidth
                   size="small"
-                  label="Min Budget"
-                  type="number"
-                  value={filters.minBudget}
-                  onChange={(e) => onFilterChange('minBudget', e.target.value)}
+                  label="Start"
+                  type="date"
+                  value={filters.startDate || ''}
+                  onChange={(e) => onFilterChange('startDate', e.target.value)}
+                  InputLabelProps={{ shrink: true }}
                 />
               </Grid>
               <Grid item xs={6}>
                 <TextField
                   fullWidth
                   size="small"
-                  label="Max Budget"
-                  type="number"
-                  value={filters.maxBudget}
-                  onChange={(e) => onFilterChange('maxBudget', e.target.value)}
+                  label="End"
+                  type="date"
+                  value={filters.endDate || ''}
+                  onChange={(e) => onFilterChange('endDate', e.target.value)}
+                  InputLabelProps={{ shrink: true }}
                 />
               </Grid>
             </Grid>
-          </Collapse>
-        </FilterSection>
+          )}
+        </Collapse>
+      </StyledFilterGroup>
 
-        {/* Date Filters */}
-        <FilterSection>
-          <Box display="flex" alignItems="center" justifyContent="space-between" sx={{ cursor: 'pointer' }} onClick={() => toggleSection('dates')}>
-            <FontAwesomeIcon icon={faFileContract} />
-  <Typography variant="h6" fontWeight="700">
-    Contract Terms
-  </Typography>
-            <ExpandMore sx={{ transform: expandedSections.dates ? 'rotate(180deg)' : 'none', transition: '0.3s' }} />
+      {/* Budget & Currency */}
+      <StyledFilterGroup>
+        <Box className="section-header" onClick={() => toggleSection('budget')}>
+          <Box display="flex" alignItems="center" gap={1.5}>
+            <FontAwesomeIcon icon={faMoneyBillWave} />
+            <Typography variant="subtitle2" fontWeight="700">BUDGET</Typography>
           </Box>
-          <Collapse in={expandedSections.dates}>
-            <FormControl fullWidth size="small" sx={{ mt: 2, mb: 2 }}>
-              <InputLabel>Date Range</InputLabel>
-              <Select
-                value={filters.dateRange}
-                onChange={(e) => onFilterChange('dateRange', e.target.value)}
-                label="Date Range"
-              >
-                <MenuItem value="">All Time</MenuItem>
-                <MenuItem value="today">Today</MenuItem>
-                <MenuItem value="week">Last 7 Days</MenuItem>
-                <MenuItem value="month">Last 30 Days</MenuItem>
-                <MenuItem value="custom">Custom Range</MenuItem>
-              </Select>
-            </FormControl>
-            {filters.dateRange === 'custom' && (
-              <Grid container spacing={1}>
-                <Grid item xs={6}>
-                  <TextField
-                    fullWidth
-                    size="small"
-                    label="Start Date"
-                    type="date"
-                    value={filters.startDate}
-                    onChange={(e) => onFilterChange('startDate', e.target.value)}
-                    InputLabelProps={{ shrink: true }}
-                  />
-                </Grid>
-                <Grid item xs={6}>
-                  <TextField
-                    fullWidth
-                    size="small"
-                    label="End Date"
-                    type="date"
-                    value={filters.endDate}
-                    onChange={(e) => onFilterChange('endDate', e.target.value)}
-                    InputLabelProps={{ shrink: true }}
-                  />
-                </Grid>
-              </Grid>
-            )}
-          </Collapse>
-        </FilterSection>
-
-        {/* Results Summary */}
-        <Box sx={{ p: 2, background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%)', borderRadius: '12px', textAlign: 'center', mt: 2 }}>
-          <Typography variant="body2" color="primary" fontWeight="600">
-            {applicationCounts.filtered} of {applicationCounts.total} applications
-          </Typography>
-          <Typography variant="caption" color="text.secondary">
-            Matching your criteria
-          </Typography>
+          <ExpandMore sx={{ transform: expandedSections.budget ? 'rotate(180deg)' : 'none', transition: '0.3s' }} />
         </Box>
-      </Paper>
+        <Collapse in={expandedSections.budget}>
+          <FormControl fullWidth size="small" sx={{ mb: 2 }}>
+            <InputLabel>Currency</InputLabel>
+            <Select
+              value={filters.currency || ''}
+              onChange={(e) => onFilterChange('currency', e.target.value)}
+              input={<OutlinedInput label="Currency" />}
+            >
+              <MenuItem value="">Any Currency</MenuItem>
+              <MenuItem value="USD">USD ($)</MenuItem>
+              <MenuItem value="EUR">EUR (€)</MenuItem>
+              <MenuItem value="GBP">GBP (£)</MenuItem>
+              <MenuItem value="INR">INR (₹)</MenuItem>
+            </Select>
+          </FormControl>
+          <Grid container spacing={2}>
+            <Grid item xs={6}>
+              <TextField
+                fullWidth
+                size="small"
+                label="Min"
+                type="number"
+                value={filters.minBudget || ''}
+                onChange={(e) => onFilterChange('minBudget', e.target.value)}
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <TextField
+                fullWidth
+                size="small"
+                label="Max"
+                type="number"
+                value={filters.maxBudget || ''}
+                onChange={(e) => onFilterChange('maxBudget', e.target.value)}
+              />
+            </Grid>
+          </Grid>
+        </Collapse>
+      </StyledFilterGroup>
+
+      {/* Results Summary Box */}
+      <Box sx={{
+        p: 3,
+        mt: 2,
+        background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
+        color: 'white',
+        borderRadius: '16px',
+        textAlign: 'center',
+        boxShadow: '0 8px 32px rgba(25, 118, 210, 0.25)'
+      }}>
+        <Typography variant="h5" fontWeight="800">
+          {(applicationCounts?.filtered || 0).toLocaleString()}
+        </Typography>
+        <Typography variant="caption" sx={{ opacity: 0.9, fontWeight: 700, letterSpacing: '1px' }}>
+          APPLICATIONS MATCHED
+        </Typography>
+      </Box>
     </Box>
   );
 };
@@ -1025,6 +1103,7 @@ const DetailedFilterSection = ({ filters, onFilterChange, onClearFilters, applic
 // =============================================
 
 const SendContractDialog = ({ open, onClose, application, onSendContract }) => {
+  const theme = useTheme();
   const [sending, setSending] = useState(false);
   const [influencerData, setInfluencerData] = useState(null);
   const [campaignData, setCampaignData] = useState(null);
@@ -1051,7 +1130,7 @@ const SendContractDialog = ({ open, onClose, application, onSendContract }) => {
                 nickname: safeApplication.influencer_name || 'Unknown Influencer',
                 full_name: safeApplication.influencer_name || 'Unknown Influencer',
                 email: safeApplication.influencer_email || 'No email available',
-                
+
                 categories: safeApplication.category ? [safeApplication.category] : [],
                 bio: safeApplication.message || 'No bio available'
               }
@@ -1102,7 +1181,7 @@ const SendContractDialog = ({ open, onClose, application, onSendContract }) => {
 
   const handleSendContract = async () => {
     if (!application) return;
-    
+
     setSending(true);
     try {
       await onSendContract(application);
@@ -1116,9 +1195,9 @@ const SendContractDialog = ({ open, onClose, application, onSendContract }) => {
 
   const getInfluencerStats = () => {
     if (!influencerData) return null;
-    
+
     return {
-      
+
       categories: influencerData.categories || [],
       bio: influencerData.bio || 'No bio available'
     };
@@ -1146,17 +1225,17 @@ const SendContractDialog = ({ open, onClose, application, onSendContract }) => {
       onClose={onClose}
       maxWidth="lg"
       fullWidth
-      PaperProps={{ 
-        sx: { 
-          borderRadius: '20px', 
+      PaperProps={{
+        sx: {
+          borderRadius: '20px',
           minHeight: '700px',
-          background: 'linear-gradient(135deg, #ffffff 0%, #f8faff 100%)'
-        } 
+          background: '#ffffff'
+        }
       }}
     >
-      <DialogTitle sx={{ 
-        background: 'linear-gradient(135deg, #3b82f6 0%, #3b82f6 100%)',
-        color: 'white', 
+      <DialogTitle sx={{
+        backgroundColor: 'primary.main',
+        color: 'white',
         fontWeight: 700,
         py: 3
       }}>
@@ -1175,7 +1254,7 @@ const SendContractDialog = ({ open, onClose, application, onSendContract }) => {
           </IconButton>
         </Box>
       </DialogTitle>
-      
+
       <DialogContent dividers sx={{ p: 4 }}>
         {loading ? (
           <Box display="flex" justifyContent="center" alignItems="center" height="400px" flexDirection="column">
@@ -1189,19 +1268,19 @@ const SendContractDialog = ({ open, onClose, application, onSendContract }) => {
             {/* Left Column - Campaign Details */}
             <Grid item xs={12} md={6}>
               <Box display="flex" alignItems="center" gap={1} mb={1.5}>
-  <FontAwesomeIcon icon={faBullseye} />
-  <Typography variant="h6" gutterBottom color="primary" fontWeight="700">
-    Campaign Overview
-  </Typography>
-</Box>
+                <FontAwesomeIcon icon={faBullseye} />
+                <Typography variant="h6" gutterBottom color="primary" fontWeight="700">
+                  Campaign Overview
+                </Typography>
+              </Box>
 
-              
+
               {campaignData ? (
                 <Box sx={{ p: 3, background: 'white', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)' }}>
                   <Typography variant="h5" fontWeight="700" gutterBottom color="primary">
                     {campaignData.title}
                   </Typography>
-                  
+
                   <Grid container spacing={2} sx={{ mt: 2 }}>
                     <Grid item xs={6}>
                       <Box display="flex" alignItems="center" gap={1}>
@@ -1291,13 +1370,13 @@ const SendContractDialog = ({ open, onClose, application, onSendContract }) => {
             {/* Right Column - Influencer & Contract Details */}
             <Grid item xs={12} md={6}>
               <Box display="flex" alignItems="center" gap={1} mb={1.5}>
-  <FontAwesomeIcon icon={faUser} />
-  <Typography variant="h6" gutterBottom color="primary" fontWeight="700">
-    Influencer Profile
-  </Typography>
-</Box>
+                <FontAwesomeIcon icon={faUser} />
+                <Typography variant="h6" gutterBottom color="primary" fontWeight="700">
+                  Influencer Profile
+                </Typography>
+              </Box>
 
-              
+
               {influencerData ? (
                 <Box sx={{ p: 3, background: 'white', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)', mb: 3 }}>
                   <Box display="flex" alignItems="center" gap={2} mb={2}>
@@ -1316,7 +1395,7 @@ const SendContractDialog = ({ open, onClose, application, onSendContract }) => {
                     </Box>
                   </Box>
 
-                  
+
                   {/* Categories */}
                   {stats.categories && stats.categories.length > 0 && (
                     <Box sx={{ mt: 2 }}>
@@ -1329,8 +1408,8 @@ const SendContractDialog = ({ open, onClose, application, onSendContract }) => {
                             key={index}
                             label={category}
                             size="small"
-                            sx={{ 
-                              background: 'linear-gradient(135deg, #667eea 0%, #3b82f6 100%)',
+                            sx={{
+                              backgroundColor: theme.palette.primary.main,
                               color: 'white',
                               fontSize: '0.7rem'
                             }}
@@ -1369,14 +1448,14 @@ const SendContractDialog = ({ open, onClose, application, onSendContract }) => {
 
               {/* Contract Terms */}
               <Box display="flex" alignItems="center" gap={1} mb={1.5}>
-  <FontAwesomeIcon icon={faFileContract} />
-  <Typography variant="h6" gutterBottom color="primary" fontWeight="700">
-    Contract Terms
-  </Typography>
-</Box>
+                <FontAwesomeIcon icon={faFileContract} />
+                <Typography variant="h6" gutterBottom color="primary" fontWeight="700">
+                  Contract Terms
+                </Typography>
+              </Box>
 
 
-              <Box sx={{ p: 2.5, background: 'linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%)', borderRadius: '12px', mb: 3 }}>
+              <Box sx={{ p: 2.5, backgroundColor: '#e3f2fd', borderRadius: '12px', mb: 3 }}>
                 <Typography variant="body2" color="info.dark" fontWeight="600">
                   This agreement formalizes the collaboration between your brand and the influencer. Key terms include deliverables, timeline, compensation, and usage rights.
                 </Typography>
@@ -1384,36 +1463,36 @@ const SendContractDialog = ({ open, onClose, application, onSendContract }) => {
 
               <List dense>
                 {[
-                  { 
-                    icon: <CheckCircle color="success" />, 
-                    text: "Deliverables & Timeline", 
-                    subtext: "Clear specification of required content and submission deadlines" 
+                  {
+                    icon: <CheckCircle color="success" />,
+                    text: "Deliverables & Timeline",
+                    subtext: "Clear specification of required content and submission deadlines"
                   },
-                  { 
-                    icon: <AttachMoney color="primary" />, 
-                    text: "Compensation", 
-                    subtext: `${safeApplication.currency || 'USD'} ${safeApplication.budget || 'N/A'} upon satisfactory completion` 
+                  {
+                    icon: <AttachMoney color="primary" />,
+                    text: "Compensation",
+                    subtext: `${safeApplication.currency || 'USD'} ${safeApplication.budget || 'N/A'} upon satisfactory completion`
                   },
-                  { 
-                    icon: <Security color="info" />, 
-                    text: "Content Usage Rights", 
-                    subtext: "Brand receives rights to use submitted content for marketing" 
+                  {
+                    icon: <Security color="info" />,
+                    text: "Content Usage Rights",
+                    subtext: "Brand receives rights to use submitted content for marketing"
                   },
-                  { 
-                    icon: <VerifiedUser color="warning" />, 
-                    text: "Approval Process", 
-                    subtext: "Brand approval required before content publication" 
+                  {
+                    icon: <VerifiedUser color="warning" />,
+                    text: "Approval Process",
+                    subtext: "Brand approval required before content publication"
                   },
-                  { 
-                    icon: <Receipt color="secondary" />, 
-                    text: "Payment Terms", 
-                    subtext: "Payment released within 7 days of content approval" 
+                  {
+                    icon: <Receipt color="secondary" />,
+                    text: "Payment Terms",
+                    subtext: "Payment released within 7 days of content approval"
                   }
                 ].map((item, index) => (
                   <ListItem key={index}>
                     <ListItemIcon>{item.icon}</ListItemIcon>
-                    <ListItemText 
-                      primary={item.text} 
+                    <ListItemText
+                      primary={item.text}
                       secondary={item.subtext}
                     />
                   </ListItem>
@@ -1425,8 +1504,8 @@ const SendContractDialog = ({ open, onClose, application, onSendContract }) => {
       </DialogContent>
 
       <DialogActions sx={{ p: 3, gap: 2 }}>
-        <Button 
-          onClick={onClose} 
+        <Button
+          onClick={onClose}
           sx={{ borderRadius: '12px', px: 4, py: 1 }}
           variant="outlined"
         >
@@ -1437,13 +1516,13 @@ const SendContractDialog = ({ open, onClose, application, onSendContract }) => {
           onClick={handleSendContract}
           disabled={sending || loading}
           startIcon={sending ? <CircularProgress size={16} /> : <Email />}
-          sx={{ 
-            borderRadius: '12px', 
+          sx={{
+            borderRadius: '12px',
             px: 4,
             py: 1,
-            background: 'linear-gradient(135deg, #3b82f6 0%, #3b82f62 100%)',
+            backgroundColor: 'primary.main',
             '&:hover': {
-              background: 'linear-gradient(135deg, #3b82f6 0%, #3b82f6 100%)'
+              backgroundColor: 'primary.dark'
             }
           }}
         >
@@ -1451,6 +1530,135 @@ const SendContractDialog = ({ open, onClose, application, onSendContract }) => {
         </Button>
       </DialogActions>
     </Dialog>
+  );
+};
+
+// =============================================
+// 🖼️ MEDIA UTILITIES & COMPONENTS
+// =============================================
+
+const getMediaIcon = (mediaType) => {
+  switch (mediaType) {
+    case 'image': return <ImageIcon color="primary" />;
+    case 'video': return <VideoLibrary color="secondary" />;
+    case 'audio': return <Audiotrack color="info" />;
+    case 'document': return <PictureAsPdf color="error" />;
+    default: return <InsertDriveFile color="action" />;
+  }
+};
+
+const getMediaViewUrl = (media) => {
+  if (!media.file_id) return null;
+  const baseUrl = `${process.env.REACT_APP_API_URL || API_BASE_URL}/api/media/${media.file_id}`;
+
+  if (media.media_type === 'image' || media.media_type === 'video' || media.media_type === 'audio') {
+    return `${baseUrl}/view`;
+  }
+
+  return `${baseUrl}/download`;
+};
+
+const handleDownload = async (fileId, filename) => {
+  try {
+    const response = await campaignAPI.downloadMediaFile(fileId);
+    const url = window.URL.createObjectURL(response);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', filename || `file-${fileId}`);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url);
+  } catch (error) {
+    console.error('Error downloading file:', error);
+    const downloadUrl = `${process.env.REACT_APP_API_URL || API_BASE_URL}/api/media/${fileId}/download`;
+    window.open(downloadUrl, '_blank');
+  }
+};
+
+const MediaPreview = ({ media }) => {
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const [previewLoading, setPreviewLoading] = useState(false);
+  const [previewError, setPreviewError] = useState(null);
+
+  useEffect(() => {
+    const loadPreview = async () => {
+      if (media.media_type === 'image') {
+        setPreviewLoading(true);
+        try {
+          const viewUrl = getMediaViewUrl(media);
+          if (viewUrl) {
+            const response = await fetch(viewUrl);
+            if (response.ok) {
+              const blob = await response.blob();
+              setPreviewUrl(URL.createObjectURL(blob));
+            } else {
+              setPreviewError('Failed to load preview');
+            }
+          } else {
+            setPreviewError('No valid URL for preview');
+          }
+        } catch (error) {
+          console.error('Error loading preview:', error);
+          setPreviewError('Failed to load preview');
+        } finally {
+          setPreviewLoading(false);
+        }
+      }
+    };
+
+    loadPreview();
+
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [media]);
+
+  if (media.media_type === 'image') {
+    if (previewLoading) {
+      return (
+        <Box display="flex" justifyContent="center" alignItems="center" height="140px">
+          <CircularProgress size={30} />
+        </Box>
+      );
+    }
+
+    if (previewError) {
+      return (
+        <Box display="flex" justifyContent="center" alignItems="center" height="140px" flexDirection="column">
+          <ImageIcon color="disabled" />
+          <Typography variant="caption" color="text.secondary">
+            Preview unavailable
+          </Typography>
+        </Box>
+      );
+    }
+
+    if (previewUrl) {
+      return (
+        <img
+          src={previewUrl}
+          alt={media.filename}
+          style={{
+            width: '100%',
+            height: '140px',
+            objectFit: 'cover',
+            borderRadius: '12px'
+          }}
+        />
+      );
+    }
+  }
+
+  return (
+    <Box display="flex" justifyContent="center" alignItems="center" height="140px" flexDirection="column" sx={{ bgcolor: 'grey.50' }}>
+      {getMediaIcon(media.media_type)}
+      <Typography variant="caption" color="text.secondary" sx={{ mt: 1 }}>
+        {media.media_type?.toUpperCase() || 'FILE'}
+      </Typography>
+    </Box>
   );
 };
 
@@ -1471,11 +1679,11 @@ const MediaFilesDialog = ({ open, onClose, application }) => {
         setError('');
         try {
           let mediaData = [];
-          
+
           try {
             const response = await campaignAPI.getCampaignMediaFiles(application.campaign_id);
             if (response && Array.isArray(response)) {
-              mediaData = response.filter(media => 
+              mediaData = response.filter(media =>
                 media.influencer_id === application.influencer_id
               );
             }
@@ -1509,133 +1717,8 @@ const MediaFilesDialog = ({ open, onClose, application }) => {
     fetchMediaFiles();
   }, [open, application]);
 
-  const getMediaIcon = (mediaType) => {
-    switch (mediaType) {
-      case 'image': return <ImageIcon color="primary" />;
-      case 'video': return <VideoLibrary color="secondary" />;
-      case 'audio': return <Audiotrack color="info" />;
-      case 'document': return <PictureAsPdf color="error" />;
-      default: return <InsertDriveFile color="action" />;
-    }
-  };
-
-  const handleDownload = async (fileId, filename) => {
-    try {
-      const response = await campaignAPI.downloadMediaFile(fileId);
-      const url = window.URL.createObjectURL(response);
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', filename || `file-${fileId}`);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error('Error downloading file:', error);
-      const downloadUrl = `${process.env.REACT_APP_API_URL || API_BASE_URL}/api/media/${fileId}/download`;
-      window.open(downloadUrl, '_blank');
-    }
-  };
-
   const handleViewMedia = (media) => {
     setSelectedMedia(media);
-  };
-
-  const getMediaViewUrl = (media) => {
-    if (!media.file_id) return null;
-    const baseUrl = `${process.env.REACT_APP_API_URL || API_BASE_URL}/api/media/${media.file_id}`;
-    
-    if (media.media_type === 'image' || media.media_type === 'video' || media.media_type === 'audio') {
-      return `${baseUrl}/view`;
-    }
-    
-    return `${baseUrl}/download`;
-  };
-
-  const MediaPreview = ({ media }) => {
-    const [previewUrl, setPreviewUrl] = useState(null);
-    const [previewLoading, setPreviewLoading] = useState(false);
-    const [previewError, setPreviewError] = useState(null);
-
-    useEffect(() => {
-      const loadPreview = async () => {
-        if (media.media_type === 'image') {
-          setPreviewLoading(true);
-          try {
-            const viewUrl = getMediaViewUrl(media);
-            if (viewUrl) {
-              const response = await fetch(viewUrl);
-              if (response.ok) {
-                const blob = await response.blob();
-                setPreviewUrl(URL.createObjectURL(blob));
-              } else {
-                setPreviewError('Failed to load preview');
-              }
-            } else {
-              setPreviewError('No valid URL for preview');
-            }
-          } catch (error) {
-            console.error('Error loading preview:', error);
-            setPreviewError('Failed to load preview');
-          } finally {
-            setPreviewLoading(false);
-          }
-        }
-      };
-
-      loadPreview();
-
-      return () => {
-        if (previewUrl) {
-          URL.revokeObjectURL(previewUrl);
-        }
-      };
-    }, [media]);
-
-    if (media.media_type === 'image') {
-      if (previewLoading) {
-        return (
-          <Box display="flex" justifyContent="center" alignItems="center" height="140px">
-            <CircularProgress size={30} />
-          </Box>
-        );
-      }
-
-      if (previewError) {
-        return (
-          <Box display="flex" justifyContent="center" alignItems="center" height="140px" flexDirection="column">
-            <ImageIcon color="disabled" />
-            <Typography variant="caption" color="text.secondary">
-              Preview unavailable
-            </Typography>
-          </Box>
-        );
-      }
-
-      if (previewUrl) {
-        return (
-          <img
-            src={previewUrl}
-            alt={media.filename}
-            style={{
-              width: '100%',
-              height: '140px',
-              objectFit: 'cover',
-              borderRadius: '12px'
-            }}
-          />
-        );
-      }
-    }
-
-    return (
-      <Box display="flex" justifyContent="center" alignItems="center" height="140px" flexDirection="column">
-        {getMediaIcon(media.media_type)}
-        <Typography variant="caption" color="text.secondary" sx={{ mt: 1 }}>
-          {media.media_type?.toUpperCase() || 'FILE'}
-        </Typography>
-      </Box>
-    );
   };
 
   if (!application) return null;
@@ -1647,17 +1730,17 @@ const MediaFilesDialog = ({ open, onClose, application }) => {
         onClose={onClose}
         maxWidth="lg"
         fullWidth
-        PaperProps={{ 
-          sx: { 
-            borderRadius: '20px', 
+        PaperProps={{
+          sx: {
+            borderRadius: '20px',
             minHeight: '600px',
-            background: 'linear-gradient(135deg, #ffffff 0%, #f8faff 100%)'
-          } 
+            background: '#ffffff'
+          }
         }}
       >
-        <DialogTitle sx={{ 
-          background: 'linear-gradient(135deg, #FF9800 0%, #F57C00 100%)',
-          color: 'white', 
+        <DialogTitle sx={{
+          backgroundColor: '#FF9800',
+          color: 'white',
           fontWeight: 700,
           py: 3
         }}>
@@ -1679,7 +1762,7 @@ const MediaFilesDialog = ({ open, onClose, application }) => {
             </IconButton>
           </Box>
         </DialogTitle>
-        
+
         <DialogContent dividers sx={{ p: 4 }}>
           {/* Application Info */}
           <Box sx={{ p: 3, background: 'white', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)', mb: 4 }}>
@@ -1707,10 +1790,10 @@ const MediaFilesDialog = ({ open, onClose, application }) => {
                       Status
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                    <StatusChip 
-                      label={application.status === 'media_submitted' ? 'Ready for Review' : application.status} 
-                      status={application.status}
-                    />
+                      <StatusChip
+                        label={application.status === 'media_submitted' ? 'Ready for Review' : application.status}
+                        status={application.status}
+                      />
                     </Typography>
                   </Box>
                   {application.budget && (
@@ -1729,12 +1812,12 @@ const MediaFilesDialog = ({ open, onClose, application }) => {
           </Box>
 
           {error && (
-            <Alert 
-              severity="error" 
+            <Alert
+              severity="error"
               sx={{ mb: 3, borderRadius: '12px' }}
               action={
-                <Button 
-                  color="inherit" 
+                <Button
+                  color="inherit"
                   size="small"
                   onClick={() => window.location.reload()}
                 >
@@ -1779,7 +1862,7 @@ const MediaFilesDialog = ({ open, onClose, application }) => {
                     <CardContent sx={{ p: 2.5 }}>
                       {/* Media Preview */}
                       <MediaPreview media={media} />
-                      
+
                       <Box display="flex" alignItems="center" gap={1} mb={1} sx={{ mt: 2 }}>
                         {getMediaIcon(media.media_type)}
                         <Box flex={1}>
@@ -1791,7 +1874,7 @@ const MediaFilesDialog = ({ open, onClose, application }) => {
                           </Typography>
                         </Box>
                       </Box>
-                      
+
                       {media.description && (
                         <Typography variant="body2" sx={{ mb: 1, fontStyle: 'italic', fontSize: '0.8rem' }} noWrap>
                           "{media.description}"
@@ -1804,7 +1887,7 @@ const MediaFilesDialog = ({ open, onClose, application }) => {
                         </Typography>
                       )}
                     </CardContent>
-                    
+
                     <CardActions sx={{ p: 2, pt: 0, gap: 1 }}>
                       <Button
                         size="small"
@@ -1834,8 +1917,8 @@ const MediaFilesDialog = ({ open, onClose, application }) => {
         </DialogContent>
 
         <DialogActions sx={{ p: 3 }}>
-          <Button onClick={onClose} sx={{ borderRadius: '12px', px: 4 }}>
-            Close
+          <Button onClick={onClose} variant="contained" sx={{ borderRadius: '12px', px: 4 }}>
+            Close Media Manager
           </Button>
         </DialogActions>
       </Dialog>
@@ -1846,92 +1929,183 @@ const MediaFilesDialog = ({ open, onClose, application }) => {
         onClose={() => setSelectedMedia(null)}
         maxWidth="md"
         fullWidth
-        PaperProps={{ sx: { borderRadius: '20px' } }}
+        PaperProps={{ sx: { borderRadius: '20px', overflow: 'hidden' } }}
       >
-        {selectedMedia && (
-          <>
-            <DialogTitle sx={{ background: 'linear-gradient(135deg, #2196F3 0%, #0D47A1 100%)', color: 'white' }}>
-              <Box display="flex" alignItems="center" justifyContent="space-between">
-                <Typography variant="h6" fontWeight="600">
-                  {selectedMedia.filename || 'Media File'}
-                </Typography>
-                <IconButton onClick={() => setSelectedMedia(null)} sx={{ color: 'white' }}>
-                  <Close />
-                </IconButton>
-              </Box>
-            </DialogTitle>
-            <DialogContent dividers sx={{ p: 0, textAlign: 'center', minHeight: '500px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              {selectedMedia.media_type === 'image' ? (
-                <img
-                  src={getMediaViewUrl(selectedMedia)}
-                  alt={selectedMedia.filename}
-                  style={{ 
-                    maxWidth: '100%', 
-                    maxHeight: '70vh', 
-                    objectFit: 'contain',
-                    borderRadius: '12px'
-                  }}
-                  onError={(e) => {
-                    console.error('Image failed to load:', selectedMedia);
-                    e.target.style.display = 'none';
-                  }}
-                />
-              ) : selectedMedia.media_type === 'video' ? (
-                <video
-                  controls
-                  style={{ 
-                    maxWidth: '100%', 
-                    maxHeight: '70vh',
-                    borderRadius: '12px'
-                  }}
-                >
-                  <source src={getMediaViewUrl(selectedMedia)} type={selectedMedia.content_type} />
-                  Your browser does not support the video tag.
-                </video>
-              ) : selectedMedia.media_type === 'audio' ? (
-                <Box py={6} width="100%">
-                  <Audiotrack sx={{ fontSize: 80, color: 'primary.main', mb: 3 }} />
-                  <audio
-                    controls
-                    style={{ width: '100%', maxWidth: '400px' }}
-                  >
-                    <source src={getMediaViewUrl(selectedMedia)} type={selectedMedia.content_type} />
-                    Your browser does not support the audio tag.
-                  </audio>
-                </Box>
-              ) : (
-                <Box py={6} width="100%">
-                  {getMediaIcon(selectedMedia.media_type)}
-                  <Typography variant="h6" gutterBottom sx={{ mt: 2 }}>
-                    Preview not available
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                    Please download the file to view its contents
-                  </Typography>
-                  <Button
-                    variant="contained"
-                    startIcon={<Download />}
-                    onClick={() => handleDownload(selectedMedia.file_id, selectedMedia.filename)}
-                    sx={{ borderRadius: '12px' }}
-                  >
-                    Download File
-                  </Button>
-                </Box>
-              )}
-            </DialogContent>
-            {selectedMedia.description && (
-              <Box sx={{ p: 3, borderTop: '1px solid', borderColor: 'divider' }}>
-                <Typography variant="body1" color="text.secondary">
-                  <strong>Description:</strong> {selectedMedia.description}
-                </Typography>
-              </Box>
-            )}
-          </>
-        )}
+        <DialogTitle sx={{ backgroundColor: '#333', color: 'white' }}>
+          <Box display="flex" justifyContent="space-between" alignItems="center">
+            <Typography variant="h6">{selectedMedia?.filename || 'Media View'}</Typography>
+            <IconButton onClick={() => setSelectedMedia(null)} sx={{ color: 'white' }}>
+              <Close />
+            </IconButton>
+          </Box>
+        </DialogTitle>
+        <DialogContent sx={{ p: 0, backgroundColor: '#000', display: 'flex', justifyContent: 'center', minHeight: '400px' }}>
+          {selectedMedia?.media_type === 'image' && (
+            <img
+              src={getMediaViewUrl(selectedMedia)}
+              alt="Preview"
+              style={{ maxWidth: '100%', maxHeight: '80vh', objectFit: 'contain' }}
+            />
+          )}
+          {selectedMedia?.media_type === 'video' && (
+            <video
+              src={getMediaViewUrl(selectedMedia)}
+              controls
+              style={{ maxWidth: '100%', maxHeight: '80vh' }}
+              autoPlay
+            />
+          )}
+          {selectedMedia?.media_type === 'audio' && (
+            <Box display="flex" alignItems="center" justifyContent="center" width="100%" p={4}>
+              <audio src={getMediaViewUrl(selectedMedia)} controls autoPlay />
+            </Box>
+          )}
+          {!['image', 'video', 'audio'].includes(selectedMedia?.media_type) && (
+            <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" p={6} color="white">
+              <PictureAsPdf sx={{ fontSize: 80, mb: 2 }} />
+              <Typography>Preview not available for this file type.</Typography>
+              <Button
+                variant="contained"
+                onClick={() => handleDownload(selectedMedia.file_id, selectedMedia.filename)}
+                sx={{ mt: 3 }}
+              >
+                Download to View
+              </Button>
+            </Box>
+          )}
+        </DialogContent>
       </Dialog>
     </>
   );
 };
+
+/* =============================================
+   📁 APPLICATION MEDIA GALLERY (In-place Preview)
+   ============================================= */
+const ApplicationMediaGallery = ({ application }) => {
+  const [mediaFiles, setMediaFiles] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [mediaDialogOpen, setMediaDialogOpen] = useState(false);
+
+  useEffect(() => {
+    const fetchMedia = async () => {
+      if (!application) return;
+      setLoading(true);
+      setError('');
+      try {
+        const response = await campaignAPI.getCampaignMediaFiles(application.campaign_id);
+        if (response && Array.isArray(response)) {
+          const userMedia = response.filter(m => m.influencer_id === application.influencer_id);
+          setMediaFiles(userMedia);
+
+          if (userMedia.length === 0 && application.submitted_media) {
+            setMediaFiles(application.submitted_media);
+          }
+        } else if (application.submitted_media) {
+          setMediaFiles(application.submitted_media);
+        }
+      } catch (err) {
+        console.error('Fetch error:', err);
+        if (application.submitted_media) {
+          setMediaFiles(application.submitted_media);
+        } else {
+          setError('Failed to load media files');
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMedia();
+  }, [application]);
+
+  if (loading) return (
+    <Box display="flex" justifyContent="center" py={8} flexDirection="column" alignItems="center" gap={2}>
+      <CircularProgress thickness={5} size={40} />
+      <Typography variant="body2" color="text.secondary">Fetching media files...</Typography>
+    </Box>
+  );
+
+  if (error && mediaFiles.length === 0) return (
+    <Box textAlign="center" py={6} bgcolor="error.light" sx={{ opacity: 0.1, borderRadius: '16px' }}>
+      <Typography color="error">{error}</Typography>
+    </Box>
+  );
+
+  if (mediaFiles.length === 0) return (
+    <Box textAlign="center" py={8} bgcolor="grey.50" borderRadius="24px" border="2px dashed" borderColor="divider">
+      <ImageIcon sx={{ fontSize: 48, color: 'text.disabled', mb: 2, opacity: 0.5 }} />
+      <Typography color="text.secondary" fontWeight="600">No media files submitted yet.</Typography>
+      <Typography variant="caption" color="text.disabled">Submitted content will appear here directly.</Typography>
+    </Box>
+  );
+
+  return (
+    <Box>
+      <Grid container spacing={2}>
+        {mediaFiles.map((media, index) => (
+          <Grid item xs={12} sm={6} md={4} key={media.file_id || index}>
+            <Paper
+              elevation={0}
+              sx={{
+                borderRadius: '16px',
+                overflow: 'hidden',
+                border: '1px solid',
+                borderColor: 'divider',
+                position: 'relative',
+                cursor: 'pointer',
+                aspectRatio: '1/1',
+                '&:hover': {
+                  transform: 'translateY(-4px)',
+                  boxShadow: '0 12px 24px rgba(0,0,0,0.12)',
+                  borderColor: 'primary.light'
+                },
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+              }}
+              onClick={() => setMediaDialogOpen(true)}
+            >
+              <MediaPreview media={media} />
+            </Paper>
+            <Typography variant="caption" sx={{ mt: 1, display: 'block', px: 1, color: 'text.secondary', fontWeight: 600 }} noWrap>
+              {media.filename || `Media Asset ${index + 1}`}
+            </Typography>
+          </Grid>
+        ))}
+      </Grid>
+
+      <Box mt={4} display="flex" justifyContent="center">
+        <Button
+          variant="outlined"
+          startIcon={<Visibility />}
+          onClick={() => setMediaDialogOpen(true)}
+          sx={{
+            borderRadius: '25px',
+            px: 4,
+            fontWeight: 700,
+            textTransform: 'none',
+            borderWidth: '2px',
+            '&:hover': {
+              borderWidth: '2px',
+              backgroundColor: 'primary.main',
+              color: 'white'
+            }
+          }}
+        >
+          View All {mediaFiles.length} Media Files
+        </Button>
+      </Box>
+
+      <MediaFilesDialog
+        open={mediaDialogOpen}
+        onClose={() => setMediaDialogOpen(false)}
+        application={application}
+      />
+    </Box>
+  );
+};
+
+
 
 // =============================================
 // 🎯 MAIN COMPONENT - BRAND APPLICATIONS
@@ -1942,7 +2116,7 @@ const BrandApplications = () => {
   const navigate = useNavigate();
   const { token } = useContext(AuthContext);
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  
+
   // State Management
   const [applications, setApplications] = useState([]);
   const [filteredApplications, setFilteredApplications] = useState([]);
@@ -1954,9 +2128,25 @@ const BrandApplications = () => {
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const [sendContractDialogOpen, setSendContractDialogOpen] = useState(false);
   const [mediaFilesDialogOpen, setMediaFilesDialogOpen] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('all');
   const [detailTab, setDetailTab] = useState('overview');
+  const [isTabSticky, setIsTabSticky] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentY = window.scrollY;
+      if (currentY > 80) {
+        setIsTabSticky(true);
+      } else {
+        setIsTabSticky(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   // Enhanced Filter State
   const [filters, setFilters] = useState({
@@ -1968,9 +2158,18 @@ const BrandApplications = () => {
     status: [],
     minBudget: '',
     maxBudget: '',
+    currency: '',
+    requirements: '',
+    message: '',
     dateRange: '',
     startDate: '',
-    endDate: ''
+    endDate: '',
+    minFollowers: 0,
+    maxFollowers: 1000000,
+    minEngagement: 0,
+    maxEngagement: 100,
+    minViews: 0,
+    minLikes: 0
   });
 
   // Fetch applications on component mount
@@ -1986,10 +2185,11 @@ const BrandApplications = () => {
     if (activeTab !== 'all') {
       filtered = filtered.filter(app => {
         switch (activeTab) {
-          case 'approved': return app.status === 'approved';
+          case 'approved': return app.status === 'approved' && !app.contract_sent;
           case 'pending': return app.status === 'pending';
           case 'rejected': return app.status === 'rejected';
-          case 'contracted': return app.status === 'contracted' || app.contract_signed;
+          case 'sent': return app.contract_sent && !app.contract_signed;
+          case 'contracted': return app.contract_signed;
           case 'media_submitted': return app.status === 'media_submitted';
           case 'completed': return app.status === 'completed';
           default: return true;
@@ -2000,37 +2200,56 @@ const BrandApplications = () => {
     // Global search
     if (filters.globalSearch) {
       const query = filters.globalSearch.toLowerCase();
-      filtered = filtered.filter(app => 
-        (app.influencer_name?.toLowerCase().includes(query) ||
-         app.title?.toLowerCase().includes(query) ||
-         app.influencer_email?.toLowerCase().includes(query) ||
-         app.message?.toLowerCase().includes(query) ||
-         app.category?.toLowerCase().includes(query))
+      filtered = filtered.filter(app =>
+      (app.influencer_name?.toLowerCase().includes(query) ||
+        app.title?.toLowerCase().includes(query) ||
+        app.influencer_email?.toLowerCase().includes(query) ||
+        app.message?.toLowerCase().includes(query) ||
+        app.category?.toLowerCase().includes(query) ||
+        app.requirements?.toLowerCase().includes(query))
       );
     }
 
     // Individual filters
     if (filters.title) {
-      filtered = filtered.filter(app => 
+      filtered = filtered.filter(app =>
         app.title?.toLowerCase().includes(filters.title.toLowerCase())
       );
     }
 
     if (filters.influencerName) {
-      filtered = filtered.filter(app => 
+      filtered = filtered.filter(app =>
         app.influencer_name?.toLowerCase().includes(filters.influencerName.toLowerCase())
       );
     }
 
     if (filters.influencerEmail) {
-      filtered = filtered.filter(app => 
+      filtered = filtered.filter(app =>
         app.influencer_email?.toLowerCase().includes(filters.influencerEmail.toLowerCase())
       );
     }
 
     if (filters.category) {
-      filtered = filtered.filter(app => 
+      filtered = filtered.filter(app =>
         app.category?.toLowerCase() === filters.category.toLowerCase()
+      );
+    }
+
+    if (filters.requirements) {
+      filtered = filtered.filter(app =>
+        app.requirements?.toLowerCase().includes(filters.requirements.toLowerCase())
+      );
+    }
+
+    if (filters.message) {
+      filtered = filtered.filter(app =>
+        app.message?.toLowerCase().includes(filters.message.toLowerCase())
+      );
+    }
+
+    if (filters.currency) {
+      filtered = filtered.filter(app =>
+        app.currency === filters.currency
       );
     }
 
@@ -2040,16 +2259,16 @@ const BrandApplications = () => {
       filtered = filtered.filter(app => filters.status.includes(app.status));
     }
 
-    
+
 
     if (filters.minBudget) {
-      filtered = filtered.filter(app => 
+      filtered = filtered.filter(app =>
         app.budget && app.budget >= parseInt(filters.minBudget)
       );
     }
 
     if (filters.maxBudget) {
-      filtered = filtered.filter(app => 
+      filtered = filtered.filter(app =>
         app.budget && app.budget <= parseInt(filters.maxBudget)
       );
     }
@@ -2080,6 +2299,25 @@ const BrandApplications = () => {
       });
     }
 
+    // Performance Metrics Filtering
+    if (filters.minFollowers > 0 || filters.maxFollowers < 1000000) {
+      filtered = filtered.filter(app => {
+        const followers = app.influencer_followers || 0;
+        return followers >= filters.minFollowers && followers <= filters.maxFollowers;
+      });
+    }
+
+    if (filters.minEngagement > 0) {
+      filtered = filtered.filter(app => {
+        const er = parseFloat(app.influencer_engagement_rate) || 0;
+        return er >= filters.minEngagement;
+      });
+    }
+
+    if (filters.minViews > 0) {
+      filtered = filtered.filter(app => (app.influencer_avg_views || 0) >= filters.minViews);
+    }
+
     setFilteredApplications(filtered);
   }, [applications, filters, activeTab]);
 
@@ -2089,11 +2327,11 @@ const BrandApplications = () => {
       setLoading(true);
       setError('');
       const response = await campaignAPI.getBrandApplications();
-      
-      const appsData = Array.isArray(response) ? response : 
-                      response.data ? response.data : 
-                      response.applications ? response.applications : [];
-      
+
+      const appsData = Array.isArray(response) ? response :
+        response.data ? response.data :
+          response.applications ? response.applications : [];
+
       setApplications(appsData);
     } catch (err) {
       setError('Failed to load applications. Please check your connection and try again.');
@@ -2108,13 +2346,13 @@ const BrandApplications = () => {
   const handleStatusChange = async (campaignId, influencerId, newStatus) => {
     const key = `${campaignId}-${influencerId}`;
     setUpdatingStatus(prev => ({ ...prev, [key]: true }));
-    
+
     try {
       await campaignAPI.updateApplicationStatus(campaignId, influencerId, { status: newStatus });
-      
+
       if (newStatus === 'approved') {
         setSuccess(`Application approved! You can now send the contract agreement.`);
-        const approvedApp = applications.find(app => 
+        const approvedApp = applications.find(app =>
           app.campaign_id === campaignId && app.influencer_id === influencerId
         );
         if (approvedApp) {
@@ -2124,7 +2362,7 @@ const BrandApplications = () => {
       } else {
         setSuccess(`Application ${newStatus} successfully!`);
       }
-      
+
       await fetchApplications();
     } catch (err) {
       console.error('Status update error:', err);
@@ -2141,15 +2379,15 @@ const BrandApplications = () => {
         setError("You must be logged in to send a contract.");
         return;
       }
-      
+
       if (!application?.campaign_id || !application?.influencer_id) {
         setError("Invalid application data. Cannot send contract.");
         return;
       }
-      
+
       await campaignAPI.sendContractAgreement(application.campaign_id, application.influencer_id, token);
       setSuccess('Contract agreement sent successfully!');
-      
+
       await fetchApplications();
       navigate('/brand/agreements');
     } catch (err) {
@@ -2171,7 +2409,14 @@ const BrandApplications = () => {
   };
 
   const handleDirectChat = (application) => {
-    navigate(`/brand/collaborations?user=${application.influencer_id}&campaign=${application.campaign_id}`);
+    const params = new URLSearchParams({
+      user: application.influencer_id,
+      campaign: application.campaign_id,
+      title: application.title,
+      budget: application.budget || '',
+      currency: application.currency || 'USD'
+    });
+    navigate(`/brand/collaborations?${params.toString()}`);
   };
 
   const handleProcessPayment = (application) => {
@@ -2179,7 +2424,7 @@ const BrandApplications = () => {
       setError('Invalid application data for payment processing');
       return;
     }
-    
+
     navigate(`/brand/payments?campaign=${application.campaign_id}&influencer=${application.influencer_id}`);
   };
 
@@ -2216,17 +2461,32 @@ const BrandApplications = () => {
       status: [],
       minBudget: '',
       maxBudget: '',
+      currency: '',
+      requirements: '',
+      message: '',
       dateRange: '',
       startDate: '',
-      endDate: ''
+      endDate: '',
+      minFollowers: 0,
+      maxFollowers: 1000000,
+      minEngagement: 0,
+      maxEngagement: 100,
+      minViews: 0,
+      minLikes: 0
     });
   };
 
   const getActiveFilterCount = () => {
-    return Object.values(filters).filter(value => 
-      value !== '' && 
-      !(Array.isArray(value) && value.length === 0)
-    ).length;
+    return Object.keys(filters).filter(key => {
+      const value = filters[key];
+      if (key === 'minFollowers' && value === 0) return false;
+      if (key === 'maxFollowers' && value === 1000000) return false;
+      if (key === 'minEngagement' && value === 0) return false;
+      if (key === 'maxEngagement' && value === 100) return false;
+      if (key === 'minViews' && value === 0) return false;
+      if (key === 'minLikes' && value === 0) return false;
+      return value !== '' && !(Array.isArray(value) && value.length === 0);
+    }).length;
   };
 
   // Utility functions
@@ -2245,13 +2505,14 @@ const BrandApplications = () => {
     }
   };
 
-  const getStatusText = (status) => {
+  const getStatusText = (app) => {
+    const status = app?.status;
     switch (status) {
       case 'pending': return 'Under Review';
       case 'approved': return 'Approved - Send Contract';
       case 'rejected': return 'Rejected';
       case 'completed': return 'Completed';
-      case 'contracted': return 'Contract Signed';
+      case 'contracted': return app?.contract_signed ? 'Contract Signed' : 'Contract Sent';
       case 'media_submitted': return 'Media Submitted';
       default: return status?.charAt(0).toUpperCase() + status?.slice(1) || 'Unknown';
     }
@@ -2274,7 +2535,7 @@ const BrandApplications = () => {
               disabled={updatingStatus[`${app.campaign_id}-${app.influencer_id}`]}
               sx={{ borderRadius: '8px', fontSize: '0.7rem', flex: 1 }}
             >
-              {updatingStatus[`${app.campaign_id}-${app.influencer_id}`] ? 
+              {updatingStatus[`${app.campaign_id}-${app.influencer_id}`] ?
                 <CircularProgress size={14} /> : 'Approve'}
             </Button>
             <Button
@@ -2286,12 +2547,12 @@ const BrandApplications = () => {
               disabled={updatingStatus[`${app.campaign_id}-${app.influencer_id}`]}
               sx={{ borderRadius: '8px', fontSize: '0.7rem', flex: 1 }}
             >
-              {updatingStatus[`${app.campaign_id}-${app.influencer_id}`] ? 
+              {updatingStatus[`${app.campaign_id}-${app.influencer_id}`] ?
                 <CircularProgress size={14} /> : 'Reject'}
             </Button>
           </Box>
         );
-      
+
       case 'approved':
         return (
           <Button
@@ -2308,14 +2569,21 @@ const BrandApplications = () => {
             Send Contract
           </Button>
         );
-      
+
       case 'contracted':
+        if (!app.contract_signed) {
+          return (
+            <Typography variant="caption" color="text.secondary" textAlign="center">
+              Contract Sent - Waiting for Signature
+            </Typography>
+          );
+        }
         return (
           <Typography variant="caption" color="text.secondary" textAlign="center">
             Waiting for media submission...
           </Typography>
         );
-      
+
       case 'media_submitted':
         return (
           <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', width: '100%' }}>
@@ -2341,7 +2609,7 @@ const BrandApplications = () => {
             </Button>
           </Box>
         );
-      
+
       case 'completed':
         return (
           <Button
@@ -2355,7 +2623,7 @@ const BrandApplications = () => {
             View Media
           </Button>
         );
-      
+
       default:
         return null;
     }
@@ -2366,9 +2634,10 @@ const BrandApplications = () => {
     total: applications.length,
     filtered: filteredApplications.length,
     pending: applications.filter(app => app.status === 'pending').length,
-    approved: applications.filter(app => app.status === 'approved').length,
+    approved: applications.filter(app => app.status === 'approved' && !app.contract_sent).length,
     rejected: applications.filter(app => app.status === 'rejected').length,
-    contracted: applications.filter(app => app.status === 'contracted' || app.contract_signed).length,
+    sent: applications.filter(app => app.contract_sent && !app.contract_signed).length,
+    contracted: applications.filter(app => app.contract_signed).length,
     media_submitted: applications.filter(app => app.status === 'media_submitted').length,
     completed: applications.filter(app => app.status === 'completed').length
   };
@@ -2379,6 +2648,7 @@ const BrandApplications = () => {
     pending: applicationCounts.pending,
     approved: applicationCounts.approved,
     rejected: applicationCounts.rejected,
+    sent: applicationCounts.sent,
     contracted: applicationCounts.contracted,
     media_submitted: applicationCounts.media_submitted,
     completed: applicationCounts.completed
@@ -2405,9 +2675,11 @@ const BrandApplications = () => {
             <Typography variant="h3" component="h1" fontWeight="800" gutterBottom color="primary">
               Influencer Applications
             </Typography>
-            <Typography variant="h6" color="text.secondary" sx={{ maxWidth: '600px' }}>
-              Manage and review influencer applications for your campaigns. Track progress, communicate with influencers, and process payments.
-            </Typography>
+            <Box display="flex" alignItems="center" gap={2}>
+              <Typography variant="h6" color="text.secondary" sx={{ maxWidth: '600px' }}>
+                Manage and review influencer applications for your campaigns.
+              </Typography>
+            </Box>
           </Box>
           <Box display="flex" gap={1} flexWrap="wrap">
             <Button
@@ -2429,142 +2701,235 @@ const BrandApplications = () => {
             </Button>
           </Box>
         </Box>
+      </Box>
 
-        {/* Campaign Metrics */}
-        {/* <CampaignMetrics applications={applications} /> */}
-
+      {/* Static Sticky Header Container (Search + Tabs) */}
+      <Box
+        sx={{
+          position: 'sticky',
+          top: '0px',
+          zIndex: 1100,
+          transition: 'all 0.3s ease',
+          mb: 3
+        }}
+      >
         {/* Global Search Bar */}
-        <SearchBar>
+        <SearchBar sx={{ pr: '6px', mb: 2 }}>
           <Search sx={{ color: 'primary.main', mr: 1 }} />
           <InputBase
             fullWidth
-            placeholder="Search applications by influencer name, campaign title, email, category..."
+            placeholder="Search applications by name, campaign, keywords..."
             value={filters.globalSearch}
             onChange={(e) => handleFilterChange('globalSearch', e.target.value)}
             sx={{ ml: 1, flex: 1, fontSize: '1rem' }}
           />
           {filters.globalSearch && (
-            <IconButton size="small" onClick={() => handleFilterChange('globalSearch', '')}>
+            <IconButton size="small" onClick={() => handleFilterChange('globalSearch', '')} sx={{ mr: 1 }}>
               <Close />
             </IconButton>
           )}
+
+          <Divider sx={{ height: 28, mx: 1 }} orientation="vertical" />
+
+          <Button
+            variant="contained"
+            disableElevation
+            startIcon={<FilterList />}
+            onClick={() => isMobile ? setFilterDrawerOpen(true) : setShowFilters(!showFilters)}
+            sx={{
+              borderRadius: '25px',
+              textTransform: 'none',
+              px: { xs: 2, md: 3 },
+              py: 0.8,
+              fontWeight: 700,
+              boxShadow: 'none',
+              '&:hover': {
+                boxShadow: '0 4px 12px rgba(25, 118, 210, 0.2)'
+              }
+            }}
+          >
+            <Box display={{ xs: 'none', sm: 'block' }}>Filters</Box>
+            {getActiveFilterCount() > 0 && (
+              <Badge
+                badgeContent={getActiveFilterCount()}
+                color="error"
+                sx={{
+                  ml: { xs: 0, sm: 1.5 },
+                  '& .MuiBadge-badge': {
+                    border: '2px solid white'
+                  }
+                }}
+              />
+            )}
+          </Button>
         </SearchBar>
 
-        {/* Status Tabs with Animation */}
-        <Paper sx={{ borderRadius: '20px', mb: 3, boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)', overflow: 'hidden' }}>
+        {/* Status Tabs with Smart Sticky Behavior (LinkedIn Style) */}
+        <Paper
+          sx={{
+            borderRadius: '20px',
+            boxShadow: isTabSticky
+              ? '0 12px 40px rgba(0, 0, 0, 0.15)'
+              : '0 8px 32px rgba(0, 0, 0, 0.08)',
+            overflow: 'hidden',
+            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+            backdropFilter: 'blur(12px)',
+            border: '1px solid rgba(255, 255, 255, 0.3)'
+          }}
+        >
           <Tabs
             value={activeTab}
             onChange={(e, newValue) => setActiveTab(newValue)}
             variant="scrollable"
             scrollButtons="auto"
-            sx={{ 
+            sx={{
               px: 2,
               '& .MuiTabs-indicator': {
                 display: 'none'
               }
             }}
           >
-            <AnimatedTab 
+            <AnimatedTab
               label={
                 <Box display="flex" alignItems="center">
                   <Work sx={{ mr: 1, fontSize: 20 }} />
                   All Applications
                   <Chip label={tabCounts.all} size="small" sx={{ ml: 1 }} color="primary" />
                 </Box>
-              } 
-              value="all" 
+              }
+              value="all"
             />
-            <AnimatedTab 
+            <AnimatedTab
               label={
                 <Box display="flex" alignItems="center">
                   <AccessTime sx={{ mr: 1, fontSize: 20 }} />
                   Under Review
                   <Chip label={tabCounts.pending} size="small" sx={{ ml: 1 }} color="warning" />
                 </Box>
-              } 
-              value="pending" 
+              }
+              value="pending"
             />
-            <AnimatedTab 
+            <AnimatedTab
               label={
                 <Box display="flex" alignItems="center">
                   <Check sx={{ mr: 1, fontSize: 20 }} />
                   Approved
                   <Chip label={tabCounts.approved} size="small" sx={{ ml: 1 }} color="success" />
                 </Box>
-              } 
-              value="approved" 
+              }
+              value="approved"
             />
-            <AnimatedTab 
+            <AnimatedTab
+              label={
+                <Box display="flex" alignItems="center">
+                  <Send sx={{ mr: 1, fontSize: 20 }} />
+                  Contract Sent
+                  <Chip label={tabCounts.sent} size="small" sx={{ ml: 1 }} color="info" />
+                </Box>
+              }
+              value="sent"
+            />
+            <AnimatedTab
               label={
                 <Box display="flex" alignItems="center">
                   <AssignmentTurnedIn sx={{ mr: 1, fontSize: 20 }} />
-                  Contracted
+                  Contract Signed
                   <Chip label={tabCounts.contracted} size="small" sx={{ ml: 1 }} color="secondary" />
                 </Box>
-              } 
-              value="contracted" 
+              }
+              value="contracted"
             />
-            <AnimatedTab 
+            <AnimatedTab
               label={
                 <Box display="flex" alignItems="center">
                   <ImageIcon sx={{ mr: 1, fontSize: 20 }} />
                   Media Ready
                   <Chip label={tabCounts.media_submitted} size="small" sx={{ ml: 1 }} color="info" />
                 </Box>
-              } 
-              value="media_submitted" 
+              }
+              value="media_submitted"
             />
-            <AnimatedTab 
+            <AnimatedTab
               label={
                 <Box display="flex" alignItems="center">
                   <MonetizationOn sx={{ mr: 1, fontSize: 20 }} />
                   Completed
                   <Chip label={tabCounts.completed} size="small" sx={{ ml: 1 }} color="primary" />
                 </Box>
-              } 
-              value="completed" 
+              }
+              value="completed"
             />
-            <AnimatedTab 
+            <AnimatedTab
               label={
                 <Box display="flex" alignItems="center">
                   <Clear sx={{ mr: 1, fontSize: 20 }} />
                   Rejected
                   <Chip label={tabCounts.rejected} size="small" sx={{ ml: 1 }} color="error" />
                 </Box>
-              } 
-              value="rejected" 
+              }
+              value="rejected"
             />
           </Tabs>
         </Paper>
       </Box>
 
       {/* Main Content Area */}
-      <Box display="flex">
-        {/* Sidebar Filters - Hidden on mobile */}
+      <Box sx={{ width: '100%', position: 'relative' }}>
+        {/* Advanced Filter Drawer (Right Side) */}
         {!isMobile && (
-          <DetailedFilterSection
-            filters={filters}
-            onFilterChange={handleFilterChange}
-            onClearFilters={clearAllFilters}
-            applicationCounts={applicationCounts}
-          />
+          <Drawer
+            anchor="right"
+            open={showFilters}
+            onClose={() => setShowFilters(false)}
+            sx={{
+              '& .MuiDrawer-paper': {
+                width: '400px',
+                p: 0,
+                borderLeft: `1px solid ${theme.palette.divider}`,
+                boxShadow: '-8px 0 32px rgba(0, 0, 0, 0.08)',
+                background: '#ffffff',
+                height: '100%',
+                overflow: 'hidden'
+              }
+            }}
+          >
+            <AppBar position="sticky" elevation={1} sx={{ background: 'white', color: 'text.primary' }}>
+              <Toolbar>
+                <IconButton
+                  edge="start"
+                  color="inherit"
+                  onClick={() => setShowFilters(false)}
+                  aria-label="close"
+                >
+                  <Close />
+                </IconButton>
+                <Typography variant="h6" sx={{ ml: 2, flex: 1, fontWeight: 700 }}>
+                  Filters
+                </Typography>
+                <Button color="primary" onClick={clearAllFilters} sx={{ fontWeight: 600 }}>
+                  Clear All
+                </Button>
+              </Toolbar>
+            </AppBar>
+            <Box sx={{ height: 'calc(100% - 64px)', overflowY: 'auto' }}>
+              <DetailedFilterSection
+                filters={filters}
+                onFilterChange={handleFilterChange}
+                onClearFilters={clearAllFilters}
+                applicationCounts={applicationCounts}
+              />
+            </Box>
+          </Drawer>
         )}
 
         {/* Applications Grid */}
-        <Box sx={{ flex: 1 }}>
+        <Box
+          sx={{
+            flex: 1,
+            transition: 'all 0.3s ease'
+          }}
+        >
           {/* Mobile Filter Button */}
-          {isMobile && (
-            <Button
-              fullWidth
-              variant="outlined"
-              startIcon={<FilterList />}
-              onClick={() => setFilterDrawerOpen(true)}
-              sx={{ mb: 2, borderRadius: '12px', py: 1.5, fontWeight: 600 }}
-            >
-              Show Advanced Filters ({getActiveFilterCount()})
-            </Button>
-          )}
-
           {/* Alerts */}
           {error && (
             <Alert severity="error" sx={{ mb: 3, borderRadius: '12px' }} onClose={() => setError('')}>
@@ -2580,14 +2945,14 @@ const BrandApplications = () => {
 
           {/* Applications Grid */}
           {filteredApplications.length === 0 ? (
-            <Paper sx={{ textAlign: 'center', py: 8, borderRadius: '20px', background: 'linear-gradient(135deg, #ffffff 0%, #f8faff 100%)' }}>
+            <Paper sx={{ textAlign: 'center', py: 8, borderRadius: '20px', backgroundColor: '#ffffff' }}>
               <Box sx={{ color: 'text.secondary' }}>
                 <TrendingUp sx={{ fontSize: 80, mb: 2, opacity: 0.5 }} />
                 <Typography variant="h5" gutterBottom fontWeight="600">
                   {getActiveFilterCount() > 0 ? 'No matching applications found' : 'No applications received yet'}
                 </Typography>
                 <Typography variant="body1" sx={{ mb: 3, maxWidth: '400px', margin: '0 auto' }}>
-                  {getActiveFilterCount() > 0 
+                  {getActiveFilterCount() > 0
                     ? 'Try adjusting your filters or search criteria to see more results.'
                     : 'Applications from influencers will appear here once they apply to your campaigns. Create more campaigns to attract influencers!'
                   }
@@ -2600,9 +2965,29 @@ const BrandApplications = () => {
               </Box>
             </Paper>
           ) : (
-            <Grid container spacing={3} justifyContent="center">
+            <Grid
+              container
+              spacing={3}
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: {
+                  xs: '1fr',
+                  sm: 'repeat(2, 1fr)',
+                  lg: 'repeat(3, 1fr)'
+                },
+                gap: 3,
+                '& .MuiGrid-item': {
+                  padding: 0,
+                  width: '100%'
+                }
+              }}
+            >
               {filteredApplications.map((app) => (
-                <Grid item key={`${app.campaign_id}-${app.influencer_id}`}>
+                <Grid
+                  item
+                  key={`${app.campaign_id}-${app.influencer_id}`}
+                  sx={{ display: 'flex' }}
+                >
                   <Zoom in={true} style={{ transitionDelay: '100ms' }}>
                     <ProfessionalCard>
                       {/* Campaign Image with Budget Overlay */}
@@ -2611,7 +2996,7 @@ const BrandApplications = () => {
                         alt={app.title}
                         campaignData={app}
                       />
-                      
+
                       <CardContent sx={{ flexGrow: 1, p: 3, pb: 2 }}>
                         {/* Header with Influencer Info and Status */}
                         <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={2}>
@@ -2624,8 +3009,8 @@ const BrandApplications = () => {
                               size={44}
                             />
                           </Box>
-                          <StatusChip 
-                            label={getStatusText(app.status)} 
+                          <StatusChip
+                            label={getStatusText(app)}
                             status={app.status}
                             size="small"
                           />
@@ -2636,7 +3021,7 @@ const BrandApplications = () => {
                           <Typography variant="h6" fontWeight="700" color="primary" gutterBottom>
                             {app.title || 'Unknown Campaign'}
                           </Typography>
-                          
+
                           <Grid container spacing={1} sx={{ mb: 1.5 }}>
                             <Grid item xs={6}>
                               <Box display="flex" alignItems="center" gap={0.5}>
@@ -2664,16 +3049,16 @@ const BrandApplications = () => {
                                 {app.currency || 'USD'} {app.budget?.toLocaleString()}
                               </Typography>
                             </Box>
-                            
+
                           </Box>
 
                           {/* Campaign Description Preview */}
                           {app.description && (
-                            <Typography 
-                              variant="body2" 
+                            <Typography
+                              variant="body2"
                               sx={{
                                 p: 1.5,
-                                background: 'linear-gradient(135deg, #f5f7ff 0%, #f0f4ff 100%)',
+                                background: '#f5f7ff',
                                 borderRadius: '8px',
                                 fontSize: '0.75rem',
                                 lineHeight: 1.4,
@@ -2695,11 +3080,11 @@ const BrandApplications = () => {
                             <Typography variant="caption" color="text.secondary" fontWeight="600">
                               MESSAGE:
                             </Typography>
-                            <Typography 
-                              variant="body2" 
+                            <Typography
+                              variant="body2"
                               sx={{
                                 p: 1,
-                                background: 'rgba(102, 126, 234, 0.05)',
+                                backgroundColor: `${theme.palette.primary.main}10`,
                                 borderRadius: '6px',
                                 fontSize: '0.75rem',
                                 lineHeight: 1.4,
@@ -2726,14 +3111,14 @@ const BrandApplications = () => {
                               size="small"
                               startIcon={<Visibility />}
                               onClick={() => handleViewDetails(app)}
-                              sx={{ 
-                                borderRadius: '8px', 
-                                fontSize: '0.75rem', 
+                              sx={{
+                                borderRadius: '8px',
+                                fontSize: '0.75rem',
                                 flex: 2,
-                                background: 'linear-gradient(135deg, #667eea 0%, #3b82f6 100%)',
+                                backgroundColor: 'primary.main',
                                 color: 'white',
                                 '&:hover': {
-                                  background: 'linear-gradient(135deg, #5a6fd8 0%, #3b82f6 100%)'
+                                  backgroundColor: 'primary.dark'
                                 }
                               }}
                             >
@@ -2745,12 +3130,12 @@ const BrandApplications = () => {
                               <IconButton
                                 size="small"
                                 onClick={() => handleDirectChat(app)}
-                                sx={{ 
+                                sx={{
                                   borderRadius: '8px',
-                                  background: 'linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%)',
+                                  backgroundColor: '#4CAF50',
                                   color: 'white',
                                   '&:hover': {
-                                    background: 'linear-gradient(135deg, #43A047 0%, #1B5E20 100%)'
+                                    backgroundColor: '#388E3C'
                                   }
                                 }}
                               >
@@ -2766,10 +3151,10 @@ const BrandApplications = () => {
                                   onClick={() => handleViewMediaFiles(app)}
                                   sx={{ 
                                     borderRadius: '8px',
-                                    background: 'linear-gradient(135deg, #2196F3 0%, #0D47A1 100%)',
+                                    backgroundColor: theme.palette.info.main,
                                     color: 'white',
                                     '&:hover': {
-                                      background: 'linear-gradient(135deg, #1E88E5 0%, #0D47A1 100%)'
+                                      backgroundColor: theme.palette.info.dark
                                     }
                                   }}
                                 >
@@ -2797,12 +3182,12 @@ const BrandApplications = () => {
         anchor="left"
         open={filterDrawerOpen}
         onClose={() => setFilterDrawerOpen(false)}
-        sx={{ 
-          '& .MuiDrawer-paper': { 
-            width: 340, 
+        sx={{
+          '& .MuiDrawer-paper': {
+            width: 340,
             p: 2.5,
-            background: 'linear-gradient(135deg, #ffffff 0%, #f8faff 100%)'
-          } 
+            backgroundColor: '#ffffff'
+          }
         }}
       >
         <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
@@ -2825,17 +3210,17 @@ const BrandApplications = () => {
         onClose={handleCloseDialogs}
         maxWidth="lg"
         fullWidth
-        PaperProps={{ 
-          sx: { 
-            borderRadius: '20px', 
+        PaperProps={{
+          sx: {
+            borderRadius: '20px',
             minHeight: '700px',
-            background: 'linear-gradient(135deg, #ffffff 0%, #f8faff 100%)'
-          } 
+            background: '#ffffff'
+          }
         }}
       >
-        <DialogTitle sx={{ 
-          background: 'linear-gradient(135deg, #667eea 0%, #3b82f6 100%)',
-          color: 'white', 
+        <DialogTitle sx={{
+          backgroundColor: 'primary.main',
+          color: 'white',
           fontWeight: 700,
           py: 3
         }}>
@@ -2854,329 +3239,329 @@ const BrandApplications = () => {
             </IconButton>
           </Box>
         </DialogTitle>
-        
+
         <DialogContent dividers sx={{ p: 0 }}>
           {selectedApplication && (
             <TabContext value={detailTab}>
               <Box sx={{ borderBottom: 1, borderColor: 'divider', px: 3 }}>
                 <Tabs
-  value={detailTab}
-  onChange={(e, newValue) => setDetailTab(newValue)}
-  sx={{ 
-    '& .MuiTab-root': {
-      fontWeight: 600,
-      fontSize: '0.9rem'
-    }
-  }}
->
-  <Tab
-    value="overview"
-    label={
-      <Box display="flex" alignItems="center" gap={1}>
-        <FontAwesomeIcon icon={faChartPie} />
-        Overview
-      </Box>
-    }
-  />
+                  value={detailTab}
+                  onChange={(e, newValue) => setDetailTab(newValue)}
+                  sx={{
+                    '& .MuiTab-root': {
+                      fontWeight: 600,
+                      fontSize: '0.9rem'
+                    }
+                  }}
+                >
+                  <Tab
+                    value="overview"
+                    label={
+                      <Box display="flex" alignItems="center" gap={1}>
+                        <FontAwesomeIcon icon={faChartPie} />
+                        Overview
+                      </Box>
+                    }
+                  />
 
-  <Tab
-    value="workflow"
-    label={
-      <Box display="flex" alignItems="center" gap={1}>
-        <FontAwesomeIcon icon={faArrowsRotate} />
-        Workflow
-      </Box>
-    }
-  />
+                  <Tab
+                    value="workflow"
+                    label={
+                      <Box display="flex" alignItems="center" gap={1}>
+                        <FontAwesomeIcon icon={faArrowsRotate} />
+                        Workflow
+                      </Box>
+                    }
+                  />
 
-  <Tab
-    value="profile"
-    label={
-      <Box display="flex" alignItems="center" gap={1}>
-        <FontAwesomeIcon icon={faUser} />
-        Profile
-      </Box>
-    }
-  />
+                  <Tab
+                    value="profile"
+                    label={
+                      <Box display="flex" alignItems="center" gap={1}>
+                        <FontAwesomeIcon icon={faUser} />
+                        Profile
+                      </Box>
+                    }
+                  />
 
-  <Tab
-    value="media"
-    label={
-      <Box display="flex" alignItems="center" gap={1}>
-        <FontAwesomeIcon icon={faFolderOpen} />
-        Media Files
-      </Box>
-    }
-  />
-</Tabs>
+                  <Tab
+                    value="media"
+                    label={
+                      <Box display="flex" alignItems="center" gap={1}>
+                        <FontAwesomeIcon icon={faFolderOpen} />
+                        Media Files
+                      </Box>
+                    }
+                  />
+                </Tabs>
 
               </Box>
 
               <TabPanel value="overview" sx={{ p: 4 }}>
-  {/* Campaign Details - FULL WIDTH */}
-  <Grid item xs={12} sx={{ mb: 4 }}>
-    <Typography variant="h6" gutterBottom color="primary" fontWeight="700" sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
-      <FontAwesomeIcon icon={faBullseye} />
-      Campaign Details
-    </Typography>
-    
-    <Paper sx={{ p: 3, borderRadius: '16px', boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)' }}>
-      {/* Campaign Title */}
-      <Typography variant="h5" fontWeight="700" color="primary" gutterBottom>
-        {selectedApplication.title || 'Untitled Campaign'}
-      </Typography>
-      
-      {/* Campaign Stats Grid */}
-      <Grid container spacing={2} sx={{ mt: 2, mb: 3 }}>
-        <Grid item xs={6} sm={3}>
-          <Box display="flex" alignItems="center" gap={1}>
-            <AttachMoney color="success" />
-            <Box>
-              <Typography variant="caption" color="text.secondary">
-                Budget
-              </Typography>
-              <Typography variant="body2" fontWeight="600">
-                {selectedApplication.currency || 'USD'} {selectedApplication.budget?.toLocaleString() || '0'}
-              </Typography>
-            </Box>
-          </Box>
-        </Grid>
-        <Grid item xs={6} sm={3}>
-          <Box display="flex" alignItems="center" gap={1}>
-            <Category color="info" />
-            <Box>
-              <Typography variant="caption" color="text.secondary">
-                Category
-              </Typography>
-              <Typography variant="body2" fontWeight="600">
-                {selectedApplication.category || 'General'}
-              </Typography>
-            </Box>
-          </Box>
-        </Grid>
-        <Grid item xs={6} sm={3}>
-          <Box display="flex" alignItems="center" gap={1}>
-            <Schedule color="warning" />
-            <Box>
-              <Typography variant="caption" color="text.secondary">
-                Deadline
-              </Typography>
-              <Typography variant="body2" fontWeight="600">
-                {selectedApplication.deadline ? format(new Date(selectedApplication.deadline), 'MMM dd, yyyy') : 'N/A'}
-              </Typography>
-            </Box>
-          </Box>
-        </Grid>
-        <Grid item xs={6} sm={3}>
-          <Box display="flex" alignItems="center" gap={1}>
-            <Flag color="secondary" />
-            <Box>
-              <Typography variant="caption" color="text.secondary">
-                Status
-              </Typography>
-              <Typography variant="body2" fontWeight="600">
-                <StatusChip 
-                  label={getStatusText(selectedApplication.status)} 
-                  status={selectedApplication.status}
-                  size="small"
-                />
-              </Typography>
-            </Box>
-          </Box>
-        </Grid>
-      </Grid>
-
-      {/* Description - FULL WIDTH */}
-      {selectedApplication.description && (
-        <Box sx={{ mt: 3, mb: 3 }}>
-          <Typography variant="subtitle2" color="text.secondary" gutterBottom fontWeight="600">
-            Description
-          </Typography>
-          <Paper sx={{ p: 2.5, bgcolor: 'grey.50', borderRadius: '8px', lineHeight: 1.6 }}>
-            <Typography variant="body2">
-              {selectedApplication.description}
-            </Typography>
-          </Paper>
-        </Box>
-      )}
-
-      {/* Requirements - FULL WIDTH */}
-      {selectedApplication.requirements && (
-        <Box sx={{ mt: 3 }}>
-          <Typography variant="subtitle2" color="text.secondary" gutterBottom fontWeight="600">
-            Requirements
-          </Typography>
-          <Paper sx={{ p: 2.5, bgcolor: 'grey.50', borderRadius: '8px', lineHeight: 1.6 }}>
-            <Typography variant="body2">
-              {selectedApplication.requirements}
-            </Typography>
-          </Paper>
-        </Box>
-      )}
-    </Paper>
-  </Grid>
-
-  {/* Quick Actions - FULL WIDTH */}
-  <Grid item xs={12} sx={{ mb: 4 }}>
-    <Typography variant="h6" gutterBottom color="primary" fontWeight="700" sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
-      <FaRocket />
-      Quick Actions
-    </Typography>
-    
-    <Paper sx={{ p: 3, borderRadius: '16px', boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)' }}>
-      <Box display="flex" gap={2} flexWrap="wrap" justifyContent="center">
-        <Button
-          variant="outlined"
-          startIcon={<Person />}
-          onClick={() => handleViewProfile(selectedApplication.influencer_id, 'influencer')}
-          sx={{ borderRadius: '12px', px: 3, py: 1.5, minWidth: '180px' }}
-        >
-          View Influencer Profile
-        </Button>
-        <Button
-          variant="contained"
-          startIcon={<Chat />}
-          onClick={() => {
-            setDetailDialogOpen(false);
-            handleDirectChat(selectedApplication);
-          }}
-          sx={{ borderRadius: '12px', px: 3, py: 1.5, minWidth: '180px' }}
-        >
-          Open Chat
-        </Button>
-        {selectedApplication.status === 'approved' && (
-          <Button
-            variant="contained"
-            startIcon={<Description />}
-            onClick={() => {
-              setDetailDialogOpen(false);
-              setSendContractDialogOpen(true);
-            }}
-            sx={{
-              borderRadius: '12px',
-              px: 3,
-              py: 1.5,
-              minWidth: '180px',
-              background: 'linear-gradient(135deg, #3b82f6 0%, #3b82f6 100%)'
-            }}
-          >
-            Send Contract
-          </Button>
-        )}
-        {selectedApplication.status === 'media_submitted' && (
-          <Button
-            variant="contained"
-            startIcon={<Payment />}
-            onClick={() => handleProcessPayment(selectedApplication)}
-            sx={{
-              borderRadius: '12px',
-              px: 3,
-              py: 1.5,
-              minWidth: '180px',
-              background: 'linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%)'
-            }}
-          >
-            Process Payment
-          </Button>
-        )}
-      </Box>
-    </Paper>
-  </Grid>
-
-  {/* Influencer Details - FULL WIDTH */}
-  <Grid item xs={12}>
-    <Typography variant="h6" gutterBottom color="primary" fontWeight="700" sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
-      <FontAwesomeIcon icon={faUser} />
-      Influencer Details
-    </Typography>
-    
-    <Paper sx={{ p: 3, borderRadius: '16px', boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)' }}>
-      {/* User Info Section */}
-      <Box sx={{ mb: 3 }}>
-        <UserInfo
-          userId={selectedApplication.influencer_id}
-          profileType="influencer"
-          showEmail={true}
-          showStats={true}
-          size={60}
-        />
-      </Box>
-
-      {/* Application Message - FULL WIDTH */}
-      {selectedApplication.message && (
-        <Box sx={{ mt: 3, mb: 3 }}>
-          <Typography variant="subtitle2" color="text.secondary" gutterBottom fontWeight="600">
-            APPLICATION MESSAGE
-          </Typography>
-          <TextField
-            fullWidth
-            multiline
-            rows={3}
-            value={selectedApplication.message}
-            InputProps={{ 
-              readOnly: true,
-              sx: { 
-                bgcolor: 'grey.50', 
-                borderRadius: '12px',
-                fontSize: '0.9rem',
-                lineHeight: 1.6,
-                '& .MuiInputBase-input': {
-                  padding: '12px',
-                }
-              } 
-            }}
-            variant="outlined"
-          />
-        </Box>
-      )}
-
-      {/* Application Timeline - FULL WIDTH */}
-      <Box sx={{ mt: 3 }}>
-        <Typography variant="subtitle2" color="text.secondary" gutterBottom fontWeight="600">
-          APPLICATION TIMELINE
-        </Typography>
-        <Paper sx={{ p: 2.5, bgcolor: 'grey.50', borderRadius: '8px' }}>
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
-              <Box display="flex" justifyContent="space-between" alignItems="center">
-                <Typography variant="body2">
-                  Applied on
-                </Typography>
-                <Typography variant="body2" fontWeight="600">
-                  {formatDate(selectedApplication.applied_at)}
-                </Typography>
-              </Box>
-            </Grid>
-            {selectedApplication.media_submitted_at && (
-              <Grid item xs={12} sm={6}>
-                <Box display="flex" justifyContent="space-between" alignItems="center">
-                  <Typography variant="body2">
-                    Media submitted on
+                {/* Campaign Details - FULL WIDTH */}
+                <Grid item xs={12} sx={{ mb: 4 }}>
+                  <Typography variant="h6" gutterBottom color="primary" fontWeight="700" sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <FontAwesomeIcon icon={faBullseye} />
+                    Campaign Details
                   </Typography>
-                  <Typography variant="body2" fontWeight="600">
-                    {formatDate(selectedApplication.media_submitted_at)}
+
+                  <Paper sx={{ p: 3, borderRadius: '16px', boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)' }}>
+                    {/* Campaign Title */}
+                    <Typography variant="h5" fontWeight="700" color="primary" gutterBottom>
+                      {selectedApplication.title || 'Untitled Campaign'}
+                    </Typography>
+
+                    {/* Campaign Stats Grid */}
+                    <Grid container spacing={2} sx={{ mt: 2, mb: 3 }}>
+                      <Grid item xs={6} sm={3}>
+                        <Box display="flex" alignItems="center" gap={1}>
+                          <AttachMoney color="success" />
+                          <Box>
+                            <Typography variant="caption" color="text.secondary">
+                              Budget
+                            </Typography>
+                            <Typography variant="body2" fontWeight="600">
+                              {selectedApplication.currency || 'USD'} {selectedApplication.budget?.toLocaleString() || '0'}
+                            </Typography>
+                          </Box>
+                        </Box>
+                      </Grid>
+                      <Grid item xs={6} sm={3}>
+                        <Box display="flex" alignItems="center" gap={1}>
+                          <Category color="info" />
+                          <Box>
+                            <Typography variant="caption" color="text.secondary">
+                              Category
+                            </Typography>
+                            <Typography variant="body2" fontWeight="600">
+                              {selectedApplication.category || 'General'}
+                            </Typography>
+                          </Box>
+                        </Box>
+                      </Grid>
+                      <Grid item xs={6} sm={3}>
+                        <Box display="flex" alignItems="center" gap={1}>
+                          <Schedule color="warning" />
+                          <Box>
+                            <Typography variant="caption" color="text.secondary">
+                              Deadline
+                            </Typography>
+                            <Typography variant="body2" fontWeight="600">
+                              {selectedApplication.deadline ? format(new Date(selectedApplication.deadline), 'MMM dd, yyyy') : 'N/A'}
+                            </Typography>
+                          </Box>
+                        </Box>
+                      </Grid>
+                      <Grid item xs={6} sm={3}>
+                        <Box display="flex" alignItems="center" gap={1}>
+                          <Flag color="secondary" />
+                          <Box>
+                            <Typography variant="caption" color="text.secondary">
+                              Status
+                            </Typography>
+                            <Typography variant="body2" fontWeight="600">
+                              <StatusChip
+                                label={getStatusText(selectedApplication.status)}
+                                status={selectedApplication.status}
+                                size="small"
+                              />
+                            </Typography>
+                          </Box>
+                        </Box>
+                      </Grid>
+                    </Grid>
+
+                    {/* Description - FULL WIDTH */}
+                    {selectedApplication.description && (
+                      <Box sx={{ mt: 3, mb: 3 }}>
+                        <Typography variant="subtitle2" color="text.secondary" gutterBottom fontWeight="600">
+                          Description
+                        </Typography>
+                        <Paper sx={{ p: 2.5, bgcolor: 'grey.50', borderRadius: '8px', lineHeight: 1.6 }}>
+                          <Typography variant="body2">
+                            {selectedApplication.description}
+                          </Typography>
+                        </Paper>
+                      </Box>
+                    )}
+
+                    {/* Requirements - FULL WIDTH */}
+                    {selectedApplication.requirements && (
+                      <Box sx={{ mt: 3 }}>
+                        <Typography variant="subtitle2" color="text.secondary" gutterBottom fontWeight="600">
+                          Requirements
+                        </Typography>
+                        <Paper sx={{ p: 2.5, bgcolor: 'grey.50', borderRadius: '8px', lineHeight: 1.6 }}>
+                          <Typography variant="body2">
+                            {selectedApplication.requirements}
+                          </Typography>
+                        </Paper>
+                      </Box>
+                    )}
+                  </Paper>
+                </Grid>
+
+                {/* Quick Actions - FULL WIDTH */}
+                <Grid item xs={12} sx={{ mb: 4 }}>
+                  <Typography variant="h6" gutterBottom color="primary" fontWeight="700" sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <FaRocket />
+                    Quick Actions
                   </Typography>
-                </Box>
-              </Grid>
-            )}
-            {selectedApplication.contract_signed_at && (
-              <Grid item xs={12} sm={6}>
-                <Box display="flex" justifyContent="space-between" alignItems="center">
-                  <Typography variant="body2">
-                    Contract signed on
+
+                  <Paper sx={{ p: 3, borderRadius: '16px', boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)' }}>
+                    <Box display="flex" gap={2} flexWrap="wrap" justifyContent="center">
+                      <Button
+                        variant="outlined"
+                        startIcon={<Person />}
+                        onClick={() => handleViewProfile(selectedApplication.influencer_id, 'influencer')}
+                        sx={{ borderRadius: '12px', px: 3, py: 1.5, minWidth: '180px' }}
+                      >
+                        View Influencer Profile
+                      </Button>
+                      <Button
+                        variant="contained"
+                        startIcon={<Chat />}
+                        onClick={() => {
+                          setDetailDialogOpen(false);
+                          handleDirectChat(selectedApplication);
+                        }}
+                        sx={{ borderRadius: '12px', px: 3, py: 1.5, minWidth: '180px' }}
+                      >
+                        Open Chat
+                      </Button>
+                      {selectedApplication.status === 'approved' && (
+                        <Button
+                          variant="contained"
+                          startIcon={<Description />}
+                          onClick={() => {
+                            setDetailDialogOpen(false);
+                            setSendContractDialogOpen(true);
+                          }}
+                          sx={{
+                            borderRadius: '12px',
+                            px: 3,
+                            py: 1.5,
+                            minWidth: '180px',
+                            backgroundColor: 'primary.main'
+                          }}
+                        >
+                          Send Contract
+                        </Button>
+                      )}
+                      {selectedApplication.status === 'media_submitted' && (
+                        <Button
+                          variant="contained"
+                          startIcon={<Payment />}
+                          onClick={() => handleProcessPayment(selectedApplication)}
+                          sx={{
+                            borderRadius: '12px',
+                            px: 3,
+                            py: 1.5,
+                            minWidth: '180px',
+                            background: 'linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%)'
+                          }}
+                        >
+                          Process Payment
+                        </Button>
+                      )}
+                    </Box>
+                  </Paper>
+                </Grid>
+
+                {/* Influencer Details - FULL WIDTH */}
+                <Grid item xs={12}>
+                  <Typography variant="h6" gutterBottom color="primary" fontWeight="700" sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <FontAwesomeIcon icon={faUser} />
+                    Influencer Details
                   </Typography>
-                  <Typography variant="body2" fontWeight="600">
-                    {formatDate(selectedApplication.contract_signed_at)}
-                  </Typography>
-                </Box>
-              </Grid>
-            )}
-          </Grid>
-        </Paper>
-      </Box>
-    </Paper>
-  </Grid>
-</TabPanel>
+
+                  <Paper sx={{ p: 3, borderRadius: '16px', boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)' }}>
+                    {/* User Info Section */}
+                    <Box sx={{ mb: 3 }}>
+                      <UserInfo
+                        userId={selectedApplication.influencer_id}
+                        profileType="influencer"
+                        showEmail={true}
+                        showStats={true}
+                        size={60}
+                      />
+                    </Box>
+
+                    {/* Application Message - FULL WIDTH */}
+                    {selectedApplication.message && (
+                      <Box sx={{ mt: 3, mb: 3 }}>
+                        <Typography variant="subtitle2" color="text.secondary" gutterBottom fontWeight="600">
+                          APPLICATION MESSAGE
+                        </Typography>
+                        <TextField
+                          fullWidth
+                          multiline
+                          rows={3}
+                          value={selectedApplication.message}
+                          InputProps={{
+                            readOnly: true,
+                            sx: {
+                              bgcolor: 'grey.50',
+                              borderRadius: '12px',
+                              fontSize: '0.9rem',
+                              lineHeight: 1.6,
+                              '& .MuiInputBase-input': {
+                                padding: '12px',
+                              }
+                            }
+                          }}
+                          variant="outlined"
+                        />
+                      </Box>
+                    )}
+
+                    {/* Application Timeline - FULL WIDTH */}
+                    <Box sx={{ mt: 3 }}>
+                      <Typography variant="subtitle2" color="text.secondary" gutterBottom fontWeight="600">
+                        APPLICATION TIMELINE
+                      </Typography>
+                      <Paper sx={{ p: 2.5, bgcolor: 'grey.50', borderRadius: '8px' }}>
+                        <Grid container spacing={2}>
+                          <Grid item xs={12} sm={6}>
+                            <Box display="flex" justifyContent="space-between" alignItems="center">
+                              <Typography variant="body2">
+                                Applied on
+                              </Typography>
+                              <Typography variant="body2" fontWeight="600">
+                                {formatDate(selectedApplication.applied_at)}
+                              </Typography>
+                            </Box>
+                          </Grid>
+                          {selectedApplication.media_submitted_at && (
+                            <Grid item xs={12} sm={6}>
+                              <Box display="flex" justifyContent="space-between" alignItems="center">
+                                <Typography variant="body2">
+                                  Media submitted on
+                                </Typography>
+                                <Typography variant="body2" fontWeight="600">
+                                  {formatDate(selectedApplication.media_submitted_at)}
+                                </Typography>
+                              </Box>
+                            </Grid>
+                          )}
+                          {selectedApplication.contract_signed_at && (
+                            <Grid item xs={12} sm={6}>
+                              <Box display="flex" justifyContent="space-between" alignItems="center">
+                                <Typography variant="body2">
+                                  Contract signed on
+                                </Typography>
+                                <Typography variant="body2" fontWeight="600">
+                                  {formatDate(selectedApplication.contract_signed_at)}
+                                </Typography>
+                              </Box>
+                            </Grid>
+                          )}
+                        </Grid>
+                      </Paper>
+                    </Box>
+                  </Paper>
+                </Grid>
+              </TabPanel>
 
               <TabPanel value="workflow" sx={{ p: 4 }}>
                 <ApplicationWorkflow application={selectedApplication} />
@@ -3206,27 +3591,16 @@ const BrandApplications = () => {
               </TabPanel>
 
               <TabPanel value="media" sx={{ p: 4 }}>
-                <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-                  <Typography variant="h6" color="primary" fontWeight="700">
-                    <FontAwesomeIcon icon={faFileContract} /> Submitted Media Files
+                <Box sx={{ mb: 4 }}>
+                  <Typography variant="h6" color="primary" fontWeight="700" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <FontAwesomeIcon icon={faFileContract} /> Submitted Media Assets
                   </Typography>
-                  <Button
-                    variant="outlined"
-                    startIcon={<ImageIcon />}
-                    onClick={() => {
-                      setDetailDialogOpen(false);
-                      handleViewMediaFiles(selectedApplication);
-                    }}
-                    sx={{ borderRadius: '12px' }}
-                  >
-                    Open Media Manager
-                  </Button>
+                  <Typography variant="body2" color="text.secondary">
+                    Review the content submitted by the influencer for your campaign.
+                  </Typography>
                 </Box>
-                <MediaFilesDialog 
-                  open={false} 
-                  onClose={() => {}} 
-                  application={selectedApplication} 
-                />
+
+                <ApplicationMediaGallery application={selectedApplication} />
               </TabPanel>
             </TabContext>
           )}
@@ -3268,7 +3642,7 @@ const BrandApplications = () => {
         application={selectedApplication}
         onSendContract={handleSendContract}
       />
-      
+
 
       {/* Media Files Dialog */}
       <MediaFilesDialog

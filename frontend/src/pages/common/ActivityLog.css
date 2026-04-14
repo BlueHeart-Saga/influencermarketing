@@ -1,0 +1,577 @@
+/* ============================================================
+   ACTIVITY LOG – Full Redesign
+   Class prefix: alog-*  (no conflicts with brand-* / inf-ra-*)
+   ============================================================ */
+
+/* ---------- Tokens ---------- */
+:root {
+    --alog-primary: #3b82f6;
+    --alog-primary-dark: #2563eb;
+    --alog-success: #10b981;
+    --alog-warning: #f59e0b;
+    --alog-danger: #ef4444;
+    --alog-purple: #8b5cf6;
+
+    --alog-bg: #f8fafc;
+    --alog-white: #ffffff;
+
+    --alog-text-1: #1e293b;
+    --alog-text-2: #475569;
+    --alog-text-3: #94a3b8;
+
+    --alog-border: #e2e8f0;
+    --alog-border-light: #f1f5f9;
+
+    --alog-radius-sm: 8px;
+    --alog-radius-md: 12px;
+    --alog-radius-lg: 16px;
+
+    --alog-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+    --alog-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --alog-shadow-lg: 0 10px 24px rgba(0, 0, 0, 0.1);
+
+    --alog-transition: all 0.2s ease;
+}
+
+/* ---------- Page Shell ---------- */
+.alog-page {
+    min-height: 100vh;
+    background: var(--alog-white);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    color: var(--alog-text-1);
+}
+
+/* ---------- Sticky Top Bar ---------- */
+.alog-topbar {
+    background: var(--alog-white);
+    border-bottom: 1px solid var(--alog-border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: var(--alog-shadow-sm);
+}
+
+.alog-topbar-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+/* Back button */
+.alog-back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    border: 1px solid var(--alog-border);
+    color: var(--alog-text-2);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px 14px;
+    border-radius: var(--alog-radius-sm);
+    cursor: pointer;
+    transition: var(--alog-transition);
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.alog-back-btn:hover {
+    background: var(--alog-bg);
+    border-color: var(--alog-primary);
+    color: var(--alog-primary);
+}
+
+/* Title block */
+.alog-topbar-title {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex: 1;
+    min-width: 0;
+}
+
+.alog-topbar-icon {
+    width: 42px;
+    height: 42px;
+    background: rgba(59, 130, 246, 0.1);
+    color: var(--alog-primary);
+    border-radius: var(--alog-radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.alog-topbar-title h1 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--alog-text-1);
+    margin: 0 0 2px 0;
+    line-height: 1.2;
+}
+
+.alog-topbar-title span {
+    font-size: 13px;
+    color: var(--alog-text-3);
+}
+
+/* Refresh button */
+.alog-refresh-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--alog-primary);
+    color: #fff;
+    border: none;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 9px 18px;
+    border-radius: var(--alog-radius-sm);
+    cursor: pointer;
+    transition: var(--alog-transition);
+    flex-shrink: 0;
+}
+
+.alog-refresh-btn:hover:not(:disabled) {
+    background: var(--alog-primary-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.alog-refresh-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Spin animation */
+.alog-spinning {
+    animation: alog-spin 1s linear infinite;
+}
+
+@keyframes alog-spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ---------- Page Body ---------- */
+.alog-body {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* ---------- Stats Row ---------- */
+.alog-stats-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+}
+
+.alog-stat-card {
+    background: var(--alog-white);
+    border: 1px solid var(--alog-border);
+    border-radius: var(--alog-radius-lg);
+    padding: 20px 22px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: var(--alog-shadow-sm);
+    transition: var(--alog-transition);
+}
+
+.alog-stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--alog-shadow-md);
+}
+
+.alog-stat-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--alog-radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.alog-stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--alog-text-1);
+    margin: 0 0 2px 0;
+    line-height: 1;
+}
+
+.alog-stat-label {
+    font-size: 13px;
+    color: var(--alog-text-3);
+    font-weight: 500;
+    margin: 0;
+}
+
+/* ---------- Controls Bar ---------- */
+.alog-controls-bar {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+/* Search */
+.alog-search-wrap {
+    flex: 1;
+    min-width: 260px;
+    position: relative;
+}
+
+.alog-search-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--alog-text-3);
+    pointer-events: none;
+}
+
+.alog-search-input {
+    width: 100%;
+    padding: 11px 14px 11px 40px;
+    border: 1px solid var(--alog-border);
+    border-radius: var(--alog-radius-md);
+    font-size: 14px;
+    color: var(--alog-text-1);
+    background: var(--alog-white);
+    transition: var(--alog-transition);
+    outline: none;
+}
+
+.alog-search-input:focus {
+    border-color: var(--alog-primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.alog-search-input::placeholder {
+    color: var(--alog-text-3);
+}
+
+/* Filter select */
+.alog-filter-wrap {
+    position: relative;
+    min-width: 170px;
+}
+
+.alog-filter-icon {
+    position: absolute;
+    left: 13px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--alog-text-3);
+    pointer-events: none;
+}
+
+.alog-filter-caret {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--alog-text-3);
+    pointer-events: none;
+}
+
+.alog-filter-select {
+    width: 100%;
+    padding: 11px 36px 11px 38px;
+    border: 1px solid var(--alog-border);
+    border-radius: var(--alog-radius-md);
+    font-size: 14px;
+    color: var(--alog-text-1);
+    background: var(--alog-white);
+    cursor: pointer;
+    outline: none;
+    appearance: none;
+    transition: var(--alog-transition);
+}
+
+.alog-filter-select:focus {
+    border-color: var(--alog-primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Result count chip */
+.alog-results-count {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--alog-text-3);
+    white-space: nowrap;
+    margin-left: auto;
+}
+
+/* ---------- Table Card ---------- */
+.alog-table-card {
+    background: var(--alog-white);
+    border: 1px solid var(--alog-border);
+    border-radius: var(--alog-radius-lg);
+    box-shadow: var(--alog-shadow-sm);
+    overflow: hidden;
+}
+
+.alog-table-wrap {
+    overflow-x: auto;
+}
+
+/* Table base */
+.alog-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 700px;
+}
+
+/* Header */
+.alog-th {
+    background: #f8fafc;
+    padding: 13px 18px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--alog-text-3);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    border-bottom: 1px solid var(--alog-border);
+    white-space: nowrap;
+}
+
+/* Rows */
+.alog-tr {
+    transition: background 0.15s ease;
+}
+
+.alog-tr:hover {
+    background: #f8fafc;
+}
+
+.alog-tr:not(:last-child) .alog-td {
+    border-bottom: 1px solid var(--alog-border-light);
+}
+
+.alog-td {
+    padding: 14px 18px;
+    font-size: 13px;
+    color: var(--alog-text-2);
+    vertical-align: middle;
+}
+
+/* Index column */
+.alog-td-index {
+    color: var(--alog-text-3);
+    font-size: 12px;
+    width: 40px;
+    text-align: center;
+}
+
+/* Activity type cell */
+.alog-cell-activity {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.alog-activity-icon-box {
+    width: 30px;
+    height: 30px;
+    border-radius: var(--alog-radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.alog-activity-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--alog-text-1);
+    white-space: nowrap;
+}
+
+/* Campaign cell */
+.alog-cell-campaign {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.alog-cell-icon {
+    color: var(--alog-text-3);
+    flex-shrink: 0;
+}
+
+.alog-campaign-name {
+    font-weight: 600;
+    color: var(--alog-text-1);
+    max-width: 220px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Person cell */
+.alog-cell-person {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.alog-avatar {
+    width: 30px;
+    height: 30px;
+    background: #3b82f6;
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+/* Status badge */
+.alog-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+    text-transform: capitalize;
+    white-space: nowrap;
+}
+
+/* Date cell */
+.alog-cell-date {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    white-space: nowrap;
+    font-size: 13px;
+}
+
+/* ---------- Loading State ---------- */
+.alog-loading-state {
+    padding: 80px 40px;
+    text-align: center;
+    color: var(--alog-text-3);
+}
+
+.alog-loader-ring {
+    width: 42px;
+    height: 42px;
+    border: 3px solid var(--alog-border);
+    border-top-color: var(--alog-primary);
+    border-radius: 50%;
+    margin: 0 auto 18px;
+    animation: alog-spin 0.9s linear infinite;
+}
+
+.alog-loading-state p {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--alog-text-2);
+}
+
+/* ---------- Empty State ---------- */
+.alog-empty-state {
+    padding: 80px 40px;
+    text-align: center;
+    color: var(--alog-text-3);
+}
+
+.alog-empty-icon {
+    width: 70px;
+    height: 70px;
+    background: var(--alog-bg);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    color: var(--alog-text-3);
+}
+
+.alog-empty-state h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--alog-text-1);
+    margin: 0 0 8px;
+}
+
+.alog-empty-state p {
+    font-size: 14px;
+    color: var(--alog-text-3);
+    margin: 0 0 20px;
+}
+
+.alog-clear-btn {
+    background: transparent;
+    border: 1px solid var(--alog-border);
+    color: var(--alog-primary);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 9px 20px;
+    border-radius: var(--alog-radius-sm);
+    cursor: pointer;
+    transition: var(--alog-transition);
+}
+
+.alog-clear-btn:hover {
+    background: rgba(59, 130, 246, 0.06);
+    border-color: var(--alog-primary);
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 768px) {
+    .alog-topbar-inner {
+        padding: 14px 16px;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .alog-topbar-title h1 {
+        font-size: 17px;
+    }
+
+    .alog-body {
+        padding: 16px;
+        gap: 16px;
+    }
+
+    .alog-stats-row {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .alog-controls-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .alog-search-wrap {
+        min-width: unset;
+        width: 100%;
+    }
+
+    .alog-results-count {
+        margin-left: 0;
+        text-align: right;
+    }
+}

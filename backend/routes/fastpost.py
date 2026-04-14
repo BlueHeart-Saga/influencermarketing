@@ -1,11 +1,12 @@
 # fastpost.py
-from fastapi import FastAPI, APIRouter, UploadFile, Form, HTTPException
+import os
+import io
+from fastapi import FastAPI, APIRouter, UploadFile, Form, HTTPException, Depends, status, BackgroundTasks, File
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pymongo import MongoClient
 from pymongo.server_api import ServerApi
 
-import os
 import shutil
 import json
 import datetime
@@ -365,6 +366,14 @@ async def post_content(
         
         posts_collection.insert_one(post_record)
 
+        # Cleanup local file if it exists
+        if file_path and os.path.exists(file_path):
+            try:
+                os.remove(file_path)
+                logger.info(f"Cleaned up local file: {file_path}")
+            except Exception as e:
+                logger.error(f"Error cleaning up local file: {e}")
+
         return {
             "status": "success", 
             "details": results, 
@@ -392,21 +401,37 @@ async def get_posts(limit: int = 10, skip: int = 0):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.get("/media/{media_id}")
-async def get_media(media_id: str):
+@router.get("/media/{file_id:path}")
+async def get_media(file_id: str):
     """
-    Retrieve media from GridFS
+    Retrieve media from storage
     """
     try:
-        content = storage_provider.download(media_id)
+        # Strip any legacy prefixes or slashes
+        clean_id = file_id.replace("\\", "/")
+        base_name = clean_id.split("/")[-1]
+        
+        try:
+            # Try specific fastpost folder first
+            content = storage_provider.download(f"fastpost/{base_name}")
+        except Exception:
+            try:
+                # Then try the raw file_id
+                content = storage_provider.download(file_id)
+            except Exception:
+                # Finally try base name
+                content = storage_provider.download(base_name)
+
         # Determine media type from filename or default to octet-stream
         media_type = "application/octet-stream"
-        if media_id.lower().endswith(('.jpg', '.jpeg', '.png')):
-            media_type = "image/jpeg"
-        elif media_id.lower().endswith(('.mp4', '.mov')):
-            media_type = "video/mp4"
+        if base_name.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.webp')):
+            media_type = f"image/{base_name.split('.')[-1]}"
+            if 'jpg' in media_type: media_type = 'image/jpeg'
+        elif base_name.lower().endswith(('.mp4', '.mov', '.webm')):
+            media_type = f"video/{base_name.split('.')[-1]}"
+            if 'mov' in media_type: media_type = 'video/mp4'
             
-        return StreamingResponse(iter([content]), media_type=media_type)
+        return StreamingResponse(io.BytesIO(content), media_type=media_type)
     except Exception as e:
         logger.error(f"Media retrieval error: {e}")
         raise HTTPException(status_code=404, detail="Media not found")

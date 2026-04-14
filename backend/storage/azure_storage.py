@@ -23,9 +23,12 @@ class AzureBlobStorage(StorageProvider):
             # Container might already exist
             pass
     
-    def upload(self, file_data: Union[bytes, BinaryIO], filename: str, folder: str = "") -> str:
+    def upload(self, file_data: Union[bytes, BinaryIO], filename: str, folder: str = "", preserve_name: bool = False) -> str:
         # Create blob name with folder structure
-        blob_name = f"{folder}/{uuid.uuid4()}_{filename}" if folder else f"{uuid.uuid4()}_{filename}"
+        if preserve_name:
+            blob_name = f"{folder}/{filename}" if folder else filename
+        else:
+            blob_name = f"{folder}/{uuid.uuid4()}_{filename}" if folder else f"{uuid.uuid4()}_{filename}"
         blob_name = blob_name.replace('\\', '/')  # Ensure forward slashes for Azure
         
         blob_client = self.container_client.get_blob_client(blob_name)

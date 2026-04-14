@@ -128,6 +128,27 @@ export const AuthProvider = ({ children }) => {
     }
   }, [user]);
 
+  const refreshSubscription = useCallback(async () => {
+    const currentToken = localStorage.getItem("access_token") || user?.token;
+    if (!currentToken || !user) return null;
+
+    try {
+      const response = await axios.get(`${API_BASE_URL}/subscriptions/me`, {
+        headers: { Authorization: `Bearer ${currentToken}` }
+      });
+      setSubscription(response.data);
+      if (response.data.type === 'trial' && new Date(response.data.current_period_end) < new Date()) {
+        setTrialExpired(true);
+      } else {
+        setTrialExpired(false);
+      }
+      return response.data;
+    } catch (error) {
+      console.error("Subscription fetch failed:", error);
+      return null;
+    }
+  }, [user]);
+
   // -----------------------------------------
   // Side Effects
   // -----------------------------------------
@@ -189,8 +210,9 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     if (authInitialized && user) {
       refreshProfileStatus();
+      refreshSubscription();
     }
-  }, [authInitialized, user, refreshProfileStatus]);
+  }, [authInitialized, user, refreshProfileStatus, refreshSubscription]);
 
   // 4. Final Render
   if (!authInitialized || loading) {
@@ -214,6 +236,8 @@ export const AuthProvider = ({ children }) => {
         profileStatus,
         refreshProfileStatus,
         authInitialized,
+        setSubscription,
+        refreshSubscription,
       }}
     >
       {children}
