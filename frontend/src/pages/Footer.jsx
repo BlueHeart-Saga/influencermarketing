@@ -47,7 +47,7 @@
 //         <stop offset="0%" stopColor="#63c9f1ff" />
 //         <stop offset="100%" stopColor="#0f6eeaff" />
 //       </linearGradient>
-      
+
 //     </defs>
 //     <path
 //       d="M0,60 C360,160 1080,-40 1440,60 L1440,0 L0,0 Z"
@@ -92,7 +92,7 @@
 //       <div className="footer-main-content">
 //         <div className="footer-content-container">
 //           <div className="footer-columns-grid">
-            
+
 //             {/* Brand Column */}
 //             <div className="brand-info-column">
 //               <div className="company-logo-section">
@@ -111,7 +111,7 @@
 //               <p className="company-description">
 //                 Enterprise-grade AI-powered influencer marketing platform connecting global brands with premium creators. Scale your campaigns with data-driven insights.
 //               </p>
-              
+
 //               {/* Social Links */}
 //               <div className="social-media-links">
 //                 <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
@@ -246,7 +246,7 @@
 //           </div>
 //         </div>
 
-        
+
 
 //         {/* App Download Section */}
 //         <div className="mobile-app-section">
@@ -283,7 +283,7 @@
 //             <div className="copyright-text">
 //               <p>© {new Date().getFullYear()} QuickBox.io, Inc. All rights reserved.</p>
 //             </div>
-            
+
 //             <div className="legal-nav-links">
 //               <a href="/privacy">Privacy Policy</a>
 //               <a href="/terms">Terms of Service</a>
@@ -292,7 +292,7 @@
 //               <a href="/accessibility">Accessibility</a>
 //               <a href="/sitemap">Sitemap</a>
 //             </div>
-            
+
 //             <div className="footer-meta-section">
 //               <div className="achievement-badges">
 //                 <span className="achievement-tag">🏆 G2 Leader 2024</span>
@@ -317,7 +317,7 @@
 // }
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Facebook, Twitter, Linkedin, Instagram, ArrowRight, Globe } from 'lucide-react';
 
 function Footer() {
@@ -418,7 +418,7 @@ function Footer() {
               <h3 className="qb-footer-heading">PLATFORM</h3>
               <ul className="qb-footer-links">
                 <li>
-                  <span 
+                  <span
                     className="qb-footer-link"
                     onClick={(e) => handleNavigation('/platform-overview', e)}
                   >
@@ -426,7 +426,7 @@ function Footer() {
                   </span>
                 </li>
                 <li>
-                  <span 
+                  <span
                     className="qb-footer-link"
                     onClick={(e) => handleNavigation('/pricingsection', e)}
                   >
@@ -434,7 +434,7 @@ function Footer() {
                   </span>
                 </li>
                 <li>
-                  <span 
+                  <span
                     className="qb-footer-link"
                     onClick={(e) => handleNavigation('/trend-predictor', e)}
                   >
@@ -450,14 +450,14 @@ function Footer() {
                   </span>
                 </li> */}
                 <li>
-                  <span 
+                  <span
                     className="qb-footer-link"
                     onClick={(e) => handleNavigation('/faq', e)}
                   >
                     FAQ
                   </span>
                 </li>
-                
+
               </ul>
             </div>
 
@@ -465,7 +465,7 @@ function Footer() {
             <div className="qb-footer-column">
               <h3 className="qb-footer-heading">SOLUTIONS</h3>
               <ul className="qb-footer-links">
-                
+
                 {/* <li>
                   <span 
                     className="qb-footer-link"
@@ -475,7 +475,7 @@ function Footer() {
                   </span>
                 </li> */}
                 <li>
-                  <span 
+                  <span
                     className="qb-footer-link"
                     onClick={(e) => handleNavigation('/automation-marketing', e)}
                   >
@@ -483,7 +483,7 @@ function Footer() {
                   </span>
                 </li>
                 <li>
-                  <span 
+                  <span
                     className="qb-footer-link"
                     onClick={(e) => handleNavigation('/futureai', e)}
                   >
@@ -499,7 +499,7 @@ function Footer() {
                   </span>
                 </li> */}
                 <li>
-                  <span 
+                  <span
                     className="qb-footer-link"
                     onClick={(e) => handleNavigation('/predictive-roi', e)}
                   >
@@ -507,7 +507,7 @@ function Footer() {
                   </span>
                 </li>
                 <li>
-                  <span 
+                  <span
                     className="qb-footer-link"
                     onClick={(e) => handleNavigation('/payment-automation', e)}
                   >
@@ -522,7 +522,7 @@ function Footer() {
               <h3 className="qb-footer-heading">RESOURCES</h3>
               <ul className="qb-footer-links">
                 <li>
-                  <span 
+                  <span
                     className="qb-footer-link"
                     onClick={(e) => handleNavigation('/resources/blog', e)}
                   >
@@ -530,7 +530,7 @@ function Footer() {
                   </span>
                 </li>
                 <li>
-                  <span 
+                  <span
                     className="qb-footer-link"
                     onClick={(e) => handleNavigation('/resources/case-studies', e)}
                   >
@@ -538,16 +538,16 @@ function Footer() {
                   </span>
                 </li>
                 <li>
-                  <span 
+                  <span
                     className="qb-footer-link"
                     onClick={(e) => handleNavigation('/resources/documentation', e)}
                   >
                     API Documentation
                   </span>
                 </li>
-                
+
                 <li>
-                  <span 
+                  <span
                     className="qb-footer-link"
                     onClick={(e) => handleNavigation('/resources/community', e)}
                   >
@@ -609,7 +609,7 @@ function Footer() {
               <h3 className="qb-footer-heading">SUPPORT</h3>
               <ul className="qb-footer-links">
                 <li>
-                  <span 
+                  <span
                     className="qb-footer-link"
                     onClick={() => navigate("/about")}
                   >
@@ -617,7 +617,7 @@ function Footer() {
                   </span>
                 </li>
                 <li>
-                  <span 
+                  <span
                     className="qb-footer-link"
                     onClick={(e) => handleNavigation('/contactUs', e)}
                   >
@@ -625,7 +625,7 @@ function Footer() {
                   </span>
                 </li>
                 <li>
-                  <span 
+                  <span
                     className="qb-footer-link"
                     onClick={(e) => handleNavigation('/resources/help-center', e)}
                   >
@@ -633,7 +633,7 @@ function Footer() {
                   </span>
                 </li>
                 <li>
-                  <span 
+                  <span
                     className="qb-footer-link"
                     onClick={(e) => handleNavigation('/integration', e)}
                   >
@@ -664,8 +664,8 @@ function Footer() {
               {/* Dynamic Brand Name with Logo */}
               <div className="qb-footer-brand-section">
                 {logoUrl && (
-                  <img 
-                    src={logoUrl} 
+                  <img
+                    src={logoUrl}
                     alt={`${brandName} Logo`}
                     className="qb-footer-logo"
                     onError={(e) => {
@@ -682,22 +682,22 @@ function Footer() {
                   )}
                 </h3>
               </div>
-              
+
               <p className="qb-footer-description">
-                AI-powered influencer marketing for global brands. 
+                AI-powered influencer marketing for global brands.
                 Connect with top creators and scale with data-driven insights.
               </p>
-              
+
               <div className="qb-footer-form">
                 <div className="qb-footer-input-wrapper">
-                  <input 
-                    type="email" 
-                    placeholder="Enter your email" 
+                  <input
+                    type="email"
+                    placeholder="Enter your email"
                     className="qb-footer-input"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                   />
-                  <button 
+                  <button
                     onClick={handleSubmit}
                     className="qb-footer-submit-btn"
                     aria-label="Submit email"
@@ -730,62 +730,62 @@ function Footer() {
 
           <div className="qb-footer-legal-links">
             <div className="qb-footer-social">
-  <button
-    onClick={(e) => handleSocialLink(socialLinks.facebook, e)}
-    className="qb-footer-social-link"
-    aria-label="Facebook"
-  >
-    <Facebook size={20} />
-  </button>
+              <button
+                onClick={(e) => handleSocialLink(socialLinks.facebook, e)}
+                className="qb-footer-social-link"
+                aria-label="Facebook"
+              >
+                <Facebook size={20} />
+              </button>
 
-  
 
-  <button
-    onClick={(e) => handleSocialLink(socialLinks.linkedin, e)}
-    className="qb-footer-social-link"
-    aria-label="LinkedIn"
-  >
-    <Linkedin size={20} />
-  </button>
 
-  <button
-    onClick={(e) => handleSocialLink(socialLinks.instagram, e)}
-    className="qb-footer-social-link"
-    aria-label="Instagram"
-  >
-    <Instagram size={20} />
-  </button>
+              <button
+                onClick={(e) => handleSocialLink(socialLinks.linkedin, e)}
+                className="qb-footer-social-link"
+                aria-label="LinkedIn"
+              >
+                <Linkedin size={20} />
+              </button>
 
-  <button
-    onClick={(e) => handleSocialLink(socialLinks.website, e)}
-    className="qb-footer-social-link"
-    aria-label="Website"
-  >
-    <Globe size={20} />
-  </button>
-</div>
+              <button
+                onClick={(e) => handleSocialLink(socialLinks.instagram, e)}
+                className="qb-footer-social-link"
+                aria-label="Instagram"
+              >
+                <Instagram size={20} />
+              </button>
 
-            
-            <span 
+              <button
+                onClick={(e) => handleSocialLink(socialLinks.website, e)}
+                className="qb-footer-social-link"
+                aria-label="Website"
+              >
+                <Globe size={20} />
+              </button>
+            </div>
+
+
+            <Link
+              to="/terms"
               className="qb-footer-legal-link"
-              onClick={(e) => handleNavigation('/terms', e)}
             >
-              Terms & Conditions
-            </span>
+              Terms of Service
+            </Link>
             <span className="qb-footer-separator">|</span>
-            <span 
+            <Link
+              to="/privacy"
               className="qb-footer-legal-link"
-              onClick={(e) => handleNavigation('/privacy', e)}
             >
               Privacy Policy
-            </span>
+            </Link>
             <span className="qb-footer-separator">|</span>
-            <span 
+            <Link
+              to="/payment-policy"
               className="qb-footer-legal-link"
-              onClick={(e) => handleNavigation('/payment-policy', e)}
             >
               Payment Policy
-            </span>
+            </Link>
           </div>
         </div>
       </div>

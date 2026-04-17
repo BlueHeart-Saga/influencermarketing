@@ -1,21 +1,21 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { 
-  Search, 
-  ChevronLeft, 
-  ChevronRight, 
-  Rocket, 
-  Lock, 
-  Users, 
-  Target, 
-  BarChart3, 
-  AlertCircle, 
-  FileCode, 
-  MessageCircle, 
-  BookOpen, 
-  Code, 
-  Github, 
-  Database, 
-  Copy, 
+import {
+  Search,
+  ChevronLeft,
+  ChevronRight,
+  Rocket,
+  Lock,
+  Users,
+  Target,
+  BarChart3,
+  AlertCircle,
+  FileCode,
+  MessageCircle,
+  BookOpen,
+  Code,
+  Github,
+  Database,
+  Copy,
   Check,
   Printer,
   FileText,
@@ -66,7 +66,7 @@ const TermsAndConditions = () => {
   useEffect(() => {
     const handleScroll = () => {
       const scrollPosition = window.scrollY + 100;
-      
+
       for (const section of sections) {
         const element = sectionRefs.current[section.id];
         if (element) {
@@ -113,19 +113,19 @@ const TermsAndConditions = () => {
       {/* Hero Section */}
       <section className="doc-hero">
         <div className="doc-hero-content">
-          <h1 className="doc-hero-title">Terms & Conditions</h1>
+          <h1 className="doc-hero-title">Terms of Service</h1>
           <p className="doc-hero-subtitle">
             Legal agreement governing your use of Brio AI Influencer Platform.<br />
-            Last updated: {new Date().toLocaleDateString('en-US', { 
-              year: 'numeric', 
-              month: 'long', 
-              day: 'numeric' 
+            Last updated: {new Date().toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
             })}
           </p>
           <div className="doc-search-wrapper">
-            <input 
-              type="text" 
-              placeholder="Search terms..." 
+            <input
+              type="text"
+              placeholder="Search terms..."
               className="doc-search-input"
             />
             <button className="doc-search-btn">
@@ -154,7 +154,7 @@ const TermsAndConditions = () => {
 
               <nav className="doc-nav">
                 {sections.map((section) => (
-                  <button 
+                  <button
                     key={section.id}
                     className={`doc-nav-item ${activeSection === section.id ? 'active' : ''}`}
                     onClick={() => scrollToSection(section.id)}
@@ -171,8 +171,8 @@ const TermsAndConditions = () => {
                 <div className="doc-api-key-box">
                   <code>By using Brio, you agree to these Terms & Conditions and all referenced policies.</code>
                 </div>
-                <button 
-                  className="doc-copy-btn" 
+                <button
+                  className="doc-copy-btn"
                   onClick={() => setShowAcceptDialog(true)}
                 >
                   <FileSignature size={16} />
@@ -200,7 +200,7 @@ const TermsAndConditions = () => {
                   <Scale size={32} />
                 </div>
                 <div>
-                  <h2 className="doc-content-title">Terms & Conditions</h2>
+                  <h2 className="doc-content-title">Terms of Service</h2>
                   <div className="doc-tags">
                     <span className="doc-tag">Legal Document</span>
                     <span className="doc-tag">Binding Agreement</span>
@@ -222,7 +222,7 @@ const TermsAndConditions = () => {
               </div>
 
               {/* INTRODUCTION */}
-              <section 
+              <section
                 ref={(el) => sectionRefs.current.introduction = el}
                 className="doc-section"
               >
@@ -239,12 +239,12 @@ const TermsAndConditions = () => {
               </section>
 
               {/* DEFINITIONS */}
-              <section 
+              <section
                 ref={(el) => sectionRefs.current.definitions = el}
                 className="doc-section"
               >
                 <h3 className="doc-section-title">2. Definitions & Platform Roles</h3>
-                
+
                 <div className="doc-definition-box">
                   <h4>Key Definitions</h4>
                   <div className="doc-definition-grid">
@@ -277,7 +277,7 @@ const TermsAndConditions = () => {
               </section>
 
               {/* ELIGIBILITY */}
-              <section 
+              <section
                 ref={(el) => sectionRefs.current.eligibility = el}
                 className="doc-section"
               >
@@ -291,12 +291,12 @@ const TermsAndConditions = () => {
               </section>
 
               {/* USER ROLES */}
-              <section 
+              <section
                 ref={(el) => sectionRefs.current['user-roles'] = el}
                 className="doc-section"
               >
                 <h3 className="doc-section-title">4. User Roles & Responsibilities</h3>
-                
+
                 <div className="doc-subsection">
                   <h4>4.1 Brands</h4>
                   <p className="doc-section-text">
@@ -320,12 +320,12 @@ const TermsAndConditions = () => {
               </section>
 
               {/* AI SERVICES */}
-              <section 
+              <section
                 ref={(el) => sectionRefs.current['ai-services'] = el}
                 className="doc-section"
               >
                 <h3 className="doc-section-title">5. AI Services & Disclaimer</h3>
-                
+
                 <div className="doc-notice info">
                   <AlertCircle size={20} />
                   <div>
@@ -346,7 +346,7 @@ const TermsAndConditions = () => {
               </section>
 
               {/* CAMPAIGNS */}
-              <section 
+              <section
                 ref={(el) => sectionRefs.current.campaigns = el}
                 className="doc-section"
               >
@@ -360,7 +360,7 @@ const TermsAndConditions = () => {
               </section>
 
               {/* CONTRACTS */}
-              <section 
+              <section
                 ref={(el) => sectionRefs.current.contracts = el}
                 className="doc-section"
               >
@@ -374,12 +374,12 @@ const TermsAndConditions = () => {
               </section>
 
               {/* PAYMENTS */}
-              <section 
+              <section
                 ref={(el) => sectionRefs.current.payments = el}
                 className="doc-section"
               >
                 <h3 className="doc-section-title">8. Payments, Platform Fees & Payouts</h3>
-                
+
                 <div className="doc-notice warning">
                   <DollarSign size={20} />
                   <div>
@@ -411,7 +411,7 @@ const TermsAndConditions = () => {
               </section>
 
               {/* TAXES */}
-              <section 
+              <section
                 ref={(el) => sectionRefs.current.taxes = el}
                 className="doc-section"
               >
@@ -425,7 +425,7 @@ const TermsAndConditions = () => {
               </section>
 
               {/* CONTENT RIGHTS */}
-              <section 
+              <section
                 ref={(el) => sectionRefs.current['content-rights'] = el}
                 className="doc-section"
               >
@@ -439,7 +439,7 @@ const TermsAndConditions = () => {
               </section>
 
               {/* PROHIBITED */}
-              <section 
+              <section
                 ref={(el) => sectionRefs.current.prohibited = el}
                 className="doc-section"
               >
@@ -454,12 +454,12 @@ const TermsAndConditions = () => {
               </section>
 
               {/* TERMINATION */}
-              <section 
+              <section
                 ref={(el) => sectionRefs.current.termination = el}
                 className="doc-section"
               >
                 <h3 className="doc-section-title">12. Suspension, Termination & Account Restriction</h3>
-                
+
                 <div className="doc-notice error">
                   <AlertCircle size={20} />
                   <div>
@@ -474,7 +474,7 @@ const TermsAndConditions = () => {
               </section>
 
               {/* CONFIDENTIALITY */}
-              <section 
+              <section
                 ref={(el) => sectionRefs.current.confidentiality = el}
                 className="doc-section"
               >
@@ -485,7 +485,7 @@ const TermsAndConditions = () => {
               </section>
 
               {/* PRIVACY */}
-              <section 
+              <section
                 ref={(el) => sectionRefs.current.privacy = el}
                 className="doc-section"
               >
@@ -496,7 +496,7 @@ const TermsAndConditions = () => {
               </section>
 
               {/* DISCLAIMERS */}
-              <section 
+              <section
                 ref={(el) => sectionRefs.current.disclaimers = el}
                 className="doc-section"
               >
@@ -510,7 +510,7 @@ const TermsAndConditions = () => {
               </section>
 
               {/* INDEMNIFICATION */}
-              <section 
+              <section
                 ref={(el) => sectionRefs.current.indemnification = el}
                 className="doc-section"
               >
@@ -521,7 +521,7 @@ const TermsAndConditions = () => {
               </section>
 
               {/* GOVERNING LAW */}
-              <section 
+              <section
                 ref={(el) => sectionRefs.current['governing-law'] = el}
                 className="doc-section"
               >
@@ -535,7 +535,7 @@ const TermsAndConditions = () => {
               </section>
 
               {/* MODIFICATIONS */}
-              <section 
+              <section
                 ref={(el) => sectionRefs.current.modifications = el}
                 className="doc-section"
               >
@@ -546,7 +546,7 @@ const TermsAndConditions = () => {
               </section>
 
               {/* FORCE MAJEURE */}
-              <section 
+              <section
                 ref={(el) => sectionRefs.current['force-majeure'] = el}
                 className="doc-section"
               >
@@ -557,12 +557,12 @@ const TermsAndConditions = () => {
               </section>
 
               {/* CONTACT */}
-              <section 
+              <section
                 ref={(el) => sectionRefs.current.contact = el}
                 className="doc-section"
               >
                 <h3 className="doc-section-title">20. Contact Information</h3>
-                
+
                 <div className="doc-contact-box">
                   <div className="doc-contact-section">
                     <h4>Brio Technologies Pvt. Ltd.</h4>
@@ -584,8 +584,8 @@ const TermsAndConditions = () => {
                   <Printer size={18} />
                   <span>Print Terms</span>
                 </button>
-                <button 
-                  className="doc-primary-btn" 
+                <button
+                  className="doc-primary-btn"
                   onClick={() => setShowAcceptDialog(true)}
                 >
                   <FileSignature size={18} />
@@ -654,13 +654,13 @@ const TermsAndConditions = () => {
               </div>
             </div>
             <div className="doc-modal-actions">
-              <button 
+              <button
                 className="doc-secondary-btn"
                 onClick={() => setShowAcceptDialog(false)}
               >
                 Cancel
               </button>
-              <button 
+              <button
                 className="doc-primary-btn"
                 onClick={handleAcceptTerms}
               >
@@ -673,7 +673,7 @@ const TermsAndConditions = () => {
       )}
 
       {/* Back to Top Button */}
-      <button 
+      <button
         className="doc-back-to-top"
         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
       >
