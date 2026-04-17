@@ -2,6 +2,7 @@ import React, { createContext, useState, useEffect, useContext, useCallback, use
 import axios from "axios";
 import API_BASE_URL from "../config/api";
 import profileAPI from "../services/profileAPI";
+import Loader from "../components/Loader";
 
 const AuthContext = createContext();
 
@@ -198,8 +199,11 @@ export const AuthProvider = ({ children }) => {
         }
         // If server is down, we keep the user state initialized from constructor
       } finally {
-        setLoading(false);
-        setAuthInitialized(true);
+        // Ensure loader shows for at least 5s for a smooth transition
+        setTimeout(() => {
+          setLoading(false);
+          setAuthInitialized(true);
+        }, 5000);
       }
     };
 
@@ -216,11 +220,7 @@ export const AuthProvider = ({ children }) => {
 
   // 4. Final Render
   if (!authInitialized || loading) {
-    return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-        <p>Loading application...</p>
-      </div>
-    );
+    return <Loader />;
   }
 
   return (

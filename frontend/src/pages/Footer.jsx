@@ -317,7 +317,7 @@
 // }
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Facebook, Twitter, Linkedin, Instagram, ArrowRight, Globe } from 'lucide-react';
 
 function Footer() {

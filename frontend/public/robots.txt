@@ -1,5 +1,11 @@
 # https://www.robotstxt.org/robotstxt.html
 User-agent: *
-Disallow:
+Disallow: /admin
+Disallow: /brand/dashboard
+Disallow: /brand/account
+Disallow: /brand/settings
+Disallow: /influencer/dashboard
+Disallow: /influencer/account
+Disallow: /influencer/settings
 
 Sitemap: https://brio.devopstrio.co.uk/sitemap.xml

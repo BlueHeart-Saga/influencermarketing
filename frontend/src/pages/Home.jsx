@@ -405,10 +405,6 @@ const Home = () => {
 
       {/* <DynamicFooter /> */}
 
-      <div style={{ opacity: 0.8, fontSize: '12px', textAlign: 'center', padding: '20px' }}>
-        <a href="/privacy" style={{ color: 'inherit', margin: '0 10px' }}>Privacy Policy</a>
-        <a href="/terms" style={{ color: 'inherit', margin: '0 10px' }}>Terms of Service</a>
-      </div>
     </div>
   );
 };
