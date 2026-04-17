@@ -43,7 +43,7 @@
 
 //   return (
 //     <div className="qb-home-container">
-      
+
 
 //       {/* Main Content */}
 //       <main className="qb-main-content">
@@ -54,7 +54,7 @@
 //             <div className="qb-hero-orbit orbit-2"></div>
 //             <div className="qb-hero-orbit orbit-3"></div>
 //           </div>
-          
+
 //           <div className={`qb-hero-content ${isVisible.hero ? 'fade-in-up' : ''}`}>
 //             <div className="qb-hero-badge">
 //                AI-Driven Influencer Marketing Platform
@@ -80,7 +80,7 @@
 //               </div>
 //             </div>
 //           </div>
-          
+
 //           <div className="qb-hero-visual">
 //             <div className="qb-hero-image-container">
 //               <img 
@@ -197,7 +197,7 @@
 //             <h2>Successful Campaign Examples</h2>
 //             <p>See how brands are achieving exceptional results with QUICKBOX.IO</p>
 //           </div>
-          
+
 //           <div className="qb-campaigns-grid">
 //             <div className={`qb-campaign-card with-hover-3d ${isVisible.campaigns ? 'fade-in-up delayed-1' : ''}`}>
 //               <div className="qb-campaign-image">
@@ -213,7 +213,7 @@
 //               </div>
 //               <Link to="/campaigns/summer" className="qb-campaign-btn">View Case Study →</Link>
 //             </div>
-            
+
 //             <div className={`qb-campaign-card with-hover-3d ${isVisible.campaigns ? 'fade-in-up delayed-2' : ''}`}>
 //               <div className="qb-campaign-image">
 //                 <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80" alt="Fitness Challenge Campaign" />
@@ -228,7 +228,7 @@
 //               </div>
 //               <Link to="/campaigns/fitness" className="qb-campaign-btn">View Case Study →</Link>
 //             </div>
-            
+
 //             <div className={`qb-campaign-card with-hover-3d ${isVisible.campaigns ? 'fade-in-up delayed-3' : ''}`}>
 //               <div className="qb-campaign-image">
 //                 <img src="/images/tech.jpg" alt="Tech Giveaway Campaign" />
@@ -244,7 +244,7 @@
 //               <Link to="/campaigns/tech" className="qb-campaign-btn">View Case Study →</Link>
 //             </div>
 //           </div>
-          
+
 //           <div className="qb-section-cta">
 //             <Link to="/campaigns" className="qb-btn primary large with-glow">Explore All Campaigns</Link>
 //           </div>
@@ -258,7 +258,7 @@
 //             <h2>Powered by Advanced AI Technology</h2>
 //             <p>Experience the future of influencer marketing with our cutting-edge AI capabilities</p>
 //           </div>
-          
+
 //           <div className="qb-ai-features-grid">
 //             <div className={`qb-ai-feature-card ${isVisible.features ? 'fade-in-up delayed-1' : ''}`}>
 //               <div className="qb-ai-icon">
@@ -271,7 +271,7 @@
 //                 <span>95% Match Accuracy</span>
 //               </div>
 //             </div>
-            
+
 //             <div className={`qb-ai-feature-card ${isVisible.features ? 'fade-in-up delayed-2' : ''}`}>
 //               <div className="qb-ai-icon">
 //                 <div className="qb-ai-glow"></div>
@@ -283,7 +283,7 @@
 //                 <span>89% Prediction Accuracy</span>
 //               </div>
 //             </div>
-            
+
 //             <div className={`qb-ai-feature-card ${isVisible.features ? 'fade-in-up delayed-3' : ''}`}>
 //               <div className="qb-ai-icon">
 //                 <div className="qb-ai-glow"></div>
@@ -357,54 +357,58 @@ import { useEffect } from "react";
 
 
 const Home = () => {
-  
-useEffect(() => {
-  setPageTitle(
-    "AI-Driven Influencer Marketing Platform for Brands & Influencers",
-    "Discover AI-powered influencer marketing that helps brands identify creators, run smarter campaigns, and maximize reach with data-driven insights."
-  );
-}, []);
+
+  useEffect(() => {
+    setPageTitle(
+      "AI-Driven Influencer Marketing Platform for Brands & Influencers",
+      "Discover AI-powered influencer marketing that helps brands identify creators, run smarter campaigns, and maximize reach with data-driven insights."
+    );
+  }, []);
 
 
-  
+
 
   return (
     <div >
-      
-        <HeroSection />
-        
-        <PartnershipScroll />
 
-        <Features />
-        
+      <HeroSection />
 
-        <ProfessionalFeatures />
+      <PartnershipScroll />
 
-        {/* <StatsSection /> */}
+      <Features />
 
-        
-        {/* <PlatformOverview /> */}
 
-        {/* <PricingSection /> */}
-        
-        {/* <CampaignsPreview/> */}
+      <ProfessionalFeatures />
 
-        {/* <AIFeatures/> */}
+      {/* <StatsSection /> */}
 
-        {/* <CaseStudies /> */}
 
-        {/* <ContentIntelligence /> */}
+      {/* <PlatformOverview /> */}
 
-        {/* <CTASection /> */}
+      {/* <PricingSection /> */}
 
-        {/* <About /> */}
-        
-        {/* <AutomationMarketing /> */}
-        
-        {/* <Integration /> */}
+      {/* <CampaignsPreview/> */}
 
-        {/* <DynamicFooter /> */}
-      
+      {/* <AIFeatures/> */}
+
+      {/* <CaseStudies /> */}
+
+      {/* <ContentIntelligence /> */}
+
+      {/* <CTASection /> */}
+
+      {/* <About /> */}
+
+      {/* <AutomationMarketing /> */}
+
+      {/* <Integration /> */}
+
+      {/* <DynamicFooter /> */}
+
+      <div style={{ opacity: 0.8, fontSize: '12px', textAlign: 'center', padding: '20px' }}>
+        <a href="/privacy" style={{ color: 'inherit', margin: '0 10px' }}>Privacy Policy</a>
+        <a href="/terms" style={{ color: 'inherit', margin: '0 10px' }}>Terms of Service</a>
+      </div>
     </div>
   );
 };

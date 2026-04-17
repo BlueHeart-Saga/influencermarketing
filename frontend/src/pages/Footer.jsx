@@ -766,26 +766,11 @@ function Footer() {
             </div>
 
 
-            <Link
-              to="/terms"
-              className="qb-footer-legal-link"
-            >
-              Terms of Service
-            </Link>
+            <a href="/terms" className="qb-footer-legal-link">Terms of Service</a>
             <span className="qb-footer-separator">|</span>
-            <Link
-              to="/privacy"
-              className="qb-footer-legal-link"
-            >
-              Privacy Policy
-            </Link>
+            <a href="/privacy" className="qb-footer-legal-link">Privacy Policy</a>
             <span className="qb-footer-separator">|</span>
-            <Link
-              to="/payment-policy"
-              className="qb-footer-legal-link"
-            >
-              Payment Policy
-            </Link>
+            <a href="/payment-policy" className="qb-footer-legal-link">Payment Policy</a>
           </div>
         </div>
       </div>
