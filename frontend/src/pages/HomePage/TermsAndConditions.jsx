@@ -33,7 +33,15 @@ import {
   FileSignature
 } from 'lucide-react';
 
+import { setPageTitle } from '../../components/utils/pageTitle';
+
 const TermsAndConditions = () => {
+  useEffect(() => {
+    setPageTitle(
+      "Terms of Service | Brio Influencer Marketing Platform",
+      "Understand the Terms of Service and user agreements for Brio, the AI-driven influencer marketing ecosystem."
+    );
+  }, []);
   const [activeSection, setActiveSection] = useState('introduction');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [showAcceptDialog, setShowAcceptDialog] = useState(false);

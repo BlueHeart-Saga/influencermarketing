@@ -1,106 +1,207 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <!-- Core Pages -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+        http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+
+  <!-- Main Entry Points -->
   <url>
     <loc>https://brio.devopstrio.co.uk/</loc>
-    <lastmod>2026-04-17</lastmod>
-    <changefreq>weekly</changefreq>
+    <lastmod>2026-04-20</lastmod>
+    <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
+
+  <!-- Product & Core Offering -->
   <url>
-    <loc>https://brio.devopstrio.co.uk/about</loc>
-    <lastmod>2026-04-17</lastmod>
+    <loc>https://brio.devopstrio.co.uk/platform-overview</loc>
+    <lastmod>2026-04-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://brio.devopstrio.co.uk/ai-features</loc>
+    <lastmod>2026-04-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://brio.devopstrio.co.uk/pricingsection</loc>
+    <lastmod>2026-04-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
+
+  <!-- Key Tools & AI Capabilities -->
+  <url>
+    <loc>https://brio.devopstrio.co.uk/ai-chatbot</loc>
+    <lastmod>2026-04-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://brio.devopstrio.co.uk/ai-insights</loc>
+    <lastmod>2026-04-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://brio.devopstrio.co.uk/trend-predictor</loc>
+    <lastmod>2026-04-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://brio.devopstrio.co.uk/budget-planner</loc>
+    <lastmod>2026-04-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://brio.devopstrio.co.uk/engagement-calculator</loc>
+    <lastmod>2026-04-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://brio.devopstrio.co.uk/fraud-detection</loc>
+    <lastmod>2026-04-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://brio.devopstrio.co.uk/predictive-roi</loc>
+    <lastmod>2026-04-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://brio.devopstrio.co.uk/content-analyzer</loc>
+    <lastmod>2026-04-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://brio.devopstrio.co.uk/find-influencer</loc>
+    <lastmod>2026-04-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://brio.devopstrio.co.uk/content-intelligence</loc>
+    <lastmod>2026-04-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://brio.devopstrio.co.uk/futureai</loc>
+    <lastmod>2026-04-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://brio.devopstrio.co.uk/automation-marketing</loc>
+    <lastmod>2026-04-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- About & Support -->
+  <url>
+    <loc>https://brio.devopstrio.co.uk/about</loc>
+    <lastmod>2026-04-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
   <url>
     <loc>https://brio.devopstrio.co.uk/contactUs</loc>
-    <lastmod>2026-04-17</lastmod>
+    <lastmod>2026-04-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://brio.devopstrio.co.uk/faq</loc>
+    <lastmod>2026-04-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://brio.devopstrio.co.uk/demo</loc>
+    <lastmod>2026-04-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
-  <!-- Auth Pages -->
+  <!-- Legal & Compliance -->
+  <url>
+    <loc>https://brio.devopstrio.co.uk/privacy</loc>
+    <lastmod>2026-04-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://brio.devopstrio.co.uk/terms</loc>
+    <lastmod>2026-04-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://brio.devopstrio.co.uk/payment-policy</loc>
+    <lastmod>2026-04-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Resource Library -->
+  <url>
+    <loc>https://brio.devopstrio.co.uk/resources/blog</loc>
+    <lastmod>2026-04-20</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://brio.devopstrio.co.uk/resources/help-center</loc>
+    <lastmod>2026-04-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://brio.devopstrio.co.uk/resources/case-studies</loc>
+    <lastmod>2026-04-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://brio.devopstrio.co.uk/resources/documentation</loc>
+    <lastmod>2026-04-20</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://brio.devopstrio.co.uk/resources/community</loc>
+    <lastmod>2026-04-20</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  <url>
+    <loc>https://brio.devopstrio.co.uk/resources/support</loc>
+    <lastmod>2026-04-20</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Authentication -->
   <url>
     <loc>https://brio.devopstrio.co.uk/login</loc>
-    <lastmod>2026-04-17</lastmod>
+    <lastmod>2026-04-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://brio.devopstrio.co.uk/register</loc>
-    <lastmod>2026-04-17</lastmod>
+    <lastmod>2026-04-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
 
-  <!-- Legal Pages -->
-  <url>
-    <loc>https://brio.devopstrio.co.uk/privacy</loc>
-    <lastmod>2026-04-17</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://brio.devopstrio.co.uk/terms</loc>
-    <lastmod>2026-04-17</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://brio.devopstrio.co.uk/payment-policy</loc>
-    <lastmod>2026-04-17</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <!-- Product & AI Tools -->
-  <url>
-    <loc>https://brio.devopstrio.co.uk/ai-features</loc>
-    <lastmod>2026-04-17</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://brio.devopstrio.co.uk/platform-overview</loc>
-    <lastmod>2026-04-17</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://brio.devopstrio.co.uk/faq</loc>
-    <lastmod>2026-04-17</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
-  <url>
-    <loc>https://brio.devopstrio.co.uk/demo</loc>
-    <lastmod>2026-04-17</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-  <!-- AI Tools Redirecting/Specific -->
-  <url><loc>https://brio.devopstrio.co.uk/ai-chatbot</loc><priority>0.7</priority></url>
-  <url><loc>https://brio.devopstrio.co.uk/ai-insights</loc><priority>0.7</priority></url>
-  <url><loc>https://brio.devopstrio.co.uk/trend-predictor</loc><priority>0.7</priority></url>
-  <url><loc>https://brio.devopstrio.co.uk/budget-planner</loc><priority>0.7</priority></url>
-  <url><loc>https://brio.devopstrio.co.uk/engagement-calculator</loc><priority>0.7</priority></url>
-  <url><loc>https://brio.devopstrio.co.uk/fraud-detection</loc><priority>0.7</priority></url>
-  <url><loc>https://brio.devopstrio.co.uk/predictive-roi</loc><priority>0.7</priority></url>
-  <url><loc>https://brio.devopstrio.co.uk/content-analyzer</loc><priority>0.7</priority></url>
-  <url><loc>https://brio.devopstrio.co.uk/payment-automation</loc><priority>0.7</priority></url>
-  <url><loc>https://brio.devopstrio.co.uk/find-influencer</loc><priority>0.7</priority></url>
-  <url><loc>https://brio.devopstrio.co.uk/integration</loc><priority>0.7</priority></url>
-  <url><loc>https://brio.devopstrio.co.uk/content-intelligence</loc><priority>0.7</priority></url>
-  <url><loc>https://brio.devopstrio.co.uk/futureai</loc><priority>0.7</priority></url>
-  <url><loc>https://brio.devopstrio.co.uk/automation-marketing</loc><priority>0.7</priority></url>
-
-  <!-- Resources -->
-  <url><loc>https://brio.devopstrio.co.uk/resources/blog</loc><priority>0.6</priority></url>
-  <url><loc>https://brio.devopstrio.co.uk/resources/help-center</loc><priority>0.6</priority></url>
-  <url><loc>https://brio.devopstrio.co.uk/resources/case-studies</loc><priority>0.6</priority></url>
-  <url><loc>https://brio.devopstrio.co.uk/resources/documentation</loc><priority>0.6</priority></url>
-  <url><loc>https://brio.devopstrio.co.uk/resources/community</loc><priority>0.6</priority></url>
-  <url><loc>https://brio.devopstrio.co.uk/resources/support</loc><priority>0.6</priority></url>
 </urlset>

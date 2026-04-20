@@ -287,9 +287,9 @@ function Features() {
         <div className="qb-features-container">
           <div className="qb-features-discovery-grid">
             <div className="qb-features-discovery-left">
-              <img 
-                src="/images/influencers-list.png" 
-                alt="Influencer Discovery Interface" 
+              <img
+                src="/images/influencers-list.png"
+                alt="Brio AI Influencer Discovery Interface - Filter and Search Vetted Creators"
                 className="qb-features-discovery-image"
               />
             </div>
@@ -326,8 +326,8 @@ function Features() {
             <div className="qb-features-campaign-content">
               <h2 className="qb-features-section-title">CAMPAIGNS THAT MOVE AT YOUR SPEED</h2>
               <p className="qb-features-campaign-text">
-                Paste your product link and provide the key details. 
-                Our AI instantly analyzes your product and gets to work. 
+                Paste your product link and provide the key details.
+                Our AI instantly analyzes your product and gets to work.
                 Within moments, it generates a complete, ready-to-launch campaign.
               </p>
               <p className="qb-features-campaign-text-secondary">
@@ -335,9 +335,9 @@ function Features() {
               </p>
             </div>
             <div className="qb-features-campaign-image-wrapper">
-              <img 
-                src="/images/campaign-creation.png" 
-                alt="Fast Campaign Creation" 
+              <img
+                src="/images/campaign-creation.png"
+                alt="High-Speed AI Campaign Creation Workflow in Brio Platform"
                 className="qb-features-campaign-image"
               />
             </div>
@@ -351,58 +351,58 @@ function Features() {
           <div className="qb-features-grid">
             {/* AI-Powered Campaign Management */}
             <div className="qb-features-card qb-features-card-large">
-  <h3 className="qb-features-card-title">
-    AI-Powered Campaign Management
-  </h3>
+              <h3 className="qb-features-card-title">
+                AI-Powered Campaign Management
+              </h3>
 
-  <p className="qb-features-card-description">
-    Manage influencer campaigns end-to-end with AI-driven precision.
-  </p>
+              <p className="qb-features-card-description">
+                Manage influencer campaigns end-to-end with AI-driven precision.
+              </p>
 
-  {/* Bullet Points */}
-  <ul className="qb-features-bullet-list">
-    <li>
-      <CheckCircle size={16} />
-      One-click campaign creation & automation
-    </li>
-    <li>
-      <CheckCircle size={16} />
-      Centralized creator communication & approvals
-    </li>
-    <li>
-      <CheckCircle size={16} />
-      Smart timelines, briefs & deliverable tracking
-    </li>
-    <li>
-      <CheckCircle size={16} />
-      AI insights to optimize performance in real time
-    </li>
-  </ul>
+              {/* Bullet Points */}
+              <ul className="qb-features-bullet-list">
+                <li>
+                  <CheckCircle size={16} />
+                  One-click campaign creation & automation
+                </li>
+                <li>
+                  <CheckCircle size={16} />
+                  Centralized creator communication & approvals
+                </li>
+                <li>
+                  <CheckCircle size={16} />
+                  Smart timelines, briefs & deliverable tracking
+                </li>
+                <li>
+                  <CheckCircle size={16} />
+                  AI insights to optimize performance in real time
+                </li>
+              </ul>
 
-  <div className="qb-features-card-image-wrapper">
-    <img
-      src="/images/campaign-dashboard.png"
-      alt="Campaign Management Dashboard"
-      className="qb-features-card-image"
-    />
-  </div>
-</div>
+              <div className="qb-features-card-image-wrapper">
+                <img
+                  src="/images/campaign-dashboard.png"
+                  alt="Brio Centralized Campaign Management and Automation Dashboard"
+                  className="qb-features-card-image"
+                />
+              </div>
+            </div>
 
 
             {/* Smart Matching & Outreach */}
             <div className="qb-features-card qb-features-card-medium">
               <h3 className="qb-features-card-title">Smart Matching & Outreach</h3>
-             <p className="qb-features-card-description">
-  Connect with ideal creators using AI that identifies authentic, high-performing influencers tailored to your brand.
-</p>
+              <p className="qb-features-card-description">
+                Connect with ideal creators using AI that identifies authentic, high-performing influencers tailored to your brand.
+              </p>
 
 
-              
+
 
               <div className="qb-features-card-image-wrapper">
-                <img 
-                  src="/images/matching-interface.png" 
-                  alt="Smart Matching Interface" 
+                <img
+                  src="/images/matching-interface.png"
+                  alt="Smart Influencer Matching and Automated Outreach Interface"
                   className="qb-features-card-image"
                 />
               </div>
@@ -413,13 +413,13 @@ function Features() {
               <h3 className="qb-features-card-title">Automated Performance Tracking</h3>
               <p className="qb-features-card-description">
                 Real-time analytics and ROI measurement for all campaigns.
-Track engagement, conversions, and creator performance instantly.
-Make smarter decisions with data-driven insights at every step.
+                Track engagement, conversions, and creator performance instantly.
+                Make smarter decisions with data-driven insights at every step.
               </p>
               <div className="qb-features-card-image-wrapper">
-                <img 
-                  src="/images/analytics-dashboard.png" 
-                  alt="Performance Tracking Dashboard" 
+                <img
+                  src="/images/analytics-dashboard.png"
+                  alt="Real-time Influencer Performance and ROI Tracking Analytics"
                   className="qb-features-card-image"
                 />
               </div>
@@ -475,25 +475,25 @@ Make smarter decisions with data-driven insights at every step.
         </div>
       </section>
 
-      
+
 
       {/* Affiliate Marketing Section */}
       <section className="qb-features-affiliate-section">
         <div className="qb-features-container">
           <div className="qb-features-affiliate-grid">
             <div className="qb-features-affiliate-image-wrapper">
-              <img 
-                src="/images/ecommerce-stats.png" 
-                alt="E-commerce Performance" 
+              <img
+                src="/images/ecommerce-stats.png"
+                alt="E-commerce ROI and Conversion Statistics Driven by Brio AI"
                 className="qb-features-affiliate-image"
               />
             </div>
             <div className="qb-features-affiliate-content">
               <h2 className="qb-features-section-title">AFFILIATE MARKETING MADE SMARTER</h2>
               <p className="qb-features-affiliate-text">
-                Boost ROI with influencer-driven affiliate marketing. 
-                Manage campaigns, tracking, and payouts in one place. 
-                Drive more traffic to your product pages to increase sales. 
+                Boost ROI with influencer-driven affiliate marketing.
+                Manage campaigns, tracking, and payouts in one place.
+                Drive more traffic to your product pages to increase sales.
                 Reward influencers with performance-based instant payments.
               </p>
             </div>

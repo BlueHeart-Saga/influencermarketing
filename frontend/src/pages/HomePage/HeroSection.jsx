@@ -22,7 +22,7 @@
 //     <section className="quickbox-hero-section">
 //       <div className="hero-main-container">
 //         <div className="hero-content-wrapper">
-          
+
 //           {/* Announcement Badge */}
 //           <div className="hero-announcement-badge">
 //             <FaBolt className="announcement-icon" />
@@ -142,7 +142,7 @@
 //                   <span>app.quickbox.io/dashboard</span>
 //                 </div>
 //               </div>
-              
+
 //               <div className="dashboard-content-area">
 //                 <img 
 //                   src="/images/herocard.jpg"
@@ -158,13 +158,13 @@
 //       <style>{`
 //         .quickbox-hero-section {
 //           position: relative;
-          
+
 //           display: flex;
 //           max-width: 100%;
 //           overflow: hidden;
-  
+
 //   margin: 0 auto;
-  
+
 //           align-items: center;
 //           background: rgb(255, 255, 255);
 //           align-items: center;
@@ -237,7 +237,7 @@
 //           color: #000000;
 //           font-size: 48px;
 //           font-weight: 700;
-          
+
 //           background-clip: text;
 //           display: inline-block;
 //           padding-bottom: 10px ;
@@ -403,7 +403,7 @@
 //         .hero-visual-wrapper {
 //           position: relative;
 //           background: #ffffffff;
-          
+
 //         z-index: 1;
 //         }
 
@@ -654,7 +654,7 @@ function HeroCard() {
 
   const navigate = useNavigate();
 
-   const goToLogin = () => {
+  const goToLogin = () => {
     navigate("/login");
   };
 
@@ -666,15 +666,15 @@ function HeroCard() {
   }, []);
 
   useEffect(() => {
-  const checkMobile = () => {
-    setIsMobile(window.innerWidth <= 1124);
-  };
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 1124);
+    };
 
-  checkMobile(); // initial check
-  window.addEventListener("resize", checkMobile);
+    checkMobile(); // initial check
+    window.addEventListener("resize", checkMobile);
 
-  return () => window.removeEventListener("resize", checkMobile);
-}, []);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   const handleImageError = (iconName) => {
     setIconErrors(prev => ({ ...prev, [iconName]: true }));
@@ -693,52 +693,52 @@ function HeroCard() {
         {/* Floating Icons */}
 
         {!isMobile && (
-<div style={styles.floatingLayer}>
+          <div style={styles.floatingLayer}>
 
-  {/* Megaphone — Top Left */}
-  <img
-    src="/images/megaphone.png"
-    alt="📣"
-    style={{ ...styles.floatImg, ...styles.posMegaphone }}
-    onError={(e)=>e.target.src=""}
-  />
+            {/* Megaphone — Top Left */}
+            <img
+              src="/images/megaphone.png"
+              alt="Brio Campaign Announcement Megaphone"
+              style={{ ...styles.floatImg, ...styles.posMegaphone }}
+              onError={(e) => e.target.src = ""}
+            />
 
-  {/* Heart — Top Right */}
-  <img
-    src="/images/love.png"
-    alt="❤️"
-    style={{ ...styles.floatImg, ...styles.posHeartTop }}
-  />
+            {/* Heart — Top Right */}
+            <img
+              src="/images/love.png"
+              alt="Influencer Audience Engagement Heart"
+              style={{ ...styles.floatImg, ...styles.posHeartTop }}
+            />
 
-  {/* Love Face — Left Middle */}
-  <img
-    src="/images/love.png"
-    alt="😍"
-    style={{ ...styles.floatImg, ...styles.posLove }}
-  />
+            {/* Love Face — Left Middle */}
+            <img
+              src="/images/love.png"
+              alt="Authentic Content Creator Reaction"
+              style={{ ...styles.floatImg, ...styles.posLove }}
+            />
 
-  {/* Thumbs Up — Right Middle */}
-  <img
-    src="/images/like.png"
-    alt="👍"
-    style={{ ...styles.floatImg, ...styles.posThumbs }}
-  />
+            {/* Thumbs Up — Right Middle */}
+            <img
+              src="/images/like.png"
+              alt="Successful Brand Collaboration Like"
+              style={{ ...styles.floatImg, ...styles.posThumbs }}
+            />
 
-  {/* Target — Bottom Left */}
-  <img
-    src="/images/chat.png"
-    alt="🎯"
-    style={{ ...styles.floatImg, ...styles.posTarget }}
-  />
+            {/* Target — Bottom Left */}
+            <img
+              src="/images/chat.png"
+              alt="AI Targeted Influencer Discovery Chat"
+              style={{ ...styles.floatImg, ...styles.posTarget }}
+            />
 
-  {/* Heart Bubble — Bottom Right */}
-  <img
-    src="/images/chat.png"
-    alt="🌟"
-    style={{ ...styles.floatImg, ...styles.posHeartBubble }}
-  />
+            {/* Heart Bubble — Bottom Right */}
+            <img
+              src="/images/chat.png"
+              alt="Brio Real-time Support Chat"
+              style={{ ...styles.floatImg, ...styles.posHeartBubble }}
+            />
 
-</div>
+          </div>
         )}
 
 
@@ -752,11 +752,11 @@ function HeroCard() {
           <div style={styles.header}>
             <h1 style={styles.mainTitle}>
               Transform Your Brand with{" "}
-              <Heart 
-                size={32} 
-                color="#FF6B6B" 
-                fill="#FF6B6B" 
-                style={styles.heartIcon} 
+              <Heart
+                size={32}
+                color="#FF6B6B"
+                fill="#FF6B6B"
+                style={styles.heartIcon}
               />
             </h1>
             <h2 style={styles.subTitle}>AI-Powered Influencer Marketing</h2>
@@ -777,7 +777,7 @@ function HeroCard() {
               Get Started Free
             </button>
             <button style={styles.secondaryButton} onClick={() => navigate("/demo")}>
-              <Play size={18}  color="black" style={{marginRight: '8px'}} />
+              <Play size={18} color="black" style={{ marginRight: '8px' }} />
               View Demo
             </button>
           </div>
@@ -791,55 +791,55 @@ function HeroCard() {
         }}>
           <div style={styles.imageGrid}>
             {/* Image 1 */}
-            <div style={{...styles.imageCard, ...styles.image1}}>
+            <div style={{ ...styles.imageCard, ...styles.image1 }}>
               <div style={styles.imagePlaceholder}>
-                <img 
-                  src="/images/hero1.png" 
-                  alt="Brio Team" 
+                <img
+                  src="/images/hero1.png"
+                  alt="Brio Platform Team Collaborating on Influencer Marketing"
                   style={styles.collageImage}
                 />
               </div>
             </div>
 
             {/* Image 2 */}
-            <div style={{...styles.imageCard, ...styles.image2}}>
+            <div style={{ ...styles.imageCard, ...styles.image2 }}>
               <div style={styles.imagePlaceholder}>
-                <img 
-                  src="/images/hero2.png" 
-                  alt="Brio Team" 
+                <img
+                  src="/images/hero2.png"
+                  alt="Brio AI Campaign Dashboard Preview"
                   style={styles.collageImage}
                 />
               </div>
             </div>
 
             {/* Image 3 - Center */}
-            <div style={{...styles.imageCard, ...styles.image3}}>
+            <div style={{ ...styles.imageCard, ...styles.image3 }}>
               <div style={styles.imagePlaceholder}>
-                <img 
-                  src="/images/hero3.png" 
-                  alt="Brio Team" 
+                <img
+                  src="/images/hero3.png"
+                  alt="Influencer Growth Tracking and Analytics"
                   style={styles.collageImage}
                 />
               </div>
             </div>
 
             {/* Image 4 */}
-            <div style={{...styles.imageCard, ...styles.image4}}>
+            <div style={{ ...styles.imageCard, ...styles.image4 }}>
               <div style={styles.imagePlaceholder}>
-                <img 
-                  src="/images/hero5.png" 
-                  alt="Brio Team" 
+                <img
+                  src="/images/hero5.png"
+                  alt="Brio Team"
                   style={styles.collageImage}
                 />
               </div>
             </div>
 
             {/* Image 5 */}
-            <div style={{...styles.imageCard, ...styles.image5}}>
+            <div style={{ ...styles.imageCard, ...styles.image5 }}>
               <div style={styles.imagePlaceholder}>
-                <img 
-                  src="/images/hero4.png" 
-                  alt="Brio Team" 
+                <img
+                  src="/images/hero4.png"
+                  alt="Brio Team"
                   style={styles.collageImage}
                 />
               </div>
@@ -948,53 +948,53 @@ const styles = {
   },
 
   floatingLayer: {
-  position: "absolute",
-  top: 0,
-  left: 0,
-  width: "100%",
-  height: "100%",
-  pointerEvents: "none",
-  zIndex: 1
-},
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "100%",
+    pointerEvents: "none",
+    zIndex: 1
+  },
 
-floatImg: {
-  width: "90px",
-  height: "90px",
-  objectFit: "contain",
-  position: "absolute",
-  opacity: 1,
-},
+  floatImg: {
+    width: "90px",
+    height: "90px",
+    objectFit: "contain",
+    position: "absolute",
+    opacity: 1,
+  },
 
-/* EXACT SCREENSHOT POSITIONS */
-posMegaphone: {
-  top: "10px",
-  left: "120px",
-},
+  /* EXACT SCREENSHOT POSITIONS */
+  posMegaphone: {
+    top: "10px",
+    left: "120px",
+  },
 
-posHeartTop: {
-  top: "5px",
-  right: "80px",
-},
+  posHeartTop: {
+    top: "5px",
+    right: "80px",
+  },
 
-posLove: {
-  top: "120px",
-  left: "80px",
-},
+  posLove: {
+    top: "120px",
+    left: "80px",
+  },
 
-posThumbs: {
-  top: "280px",
-  right: "180px",
-},
+  posThumbs: {
+    top: "280px",
+    right: "180px",
+  },
 
-posTarget: {
-  top: "280px",
-  left: "200px",
-},
+  posTarget: {
+    top: "280px",
+    left: "200px",
+  },
 
-posHeartBubble: {
-  top: "120px",
-  right: "80px",
-},
+  posHeartBubble: {
+    top: "120px",
+    right: "80px",
+  },
 
   floatingImage: {
     width: '32px',
@@ -1341,7 +1341,7 @@ posHeartBubble: {
 // Convert media queries for React inline styles
 const responsiveStyles = (styles) => {
   const newStyles = { ...styles };
-  
+
   // Process media queries
   Object.keys(newStyles).forEach(key => {
     if (newStyles[key] && typeof newStyles[key] === 'object') {
@@ -1353,7 +1353,7 @@ const responsiveStyles = (styles) => {
       }
     }
   });
-  
+
   return newStyles;
 };
 

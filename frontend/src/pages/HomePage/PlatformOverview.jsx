@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { 
-  FaRocket, 
-  FaChartLine, 
-  FaUsers, 
+import {
+  FaRocket,
+  FaChartLine,
+  FaUsers,
   FaCheckCircle,
   FaBolt,
   FaRegLightbulb,
@@ -21,7 +21,7 @@ const QuickboxPlatform = () => {
   const goToLogin = () => {
     navigate("/login");
   };
-  
+
   const tabs = [
     { id: 'discover', label: 'Discover', icon: FaUsers },
     { id: 'campaign', label: 'Campaign', icon: FaRocket },
@@ -37,9 +37,9 @@ const QuickboxPlatform = () => {
       category: 'education',
       icon: (
         <svg width="46" height="46" viewBox="0 0 46 46" fill="none">
-          <path d="M23 3L3 13L23 23L43 13L23 3Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          <path d="M3 33L23 43L43 33" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          <path d="M23 23V43" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d="M23 3L3 13L23 23L43 13L23 3Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M3 33L23 43L43 33" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M23 23V43" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       )
     },
@@ -50,8 +50,8 @@ const QuickboxPlatform = () => {
       category: 'credentialing',
       icon: (
         <svg width="46" height="46" viewBox="0 0 46 46" fill="none">
-          <path d="M13 23L19 29L33 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          <circle cx="23" cy="23" r="20" stroke="currentColor" strokeWidth="2"/>
+          <path d="M13 23L19 29L33 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          <circle cx="23" cy="23" r="20" stroke="currentColor" strokeWidth="2" />
         </svg>
       )
     },
@@ -62,9 +62,9 @@ const QuickboxPlatform = () => {
       category: 'wallet',
       icon: (
         <svg width="46" height="46" viewBox="0 0 46 46" fill="none">
-          <rect x="3" y="11" width="40" height="24" rx="3" stroke="currentColor" strokeWidth="2"/>
-          <path d="M3 17H43" stroke="currentColor" strokeWidth="2"/>
-          <circle cx="33" cy="23" r="2" fill="currentColor"/>
+          <rect x="3" y="11" width="40" height="24" rx="3" stroke="currentColor" strokeWidth="2" />
+          <path d="M3 17H43" stroke="currentColor" strokeWidth="2" />
+          <circle cx="33" cy="23" r="2" fill="currentColor" />
         </svg>
       )
     },
@@ -75,8 +75,8 @@ const QuickboxPlatform = () => {
       category: 'human-resources',
       icon: (
         <svg width="46" height="46" viewBox="0 0 46 46" fill="none">
-          <path d="M23 25C28.5228 25 33 20.5228 33 15C33 9.47715 28.5228 5 23 5C17.4772 5 13 9.47715 13 15C13 20.5228 17.4772 25 23 25Z" stroke="currentColor" strokeWidth="2"/>
-          <path d="M5 41C5 33.8203 10.8203 28 18 28H28C35.1797 28 41 33.8203 41 41" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+          <path d="M23 25C28.5228 25 33 20.5228 33 15C33 9.47715 28.5228 5 23 5C17.4772 5 13 9.47715 13 15C13 20.5228 17.4772 25 23 25Z" stroke="currentColor" strokeWidth="2" />
+          <path d="M5 41C5 33.8203 10.8203 28 18 28H28C35.1797 28 41 33.8203 41 41" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
         </svg>
       )
     }
@@ -151,7 +151,7 @@ const QuickboxPlatform = () => {
               <FaRocket /> AI-Powered Campaign Builder
             </div>
             <h3 className="qb-showcase-title">Launch Campaigns in Minutes, Not Days</h3>
-            
+
             <div className="qb-feature-list">
               <div className="qb-list-item">
                 <FaCheckCircle className="qb-check-icon" />
@@ -194,9 +194,9 @@ const QuickboxPlatform = () => {
           </div>
           <div className="qb-showcase-visual">
             <div className="qb-dashboard-preview">
-              <img 
+              <img
                 src="/images/Launch Campaigns in Minutes.png"
-                alt="Campaign Management Dashboard"
+                alt="Brio AI-Powered Campaign Builder and Launch Interface"
                 className="qb-dashboard-image"
               />
             </div>
@@ -209,9 +209,9 @@ const QuickboxPlatform = () => {
         <div className="qb-showcase-container">
           <div className="qb-showcase-visual">
             <div className="qb-analytics-preview">
-              <img 
+              <img
                 src="/images/analyticsreport.png"
-                alt="Analytics Dashboard"
+                alt="Brio Advanced Analytics Dashboard with Real-time ROI Tracking"
                 className="qb-analytics-image"
               />
             </div>
@@ -221,7 +221,7 @@ const QuickboxPlatform = () => {
               <FaChartLine /> Advanced Analytics Engine
             </div>
             <h3 className="qb-showcase-title">Data-Driven Insights That Drive Results</h3>
-            
+
             <div className="qb-metrics-grid">
               <div className="qb-metric-card">
                 <span className="qb-metric-icon">

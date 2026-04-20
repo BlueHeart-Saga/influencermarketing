@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { 
-  Search, 
-  ChevronLeft, 
-  ChevronRight, 
+import {
+  Search,
+  ChevronLeft,
+  ChevronRight,
   Shield,
   Lock,
   Database,
@@ -48,9 +48,17 @@ import {
   FileCode
 } from 'lucide-react';
 
+import { setPageTitle } from '../../components/utils/pageTitle';
+
 const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
 
 const PrivacyPolicy = () => {
+  useEffect(() => {
+    setPageTitle(
+      "Privacy Policy | Brio AI Influencer Platform",
+      "Read Brio's Privacy Policy to understand how we protect your data and ensure privacy within our AI-powered influencer marketing platform."
+    );
+  }, []);
   const [activeSection, setActiveSection] = useState('introduction');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [logoUrl, setLogoUrl] = useState("");
@@ -122,7 +130,7 @@ const PrivacyPolicy = () => {
   useEffect(() => {
     const handleScroll = () => {
       const scrollPosition = window.scrollY + 100;
-      
+
       for (const section of sections) {
         const element = sectionRefs.current[section.id];
         if (element) {
@@ -172,16 +180,16 @@ const PrivacyPolicy = () => {
           </div>
           <p className="doc-hero-subtitle">
             How {brandName} AI Platform collects, uses, and protects your data<br />
-            Last updated: {new Date().toLocaleDateString('en-US', { 
-              year: 'numeric', 
-              month: 'long', 
-              day: 'numeric' 
+            Last updated: {new Date().toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
             })}
           </p>
           <div className="doc-search-wrapper">
-            <input 
-              type="text" 
-              placeholder="Search privacy policy..." 
+            <input
+              type="text"
+              placeholder="Search privacy policy..."
               className="doc-search-input"
             />
             <button className="doc-search-btn">
@@ -197,7 +205,7 @@ const PrivacyPolicy = () => {
           <div className="doc-layout">
             {/* Sidebar */}
             <aside className={`doc-sidebar ${sidebarOpen ? 'open' : 'closed'}`}>
-              <button 
+              <button
                 className="doc-sidebar-toggle"
                 onClick={() => setSidebarOpen(!sidebarOpen)}
               >
@@ -210,7 +218,7 @@ const PrivacyPolicy = () => {
 
               <nav className="doc-nav">
                 {sections.map((section) => (
-                  <button 
+                  <button
                     key={section.id}
                     className={`doc-nav-item ${activeSection === section.id ? 'active' : ''}`}
                     onClick={() => scrollToSection(section.id)}
@@ -299,7 +307,7 @@ const PrivacyPolicy = () => {
               </div>
 
               {/* INTRODUCTION */}
-              <section 
+              <section
                 ref={(el) => sectionRefs.current.introduction = el}
                 className="doc-section"
               >
@@ -320,12 +328,12 @@ const PrivacyPolicy = () => {
               </section>
 
               {/* DATA COLLECTION */}
-              <section 
+              <section
                 ref={(el) => sectionRefs.current['data-collection'] = el}
                 className="doc-section"
               >
                 <h3 className="doc-section-title">2. Data We Collect</h3>
-                
+
                 <div className="doc-data-collection">
                   <div className="doc-data-category">
                     <div className="doc-category-header">
@@ -445,12 +453,12 @@ const PrivacyPolicy = () => {
               </section>
 
               {/* AI PROCESSING */}
-              <section 
+              <section
                 ref={(el) => sectionRefs.current['ai-processing'] = el}
                 className="doc-section"
               >
                 <h3 className="doc-section-title">3. AI Data Processing</h3>
-                
+
                 <div className="doc-notice info">
                   <Server size={20} />
                   <div>
@@ -480,12 +488,12 @@ const PrivacyPolicy = () => {
               </section>
 
               {/* DATA USAGE */}
-              <section 
+              <section
                 ref={(el) => sectionRefs.current['data-usage'] = el}
                 className="doc-section"
               >
                 <h3 className="doc-section-title">4. How We Use Your Data</h3>
-                
+
                 <div className="doc-usage-grid">
                   <div className="doc-usage-card">
                     <div className="doc-usage-icon" style={{ backgroundColor: '#3b82f6' }}>
@@ -533,12 +541,12 @@ const PrivacyPolicy = () => {
               </section>
 
               {/* DATA RIGHTS */}
-              <section 
+              <section
                 ref={(el) => sectionRefs.current['data-rights'] = el}
                 className="doc-section"
               >
                 <h3 className="doc-section-title">5. Your Data Rights</h3>
-                
+
                 <div className="doc-rights-grid">
                   <div className="doc-right-card">
                     <div className="doc-right-icon" style={{ backgroundColor: '#3b82f6' }}>
@@ -586,12 +594,12 @@ const PrivacyPolicy = () => {
               </section>
 
               {/* DPDP RIGHTS */}
-              <section 
+              <section
                 ref={(el) => sectionRefs.current['dpdp-rights'] = el}
                 className="doc-section"
               >
                 <h3 className="doc-section-title">6. India DPDP Act 2023 Rights</h3>
-                
+
                 <div className="doc-dpdp-compliance">
                   <div className="doc-dpdp-feature">
                     <CheckCircle size={20} color="#10b981" />
@@ -625,12 +633,12 @@ const PrivacyPolicy = () => {
               </section>
 
               {/* INTERNATIONAL COMPLIANCE */}
-              <section 
+              <section
                 ref={(el) => sectionRefs.current.international = el}
                 className="doc-section"
               >
                 <h3 className="doc-section-title">7. International Compliance</h3>
-                
+
                 <div className="doc-compliance-grid">
                   <div className="doc-compliance-card">
                     <div className="doc-compliance-header">
@@ -672,12 +680,12 @@ const PrivacyPolicy = () => {
               </section>
 
               {/* DATA SECURITY */}
-              <section 
+              <section
                 ref={(el) => sectionRefs.current['data-security'] = el}
                 className="doc-section"
               >
                 <h3 className="doc-section-title">8. Data Security Measures</h3>
-                
+
                 <div className="doc-security-features">
                   <div className="doc-security-feature">
                     <h5>Encryption</h5>
@@ -699,12 +707,12 @@ const PrivacyPolicy = () => {
               </section>
 
               {/* COOKIES */}
-              <section 
+              <section
                 ref={(el) => sectionRefs.current.cookies = el}
                 className="doc-section"
               >
                 <h3 className="doc-section-title">9. Cookies & Tracking Technologies</h3>
-                
+
                 <div className="doc-cookies-table">
                   <div className="doc-cookie-row header">
                     <div>Cookie Type</div>
@@ -735,12 +743,12 @@ const PrivacyPolicy = () => {
               </section>
 
               {/* DATA RETENTION */}
-              <section 
+              <section
                 ref={(el) => sectionRefs.current['data-retention'] = el}
                 className="doc-section"
               >
                 <h3 className="doc-section-title">10. Data Retention Periods</h3>
-                
+
                 <div className="doc-retention-grid">
                   <div className="doc-retention-item">
                     <h5>Account Data</h5>
@@ -762,12 +770,12 @@ const PrivacyPolicy = () => {
               </section>
 
               {/* DATA SHARING */}
-              <section 
+              <section
                 ref={(el) => sectionRefs.current['data-sharing'] = el}
                 className="doc-section"
               >
                 <h3 className="doc-section-title">11. Data Sharing & Third Parties</h3>
-                
+
                 <div className="doc-sharing-info">
                   <div className="doc-sharing-category">
                     <h5>Service Providers</h5>
@@ -789,7 +797,7 @@ const PrivacyPolicy = () => {
               </section>
 
               {/* CHILDREN'S PRIVACY */}
-              <section 
+              <section
                 ref={(el) => sectionRefs.current.children = el}
                 className="doc-section"
               >
@@ -803,7 +811,7 @@ const PrivacyPolicy = () => {
               </section>
 
               {/* UPDATES */}
-              <section 
+              <section
                 ref={(el) => sectionRefs.current.updates = el}
                 className="doc-section"
               >
@@ -817,12 +825,12 @@ const PrivacyPolicy = () => {
               </section>
 
               {/* CONTACT */}
-              <section 
+              <section
                 ref={(el) => sectionRefs.current.contact = el}
                 className="doc-section"
               >
                 <h3 className="doc-section-title">14. Contact Data Protection Officer</h3>
-                
+
                 <div className="doc-contact-box">
                   <div className="doc-contact-section">
                     <h4>Data Protection Officer</h4>
@@ -890,7 +898,7 @@ const PrivacyPolicy = () => {
       </div>
 
       {/* Back to Top Button */}
-      <button 
+      <button
         className="doc-back-to-top"
         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
       >

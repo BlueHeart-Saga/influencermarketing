@@ -43,7 +43,15 @@ import {
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
 
+import { setPageTitle } from '../../components/utils/pageTitle';
+
 const PaymentPolicy = () => {
+  useEffect(() => {
+    setPageTitle(
+      "Payment Policy & Fee Structure | Brio AI Platform",
+      "Review the Brio Payment Policy, including our 15% platform fee structure, secure payment processing terms, and payout schedules for creators."
+    );
+  }, []);
   const [activeSection, setActiveSection] = useState('introduction');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [logoUrl, setLogoUrl] = useState("");

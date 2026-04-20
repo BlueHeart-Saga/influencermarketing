@@ -194,7 +194,24 @@ function AppRoutes() {
   useEffect(() => {
     const path = location.pathname;
 
-    if (path.startsWith("/brand")) {
+    if (path === "/") {
+      setPageTitle(
+        "AI-Driven Influencer Marketing Platform | Brio",
+        "Brio connects brands with high-performing influencers using advanced AI matching, real-time analytics, and automated workflows."
+      );
+    } else if (path === "/about") {
+      setPageTitle("About Brio | AI-Powered Influencer Marketing");
+    } else if (path === "/contactUs" || path === "/contact") {
+      setPageTitle("Contact Brio | Sales & Support Outreach");
+    } else if (path === "/faq") {
+      setPageTitle("FAQ | Frequently Asked Questions – Brio Platform");
+    } else if (path === "/demo") {
+      setPageTitle("Watch Demo | See Brio AI in Action");
+    } else if (path === "/ai-features") {
+      setPageTitle("AI Features | Influencer Discovery & Campaign Automation");
+    } else if (path === "/platform-overview") {
+      setPageTitle("Platform Overview | End-to-End Influencer Marketing Solution");
+    } else if (path.startsWith("/brand")) {
       setPageTitle("Brand Portal – AI Influencer Marketing Platform");
     } else if (path.startsWith("/influencer")) {
       setPageTitle("Influencer Portal – Collaborate with Brands");
