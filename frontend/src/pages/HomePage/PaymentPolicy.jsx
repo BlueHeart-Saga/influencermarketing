@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { 
-  Search, 
-  ChevronLeft, 
+import { setPageTitle } from '../../components/utils/pageTitle';
+import {
+  Search,
+  ChevronLeft,
   ChevronRight,
   DollarSign,
   CreditCard,
@@ -43,7 +44,7 @@ import {
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:8000";
 
-import { setPageTitle } from '../../components/utils/pageTitle';
+
 
 const PaymentPolicy = () => {
   useEffect(() => {
@@ -146,7 +147,7 @@ const PaymentPolicy = () => {
   useEffect(() => {
     const handleScroll = () => {
       const scrollPosition = window.scrollY + 100;
-      
+
       for (const section of sections) {
         const element = sectionRefs.current[section.id];
         if (element) {
@@ -196,16 +197,16 @@ const PaymentPolicy = () => {
           </div>
           <p className="doc-hero-subtitle">
             Secure payment processing, fee structure, and payout terms for {brandName} AI Platform<br />
-            Last updated: {new Date().toLocaleDateString('en-US', { 
-              year: 'numeric', 
-              month: 'long', 
-              day: 'numeric' 
+            Last updated: {new Date().toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
             })}
           </p>
           <div className="doc-search-wrapper">
-            <input 
-              type="text" 
-              placeholder="Search payment policy..." 
+            <input
+              type="text"
+              placeholder="Search payment policy..."
               className="doc-search-input"
             />
             <button className="doc-search-btn">
@@ -221,7 +222,7 @@ const PaymentPolicy = () => {
           <div className="doc-layout">
             {/* Sidebar */}
             <aside className={`doc-sidebar ${sidebarOpen ? 'open' : 'closed'}`}>
-              <button 
+              <button
                 className="doc-sidebar-toggle"
                 onClick={() => setSidebarOpen(!sidebarOpen)}
               >
@@ -234,7 +235,7 @@ const PaymentPolicy = () => {
 
               <nav className="doc-nav">
                 {sections.map((section) => (
-                  <button 
+                  <button
                     key={section.id}
                     className={`doc-nav-item ${activeSection === section.id ? 'active' : ''}`}
                     onClick={() => scrollToSection(section.id)}
@@ -339,7 +340,7 @@ const PaymentPolicy = () => {
               </div>
 
               {/* INTRODUCTION */}
-              <section 
+              <section
                 ref={(el) => sectionRefs.current.introduction = el}
                 className="doc-section"
               >
@@ -360,12 +361,12 @@ const PaymentPolicy = () => {
               </section>
 
               {/* FEE STRUCTURE */}
-              <section 
+              <section
                 ref={(el) => sectionRefs.current['fee-structure'] = el}
                 className="doc-section"
               >
                 <h3 className="doc-section-title">2. Fee Structure</h3>
-                
+
                 <div className="doc-fee-table">
                   <div className="doc-table-header">
                     <div>Service</div>
@@ -403,12 +404,12 @@ const PaymentPolicy = () => {
               </section>
 
               {/* PAYMENT METHODS */}
-              <section 
+              <section
                 ref={(el) => sectionRefs.current['payment-methods'] = el}
                 className="doc-section"
               >
                 <h3 className="doc-section-title">3. Payment Methods</h3>
-                
+
                 <div className="doc-payment-methods">
                   <div className="doc-method-category">
                     <h4>For Brands (Funding Campaigns)</h4>
@@ -481,12 +482,12 @@ const PaymentPolicy = () => {
               </section>
 
               {/* PAYOUT SCHEDULE */}
-              <section 
+              <section
                 ref={(el) => sectionRefs.current['payout-schedule'] = el}
                 className="doc-section"
               >
                 <h3 className="doc-section-title">4. Payout Schedule</h3>
-                
+
                 <div className="doc-payout-options">
                   {payoutSchedule.map((option, index) => (
                     <div key={index} className="doc-payout-card">
@@ -524,12 +525,12 @@ const PaymentPolicy = () => {
               </section>
 
               {/* TAX COMPLIANCE */}
-              <section 
+              <section
                 ref={(el) => sectionRefs.current['tax-compliance'] = el}
                 className="doc-section"
               >
                 <h3 className="doc-section-title">5. Tax Compliance</h3>
-                
+
                 <div className="doc-tax-table">
                   <div className="doc-table-header">
                     <div>Country/Region</div>
@@ -563,12 +564,12 @@ const PaymentPolicy = () => {
               </section>
 
               {/* DISPUTE RESOLUTION */}
-              <section 
+              <section
                 ref={(el) => sectionRefs.current.disputes = el}
                 className="doc-section"
               >
                 <h3 className="doc-section-title">6. Dispute Resolution</h3>
-                
+
                 <div className="doc-dispute-process">
                   <div className="doc-process-step">
                     <div className="doc-step-number">1</div>
@@ -602,12 +603,12 @@ const PaymentPolicy = () => {
               </section>
 
               {/* REFUND POLICY */}
-              <section 
+              <section
                 ref={(el) => sectionRefs.current.refunds = el}
                 className="doc-section"
               >
                 <h3 className="doc-section-title">7. Refund Policy</h3>
-                
+
                 <div className="doc-refund-categories">
                   <div className="doc-refund-category">
                     <h4>Full Refund (100%)</h4>
@@ -645,12 +646,12 @@ const PaymentPolicy = () => {
               </section>
 
               {/* CURRENCY & CONVERSION */}
-              <section 
+              <section
                 ref={(el) => sectionRefs.current.currency = el}
                 className="doc-section"
               >
                 <h3 className="doc-section-title">8. Currency & Conversion</h3>
-                
+
                 <div className="doc-currency-info">
                   <div className="doc-currency-card">
                     <h4>Supported Currencies</h4>
@@ -675,12 +676,12 @@ const PaymentPolicy = () => {
               </section>
 
               {/* PAYMENT SECURITY */}
-              <section 
+              <section
                 ref={(el) => sectionRefs.current.security = el}
                 className="doc-section"
               >
                 <h3 className="doc-section-title">9. Payment Security</h3>
-                
+
                 <div className="doc-security-measures">
                   <div className="doc-security-measure">
                     <div className="doc-security-icon" style={{ backgroundColor: '#3b82f6' }}>
@@ -722,12 +723,12 @@ const PaymentPolicy = () => {
               </section>
 
               {/* REGULATORY COMPLIANCE */}
-              <section 
+              <section
                 ref={(el) => sectionRefs.current.compliance = el}
                 className="doc-section"
               >
                 <h3 className="doc-section-title">10. Regulatory Compliance</h3>
-                
+
                 <div className="doc-compliance-list">
                   <div className="doc-compliance-item">
                     <CheckCircle size={18} color="#10b981" />
@@ -757,12 +758,12 @@ const PaymentPolicy = () => {
               </section>
 
               {/* INTERNATIONAL PAYMENTS */}
-              <section 
+              <section
                 ref={(el) => sectionRefs.current.international = el}
                 className="doc-section"
               >
                 <h3 className="doc-section-title">11. International Payments</h3>
-                
+
                 <div className="doc-international-info">
                   <div className="doc-intl-card">
                     <h4>Cross-Border Fees</h4>
@@ -783,12 +784,12 @@ const PaymentPolicy = () => {
               </section>
 
               {/* PAYMENT FAQ */}
-              <section 
+              <section
                 ref={(el) => sectionRefs.current.faq = el}
                 className="doc-section"
               >
                 <h3 className="doc-section-title">12. Payment FAQ</h3>
-                
+
                 <div className="doc-faq-list">
                   <div className="doc-faq-item">
                     <h4>When are platform fees charged?</h4>
@@ -810,12 +811,12 @@ const PaymentPolicy = () => {
               </section>
 
               {/* CONTACT */}
-              <section 
+              <section
                 ref={(el) => sectionRefs.current.contact = el}
                 className="doc-section"
               >
                 <h3 className="doc-section-title">13. Payment Support</h3>
-                
+
                 <div className="doc-contact-box">
                   <div className="doc-contact-section">
                     <h4>Payment Support Team</h4>
@@ -885,7 +886,7 @@ const PaymentPolicy = () => {
       </div>
 
       {/* Back to Top Button */}
-      <button 
+      <button
         className="doc-back-to-top"
         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
       >
