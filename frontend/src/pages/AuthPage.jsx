@@ -11,6 +11,51 @@ import { faUserShield, faLock, faHome, faArrowLeft } from '@fortawesome/free-sol
 import API_BASE_URL from "../config/api";
 import TopNav from "../components/TopNav";
 
+// --- GSI Types Enhancement ---
+/* global google */
+
+function SavedAccountPrompt({ user, onConfirm, onClear, logoUrl }) {
+  if (!user) return null;
+  
+  return (
+    <div style={styles.floatingUserPopup}>
+      <div style={styles.popupHeader}>
+        <div style={styles.popupHeaderLeft}>
+          <img 
+            src={user.auth_provider === 'google' ? "https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_Logo.svg" : (logoUrl || "https://quickbox-backend-docker-b9cbaye9a3bvhad5.southindia-01.azurewebsites.net/api/logo/current")} 
+            alt="Logo" 
+            style={styles.googleMiniLogo} 
+          />
+          <span style={styles.popupHeaderText}>
+            {user.auth_provider === 'google' ? 'Sign in to Brio with Google' : 'Welcome back to Brio'}
+          </span>
+        </div>
+        <button onClick={onClear} style={styles.popupCloseBtn}>×</button>
+      </div>
+      
+      <div style={styles.popupContent}>
+        <div style={styles.userDisplay}>
+          <div style={styles.userAvatarLarge}>
+            {user.profile_picture ? (
+              <img src={user.profile_picture} alt={user.username} style={styles.savedUserImage} />
+            ) : (
+              <span>{user.username?.charAt(0).toUpperCase()}</span>
+            )}
+          </div>
+          <div style={styles.userMeta}>
+            <p style={styles.popupUserName}>{user.username}</p>
+            <p style={styles.popupUserEmail}>{user.email}</p>
+          </div>
+        </div>
+        
+        <button onClick={onConfirm} style={styles.popupConfirmBtn}>
+          Continue as {user.username}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function AuthContainer() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -39,9 +84,135 @@ function AuthContainer() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [emailStatus, setEmailStatus] = useState("");
 const [checkingEmail, setCheckingEmail] = useState(false);
-
+const [savedUser, setSavedUser] = useState(null);
 
 const emailCheckTimerRef = useRef(null);
+
+useEffect(() => {
+  // First check if there's a valid session
+  const session = localStorage.getItem("quickbox-user");
+  const recent = localStorage.getItem("recent-user");
+  
+  if (session) {
+    try {
+      const parsed = JSON.parse(session);
+      if (parsed.email && parsed.username) {
+        setSavedUser(parsed);
+      }
+    } catch (e) {
+      localStorage.removeItem("quickbox-user");
+    }
+  } else if (recent) {
+    // Session is gone (logout), but we remember the profile
+    try {
+      const parsed = JSON.parse(recent);
+      if (parsed.email && parsed.username) {
+        setSavedUser({ ...parsed, isLoggedOut: true }); // Mark as logged out
+      }
+    } catch (e) {
+      localStorage.removeItem("recent-user");
+    }
+  }
+}, []);
+
+const handleSavedAccountLogin = async () => {
+    // If it's a Google account, we can just trigger Google flow
+    if (savedUser.auth_provider === 'google') {
+        if (window.google) {
+            window.google.accounts.id.prompt();
+        } else {
+            // Fallback to explicit google login hook if needed
+             handleModalGoogleLogin();
+        }
+        return;
+    }
+
+    // Try auto-login with stored token (instant re-entry)
+    if (savedUser.token) {
+        setLoading(true);
+        try {
+            const res = await fetch(`${API_BASE_URL}/auth/me`, {
+                headers: { Authorization: `Bearer ${savedUser.token}` },
+            });
+            if (res.ok) {
+                const data = await res.json();
+                await handleLoginSuccess({ ...data, access_token: savedUser.token }, data.email, savedUser.auth_provider);
+                return;
+            }
+        } catch (err) {}
+        setLoading(false);
+    }
+
+    // If we're here, it's either email logout or failed auto-login
+    // Just pre-fill the form and focus password
+    setLoginForm(prev => ({ ...prev, email: savedUser.email }));
+    switchMode("login");
+    setMessage(`Welcome back, ${savedUser.username}! Please enter your password.`);
+    
+    // Smooth scroll to form
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+const clearSavedAccount = () => {
+    localStorage.removeItem("quickbox-user");
+    localStorage.removeItem("recent-user");
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("user");
+    setSavedUser(null);
+};
+
+// --- Google Identity Services (One Tap) ---
+useEffect(() => {
+    const initializeGSI = () => {
+        if (!window.google) return;
+        
+        window.google.accounts.id.initialize({
+            client_id: process.env.REACT_APP_GOOGLE_CLIENT_ID,
+            callback: handleGoogleGsiSuccess,
+            auto_select: false, // Don't auto-login, let user choose
+            cancel_on_tap_outside: true,
+        });
+        
+        // Don't show one-tap if user is already looking at current step or is already logged in partially
+        if (currentMode === "login" || (currentMode === "register" && currentStep === "roleSelection")) {
+          window.google.accounts.id.prompt();
+        }
+    };
+
+    const loadGsiScript = () => {
+        const script = document.createElement("script");
+        script.src = "https://accounts.google.com/gsi/client";
+        script.async = true;
+        script.defer = true;
+        script.onload = initializeGSI;
+        document.body.appendChild(script);
+    };
+
+    if (!window.google) {
+        loadGsiScript();
+    } else {
+        initializeGSI();
+    }
+}, [currentMode, currentStep]);
+
+const handleGoogleGsiSuccess = async (response) => {
+    try {
+        setLoading(true);
+        setErrors({});
+        
+        const credential = response.credential;
+        const decoded = jwt_decode(credential);
+        const email = decoded.email;
+        const role = currentMode === "login" ? "brand" : (registerForm.role || "brand");
+
+        await handleGoogleAuth(credential, email, role);
+    } catch (err) {
+        console.error("GSI Login failed:", err);
+        setErrors({ submit: "Google Login failed" });
+    } finally {
+        setLoading(false);
+    }
+};
 
 
 
@@ -219,7 +390,7 @@ if (emailStatus === "Invalid email format") {
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.detail || "Login failed");
-      await handleLoginSuccess(data, loginForm.email);
+      await handleLoginSuccess(data, loginForm.email, "email");
     } catch (err) {
       setErrors({ submit: err.message });
     } finally {
@@ -458,7 +629,7 @@ if (emailStatus === "Invalid email format") {
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.detail || "Registration failed");
-      await handleLoginSuccess(data, registerForm.email);
+      await handleLoginSuccess(data, registerForm.email, "email");
     } catch (err) {
       setMessage(err.message);
     } finally {
@@ -539,7 +710,7 @@ if (emailStatus === "Invalid email format") {
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.detail || "Admin login failed");
-      await handleLoginSuccess(data, adminLoginForm.email);
+      await handleLoginSuccess(data, adminLoginForm.email, "email");
     } catch (err) {
       setErrors({ submit: err.message });
     } finally {
@@ -547,7 +718,7 @@ if (emailStatus === "Invalid email format") {
     }
   };
 
-const handleLoginSuccess = async (data, email) => {
+const handleLoginSuccess = async (data, email, authProvider = "email") => {
   const userRole = data.role;
   const userData = {
     token: data.access_token,
@@ -555,7 +726,7 @@ const handleLoginSuccess = async (data, email) => {
     username: data.username || registerForm.username,
     id: data.user_id,
     email: email,
-    auth_provider: data.is_new_user ? "google" : "email"
+    auth_provider: authProvider
   };
   
   // Store auth data
@@ -594,7 +765,7 @@ const handleLoginSuccess = async (data, email) => {
 
     const data = await response.json();
     if (!response.ok) throw new Error(data.detail || "Google authentication failed");
-    await handleLoginSuccess(data, email);
+    await handleLoginSuccess(data, email, "google");
   } catch (err) {
     console.error("Google auth error:", err);
     setErrors({ submit: err.message });
@@ -809,6 +980,16 @@ useEffect(() => {
             <div style={styles.logoFallback}>Brio</div>
           )}
         </div>
+
+        {/* Saved User Prompt */}
+        {savedUser && (currentMode === "login" || currentStep === "roleSelection") && (
+          <SavedAccountPrompt 
+            user={savedUser} 
+            onConfirm={handleSavedAccountLogin} 
+            onClear={clearSavedAccount} 
+            logoUrl={logoUrl}
+          />
+        )}
 
         {/* Login Form */}
         {currentMode === "login" && (
@@ -1339,14 +1520,14 @@ useEffect(() => {
  {/* Responsive CSS */}
       <style>
         {`
-          @keyframes alertSlideDown {
+          @keyframes slideFadeIn {
             from {
               opacity: 0;
-              transform: translate(-50%, -20px);
+              transform: translateY(-10px);
             }
             to {
               opacity: 1;
-              transform: translate(-50%, 0);
+              transform: translateY(0);
             }
           }
           
@@ -1797,6 +1978,103 @@ const styles = {
     alignItems: 'center',
     gap: '12px',
     marginBottom: '28px',
+  },
+
+  // --- New Floating User Popup (Matching Image) ---
+  floatingUserPopup: {
+    position: 'fixed',
+    top: '24px',
+    left: '24px',
+    width: '320px',
+    backgroundColor: 'white',
+    borderRadius: '16px',
+    boxShadow: '0 4px 20px rgba(0, 0, 0, 0.15)',
+    zIndex: 9999,
+    padding: '0',
+    overflow: 'hidden',
+    animation: 'slideFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
+  },
+  popupHeader: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: '12px 16px',
+    borderBottom: '1px solid #f3f4f6',
+  },
+  popupHeaderLeft: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+  },
+  googleMiniLogo: {
+    width: '18px',
+    height: '18px',
+  },
+  popupHeaderText: {
+    fontSize: '13px',
+    color: '#374151',
+    fontWeight: '500',
+  },
+  popupCloseBtn: {
+    background: 'none',
+    border: 'none',
+    fontSize: '20px',
+    color: '#9ca3af',
+    cursor: 'pointer',
+    padding: '4px',
+    lineHeight: '1',
+  },
+  popupContent: {
+    padding: '20px 16px 16px',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '20px',
+  },
+  userDisplay: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
+  },
+  userAvatarLarge: {
+    width: '40px',
+    height: '40px',
+    borderRadius: '50%',
+    backgroundColor: '#6366f1',
+    color: 'white',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontSize: '18px',
+    fontWeight: 'bold',
+    overflow: 'hidden',
+  },
+  userMeta: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '1px',
+  },
+  popupUserName: {
+    fontSize: '14px',
+    fontWeight: '600',
+    color: '#111827',
+    margin: 0,
+  },
+  popupUserEmail: {
+    fontSize: '12px',
+    color: '#6b7280',
+    margin: 0,
+  },
+  popupConfirmBtn: {
+    width: '100%',
+    padding: '10px',
+    backgroundColor: '#1a73e8', // Google Blue
+    color: 'white',
+    border: 'none',
+    borderRadius: '4px',
+    fontSize: '14px',
+    fontWeight: '500',
+    cursor: 'pointer',
+    transition: 'background-color 0.2s',
   },
   
   modalTitle: {

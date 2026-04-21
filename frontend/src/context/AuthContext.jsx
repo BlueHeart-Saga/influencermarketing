@@ -60,7 +60,7 @@ export const AuthProvider = ({ children }) => {
         isComplete: false, profile: null, progress: 0, completionDetails: {}, isLoaded: false
       });
 
-      // Clear Storage explicitly
+      // Clear Storage explicitly but KEEP 'recent-user' for Easy Login
       localStorage.removeItem("access_token");
       localStorage.removeItem("user");
       localStorage.removeItem("quickbox-user");
@@ -92,6 +92,16 @@ export const AuthProvider = ({ children }) => {
         role: userData.role,
         username: userData.username,
         email: userData.email,
+      }));
+
+      // SAVE TO RECENT USER (PERSISTENT LOGOUT)
+      localStorage.setItem("recent-user", JSON.stringify({
+        username: userData.username,
+        email: userData.email,
+        profile_picture: userData.profile_picture || userData.picture || null,
+        auth_provider: userData.auth_provider || "email",
+        role: userData.role,
+        token: userData.token // Added token for seamless re-entry
       }));
     }
 

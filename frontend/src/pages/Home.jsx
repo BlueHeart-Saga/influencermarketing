@@ -350,6 +350,7 @@ import CaseStudies from "../components/CaseStudies";
 import ContentIntelligence from "../components/ContentIntelligence";
 import DynamicFooter from "./DynamicFooter";
 import ProfessionalFeatures from "./HomePage/professionalFeatures";
+import SavedAccountPopup from "../components/SavedAccountPopup";
 
 
 import { setPageTitle } from "../components/utils/pageTitle";
@@ -370,7 +371,7 @@ const Home = () => {
 
   return (
     <div >
-
+      <SavedAccountPopup />
       <HeroSection />
 
       <PartnershipScroll />
